@@ -1,0 +1,818 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <!-- Create Order -->
+    <service verb="create" noun="Order">
+        <description>
+            Creates an order for a customer.
+        </description>
+        <in-parameters>
+            <parameter name="orderName">
+                <description>The name for the sales order.</description>
+            </parameter>
+            <parameter name="currencyUom">
+                <description>The three letter code describing the currency.</description>
+            </parameter>
+            <parameter name="salesChannelEnumId" entity-name="mantle.order.OrderHeader">
+                <description>The sales channel ID from where the order originated.</description>
+            </parameter>
+            <parameter name="placedDate" type="Timestamp">
+                <description>The date when the order was placed.</description>
+            </parameter>
+            <parameter name="externalOrderId">
+                <description>The ID for the order in the external system.</description>
+            </parameter>
+            <parameter name="customer_details" type="Map" required="true">
+                <parameter name="customerPartyId" required="true">
+                    <description>The unique party ID of the customer in the system.</description>
+                </parameter>
+            </parameter>
+            <parameter name="billing_details" type="Map" required="true">
+                <parameter name="address" type="Map">
+                    <description>The billing address for the order.</description>
+                    <parameter name="toName">
+                        <description>The customer's name for the address.</description>
+                    </parameter>
+                    <parameter name="address1" required="true">
+                        <description>The address line 1 of the address.</description>
+                    </parameter>
+                    <parameter name="address2">
+                        <description>The address line 2 of the address.</description>
+                    </parameter>
+                    <parameter name="city" required="true">
+                        <description>The city of the address.</description>
+                    </parameter>
+                    <parameter name="stateProvinceGeoId">
+                        <description>The ID for the state code of the address in the system.</description>
+                    </parameter>
+                    <parameter name="countryGeoId" required="true">
+                        <description>The ID for the country code of the address in the system.</description>
+                    </parameter>
+                    <parameter name="postalCode" required="true">
+                        <description>The postal code of the address.</description>
+                    </parameter>
+                </parameter>
+                <parameter name="phone" type="Map">
+                    <description>The billing phone details for the order.</description>
+                    <parameter name="countryCode">
+                        <description>The country code of the contact number.</description>
+                    </parameter>
+                    <parameter name="areaCode">
+                        <description>The area code of the contact number.</description>
+                    </parameter>
+                    <parameter name="contactNumber" required="true">
+                        <description>The contact number of the customer.</description>
+                    </parameter>
+                </parameter>
+            </parameter>
+            <parameter name="order_parts" type="List" required="true">
+                <description>The list of order parts.</description>
+                <parameter name="orderPartMap" type="Map" required="true">
+                    <description>The order part details.</description>
+                    <parameter name="item_details" type="List" required="true">
+                        <description>The list of items in the order part.</description>
+                        <parameter name="items" type="Map">
+                            <parameter name="sku" required="true">
+                                <description>The unique sku of the product.</description>
+                            </parameter>
+                            <parameter name="productName">
+                                <description>The name of the product.</description>
+                            </parameter>
+                            <parameter name="quantity" type="Integer" required="true">
+                                <description>The quantity of the product.</description>
+                            </parameter>
+                            <parameter name="unitAmount" type="BigDecimal" required="true">
+                                <description>The unit amount of the product.</description>
+                            </parameter>
+                            <parameter name="tax_details" type="List">
+                                <description>The list of tax details for the product.</description>
+                                <parameter name="taxMap" type="Map">
+                                    <description>The tax details for the product.</description>
+                                    <parameter name="amount" type="BigDecimal" required="true">
+                                        <description>The tax amount applicable for the product.</description>
+                                    </parameter>
+                                    <parameter name="percentage" type="BigDecimal" required="true">
+                                        <description>The tax percentage applicable for the product.</description>
+                                    </parameter>
+                                </parameter>
+                            </parameter>
+                        </parameter>
+                    </parameter>
+                    <parameter name="facilityId">
+                        <description>The ID of the facility in the system.</description>
+                    </parameter>
+                    <parameter name="carrierPartyId">
+                        <description>The ID of the carrier service party in the system.</description>
+                    </parameter>
+                    <parameter name="shipmentMethodEnumId">
+                        <description>The ID of the shipment method in the system.</description>
+                    </parameter>
+                    <parameter name="shipping_details" type="Map">
+                        <parameter name="address" type="Map">
+                            <description>The shipping address for the order.</description>
+                            <parameter name="toName">
+                                <description>The customer's name for the address.</description>
+                            </parameter>
+                            <parameter name="address1" required="true">
+                                <description>The address line 1 of the address.</description>
+                            </parameter>
+                            <parameter name="address2">
+                                <description>The address line 2 of the address.</description>
+                            </parameter>
+                            <parameter name="city" required="true">
+                                <description>The city of the address.</description>
+                            </parameter>
+                            <parameter name="stateProvinceGeoId">
+                                <description>The ID for the state code of the address in the system.</description>
+                            </parameter>
+                            <parameter name="countryGeoId" required="true">
+                                <description>The ID for the country code of the address in the system.</description>
+                            </parameter>
+                            <parameter name="postalCode" required="true">
+                                <description>The postal code of the address.</description>
+                            </parameter>
+                        </parameter>
+                        <parameter name="phone" type="Map">
+                            <description>The shipping phone details for the order.</description>
+                            <parameter name="countryCode">
+                                <description>The country code of the contact number.</description>
+                            </parameter>
+                            <parameter name="areaCode">
+                                <description>The area code of the contact number.</description>
+                            </parameter>
+                            <parameter name="contactNumber" required="true">
+                                <description>The contact number of the customer.</description>
+                            </parameter>
+                        </parameter>
+                    </parameter>
+                    <parameter name="shippingCost" type="BigDecimal">
+                        <description>The shipping charge for the order items.</description>
+                    </parameter>
+                    <parameter name="shippingInstructions">
+                        <description>The shipping instructions for the order.</description>
+                    </parameter>
+                </parameter>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <!-- Return Order Id and External Order Id -->
+            <parameter name="orderId" required="true">
+                <description>The unique ID assigned for the order in the system.</description>
+            </parameter>
+            <parameter name="externalOrderId">
+                <description>The ID for the order in the external system.</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <!-- get ProductStore ID from ProductStoreSetting of hostname-->
+            <service-call name="co.hotwax.oms.v1.StoreServices.get#ProductStoreIdFromHostName" in-map="[requestHostName:ec.web.getHostName(false)]" out-map="productStoreIdContext"/>
+
+            <set field="defaultProductStoreId" from="productStoreIdContext?.productStoreId"/>
+            <if condition="defaultProductStoreId">
+                <entity-find-one entity-name="mantle.product.store.ProductStore" value-field="defaultProductStore">
+                    <field-map field-name="productStoreId" from="defaultProductStoreId"/>
+                </entity-find-one>
+                <if condition="defaultProductStore == null"><set field="defaultProductStoreId" from="null"/></if>
+            </if>
+
+            <!-- Validate API request -->
+            <service-call name="co.hotwax.oms.v1.OrderServices.validate#OrderRequest" in-map="context" out-map="context"/>
+
+            <!-- Get some unspecified values from the default Product Store -->
+            <set field="productStoreId" from="defaultProductStore?.productStoreId"/>
+            <set field="vendorPartyId" from="defaultProductStore?.organizationPartyId"/>
+            <set field="salesChannelEnumId" from="salesChannelEnumId ?: defaultProductStore?.defaultSalesChannelEnumId"/>
+            <if condition="currencyUom">
+                <!-- Get UomId in the system for the incoming currencyUom abbreviated value -->
+                <entity-find entity-name="moqui.basic.Uom" list="uomList">
+                    <econdition field-name="abbreviation" from="currencyUom"/>
+                    <econdition field-name="uomTypeEnumId" value="UT_CURRENCY_MEASURE"/>
+                </entity-find>
+                <set field="currencyUomId" from="uomList ? uomList[0].uomId : null"/>
+            </if>
+            <set field="currencyUomId" from="currencyUomId ?: defaultProductStore?.defaultCurrencyUomId"/>
+
+            <service-call name="create#mantle.order.OrderHeader" out-map="orderHeaderOut"
+                    in-map="context + [enteredByPartyId:ec.user.userAccount?.partyId,
+                    orderRevision:1, statusId:'OrderPlaced', externalId:externalOrderId]"/>
+
+            <!-- Billing Details -->
+            <if condition="billing_details.address">
+                <service-call name="mantle.party.ContactServices.create#PostalAddress" out-map="billingAddressOut"
+                              in-map="[toName:billing_details.address.toName ?: '', address1:billing_details.address.address1,
+                              address2:billing_details.address.address2 ?: '', city:billing_details.address.city,
+                              stateProvinceGeoId:billing_details.address.stateProvinceGeoId ?: '',
+                              countryGeoId:billing_details.address.countryGeoId, postalCode:billing_details.address.postalCode]"/>
+            </if>
+
+            <if condition="billing_details.phone">
+                <service-call name="mantle.party.ContactServices.create#TelecomNumber" out-map="billingPhoneOut"
+                              in-map="[countryCode:billing_details.phone.countryCode,
+                              areaCode:billing_details.phone.areaCode, contactNumber:billing_details.phone.contactNumber]"/>
+            </if>
+
+            <!-- Handling of order_parts -->
+            <iterate list="order_parts" entry="order_part">
+
+                <!-- Shipping Details -->
+                <set field="shippingAddressContactMechId" value=""/>
+                <set field="shippingPhoneContactMechId" value=""/>
+                <if condition="order_part.shipping_details">
+                    <if condition="order_part.shipping_details.address">
+                        <set field="shippingAddress" from="order_part.shipping_details.address"/>
+                        <!-- Shipping Address -->
+                        <service-call name="mantle.party.ContactServices.create#PostalAddress" out-map="shippingAddressOut"
+                                      in-map="[toName:shippingAddress.toName ?: '', address1:shippingAddress.address1,
+                                      address2:shippingAddress.address2 ?: '', city:shippingAddress.city,
+                                      stateProvinceGeoId:shippingAddress.stateProvinceGeoId ?: '', countryGeoId:shippingAddress.countryGeoId,
+                                      postalCode:shippingAddress.postalCode]"/>
+                        <set field="shippingAddressContactMechId" from="shippingAddressOut.contactMechId"/>
+                    </if>
+                    <if condition="order_part.shipping_details.phone">
+                        <set field="shippingPhone" from="order_part.shipping_details.phone"/>
+                        <!-- Shipping Phone -->
+                        <service-call name="mantle.party.ContactServices.create#TelecomNumber" out-map="shippingPhoneOut"
+                                      in-map="[countryCode:shippingPhone.countryCode, areaCode:shippingPhone.areaCode,
+                                      contactNumber:shippingPhone.contactNumber]"/>
+                        <set field="shippingPhoneContactMechId" from="shippingPhoneOut.contactMechId"/>
+                    </if>
+                </if>
+
+                <!-- Shipping Instructions -->
+                <if condition="!order_part.shippingInstructions">
+                    <then>
+                        <!-- Populate from customer Party.shippingInstructions, if not specified in the request-->
+                        <entity-find-one entity-name="mantle.party.Party" value-field="customerParty">
+                            <field-map field-name="partyId" from="customer_details.customerPartyId"/>
+                        </entity-find-one>
+                        <set field="shippingInstructions" from="customerParty?.shippingInstructions"/>
+                    </then>
+                    <else>
+                        <set field="shippingInstructions" from="order_part.shippingInstructions"/>
+                    </else>
+                </if>
+
+                <!-- Create Order Part -->
+                <!-- NOTE: Setting disableTaxCalc='Y' and disableShippingCalc='Y' for Order Part as we need to store the tax amount and shipping charge as is coming in the item details.
+                Else, due to OOTB EECA rule on OrderItem, handle#OrderMajorChange gets called which deletes the tax and shipping items after calculations. -->
+                <service-call name="create#mantle.order.OrderPart" out-map="orderPartOut" in-map="context +
+                        [orderId:orderHeaderOut.orderId, customerPartyId:customer_details.customerPartyId,
+                        facilityId:order_part.facilityId ?: '', carrierPartyId:order_part.carrierPartyId,
+                        shipmentMethodEnumId:order_part.shipmentMethodEnumId, disableTaxCalc:'Y',
+                        postalContactMechId:shippingAddressContactMechId, disableShippingCalc: 'Y',
+                        telecomContactMechId:shippingPhoneContactMechId, statusId:'OrderPlaced',
+                        reservationAutoEnumId:defaultProductStore?.reservationAutoEnumId]"/>
+
+                <!-- Item Details -->
+                <iterate list="order_part.item_details" entry="order_item">
+                    <!-- Find Product from SKU to use productId in creating Order Item -->
+                    <entity-find entity-name="mantle.product.Product" list="productList">
+                        <econdition field-name="pseudoId" from="order_item.sku"/>
+                    </entity-find>
+                    
+                    <if condition="!productList">
+                        <return error="true" message="Product with sku ${order_item.sku} not found."/>
+                    </if>
+                    <!-- Create Order Item -->
+                    <service-call name="mantle.order.OrderServices.create#OrderItem" out-map="orderItemOut"
+                            in-map="context + [orderId:orderHeaderOut.orderId,
+                            orderPartSeqId:orderPartOut.orderPartSeqId, productId:productList[0].productId,
+                            quantity:order_item.quantity, itemDescription:order_item.productName,
+                            unitAmount:order_item.unitAmount]"/>
+                    <!-- Item Tax Details -->
+                    <if condition="order_item.tax_details">
+                        <!-- Create Order Item for item's tax details -->
+                        <iterate list="order_item.tax_details" entry="tax_detail">
+                            <service-call name="create#mantle.order.OrderItem" out-map="context"
+                                    in-map="[orderId:orderHeaderOut.orderId, orderPartSeqId:orderPartOut.orderPartSeqId,
+                                    parentItemSeqId:orderItemOut.orderItemSeqId, itemTypeEnumId:'ItemSalesTax',
+                                    quantity:order_item.quantity, unitAmount:tax_detail.amount,
+                                    sourcePercentage:tax_detail.percentage, itemDescription:'Sales Tax']"/>
+                        </iterate>
+                    </if>
+                </iterate>
+
+                <!-- Shipping Charge -->
+                <if condition="order_part.shippingCost">
+                    <entity-find-one entity-name="mantle.party.PartyDetail" value-field="carrierDetail">
+                        <field-map field-name="partyId" from="order_part.carrierPartyId"/>
+                    </entity-find-one>
+                    <entity-find-one entity-name="moqui.basic.Enumeration" value-field="shipmentMethodEnum">
+                        <field-map field-name="enumId" from="order_part.shipmentMethodEnumId"/>
+                    </entity-find-one>
+                    <set field="carrierName" from="carrierDetail?.organizationName"/>
+                    <!-- Create Order Item for shipping charge with description in the format "${carrieName} - ${shipmentMethodDescription}" -->
+                    <set field="shippingItemDescription" value="${order_part.carrierPartyId == '_NA_' ? '' : (carrierName + ' - ') }${shipmentMethodEnum?.description}"/>
+                    <service-call name="create#mantle.order.OrderItem" out-map="context"
+                                  in-map="[orderId:orderHeaderOut.orderId, orderPartSeqId:orderPartOut.orderPartSeqId,
+                                  itemTypeEnumId:'ItemShipping', quantity:1, unitAmount:order_part.shippingCost,
+                                  itemDescription:shippingItemDescription]"/>
+                </if>
+
+                <!-- Create Order Part Contact Mech for Billing Address and Phone, added here to avoid extra call to fetch all Order Parts -->
+                <!-- NOTE: Although we expect single billing contact in the initial API design, creating record for all Order Parts to adhere to the data model -->
+                <service-call name="create#mantle.order.OrderPartContactMech" out-map="context"
+                              in-map="[orderId:orderHeaderOut.orderId, orderPartSeqId:orderPartOut.orderPartSeqId,
+                              contactMechPurposeId:'PostalBilling', contactMechId:billingAddressOut.contactMechId]"/>
+
+                <!-- Create billing phone Contact Mech only if phone details incoming in the billing_details -->
+                <if condition="billingPhoneOut">
+                    <service-call name="create#mantle.order.OrderPartContactMech" out-map="context"
+                            in-map="[orderId:orderHeaderOut.orderId, orderPartSeqId:orderPartOut.orderPartSeqId,
+                            contactMechPurposeId:'PhoneBilling', contactMechId:billingPhoneOut.contactMechId]"/>
+                </if>
+
+            </iterate>
+
+            <!-- Setting the OrderId for the out-parameter -->
+            <set field="orderId" from="orderHeaderOut.orderId"/>
+        </actions>
+    </service>
+
+    <!-- Validate Order Request; used in create#Order -->
+    <service verb="validate" noun="OrderRequest">
+        <in-parameters>
+            <parameter name="customer_details" type="Map"/>
+            <parameter name="order_parts" type="List"/>
+            <parameter name="defaultProductStoreId"/>
+        </in-parameters>
+        <actions>
+            <!-- Validate the Customer Party Id -->
+            <entity-find-count entity-name="mantle.party.Party" count-field="customerCount">
+                <econdition field-name="partyId" from="customer_details.customerPartyId"/>
+            </entity-find-count>
+            <if condition="customerCount == 0">
+                <message error="true">Customer, ${customer_details.customerPartyId} not found. Please enter a valid Customer ID.</message>
+            </if>
+
+           <!-- Variables used to avoid returning the same error messages multiple times -->
+            <script>boolean isOrderItemError, isOrderItemTaxError, isShippingAddressError, isShippingPhoneError</script>
+            <!-- Validate Order Parts -->
+            <iterate list="order_parts" entry="order_part">
+                <!-- Validate Order Items -->
+                <!-- NOTE: "Required=true" validations not handled OOTB for nested parameters for List, handled separately in the logic for now;
+                     Related query posted here, https://groups.google.com/g/moqui/c/Ova58MKAXqA -->
+                <iterate list="order_part.item_details" entry="order_item">
+                    <if condition="(!order_item.sku || !order_item.unitAmount || !order_item.quantity) &amp;&amp; !isOrderItemError">
+                        <message error="true">Field cannot be empty for {sku, quantity, unitAmount} in the item_details.</message>
+                        <set field="isOrderItemError" from="true"/>
+                    </if>
+
+                    <!-- Validate Order Item tax_details -->
+                    <if condition="order_item.tax_details">
+                        <iterate list="order_item.tax_details" entry="tax_detail">
+                            <if condition="(!tax_detail.amount || !tax_detail.percentage) &amp;&amp; !isOrderItemTaxError">
+                                <message error="true">Please provide both amount and percentage in the tax_details.</message>
+                                <set field="isOrderItemTaxError" from="true"/>
+                            </if>
+                        </iterate>
+                    </if>
+                </iterate>
+
+                <!-- Validate the facilityId  -->
+                <if condition="order_part.facilityId">
+                    <entity-find-count entity-name="mantle.facility.Facility" count-field="facilityCount">
+                        <econdition field-name="facilityId" from="order_part.facilityId"/>
+                    </entity-find-count>
+                    <if condition="facilityCount == 0">
+                        <message error="true">Facility, ${order_part.facilityId} not found. Please enter a valid facility ID.</message>
+                    </if>
+                </if>
+
+                <!-- Validate carrierParty and shipmentMethod -->
+                <if condition="(order_part.carrierPartyId &amp;&amp; !order_part.shipmentMethodEnumId)">
+                    <message error="true">Please specify shipmentMethodEnumId for the Carrier Party, ${order_part.carrierPartyId}.</message>
+                </if>
+                <if condition="(!order_part.carrierPartyId &amp;&amp; order_part.shipmentMethodEnumId)">
+                    <message error="true">Please specify carrierPartyId for the shipmentMethod, ${order_part.shipmentMethodEnumId}.</message>
+                </if>
+                <!-- CarrierParty and Shipment method allowed as per the ship options configured for the default Product Store -->
+                <if condition="order_part.carrierPartyId &amp;&amp; order_part.shipmentMethodEnumId">
+                    <entity-find-count entity-name="mantle.product.store.ProductStoreShipOption" count-field="shipOptionCount">
+                        <econdition field-name="productStoreId" from="defaultProductStoreId"/>
+                        <econdition field-name="carrierPartyId" from="order_part.carrierPartyId"/>
+                        <econdition field-name="shipmentMethodEnumId" from="order_part.shipmentMethodEnumId"/>
+                    </entity-find-count>
+                    <if condition="shipOptionCount == 0">
+                        <message error="true">Invalid values for Carrier Party, ${order_part.carrierPartyId} and Shipment Method, ${order_part.shipmentMethodEnumId}.</message>
+                    </if>
+                </if>
+
+                <!-- Validate Shipping details -->
+                <if condition="order_part.shipping_details">
+                    <if condition="order_part.shipping_details.address">
+                        <set field="shippingAddress" from="order_part.shipping_details.address"/>
+                        <if condition="(!shippingAddress.address1 || !shippingAddress.city || !shippingAddress.countryGeoId || !shippingAddress.postalCode) &amp;&amp; !isShippingAddressError">
+                            <message error="true">Field cannot be empty for {address1, city, countryGeoId, postalCode} in the address of shipping_details.</message>
+                            <set field="isShippingAddressError" from="true"/>
+                        </if>
+                    </if>
+                    <if condition="order_part.shipping_details.phone">
+                        <set field="shippingPhone" from="order_part.shipping_details.phone"/>
+                        <if condition="!shippingPhone.contactNumber &amp;&amp; !isShippingPhoneError">
+                            <message error="true">Field cannot be empty for contactNumber in the phone of shipping_details.</message>
+                            <set field="isShippingPhoneError" from="true"/>
+                        </if>
+                    </if>
+                </if>
+            </iterate>
+            <check-errors/>
+        </actions>
+    </service>
+
+    <!-- GET Orders API service -->
+    <service verb="find" noun="Orders">
+        <in-parameters>
+            <parameter name="orderId">
+                <description>The ID for the order in the system.</description>
+            </parameter>
+            <!-- Removed multiple statusId filter as it is not working properly
+                TODO check its working and update,
+                For now filter on single statusId value -->
+            <parameter name="statusId">
+                <description>The status of the order.</description>
+            </parameter>
+            <parameter name="customerPartyId">
+                <description>The party ID of the customer in the system.</description>
+            </parameter>
+            <parameter name="facilityId">
+                <description>The ID of the facility in the system.</description>
+            </parameter>
+            <parameter name="shipmentMethodEnumId">
+                <description>The ID of the shipment method in the system.</description>
+            </parameter>
+            <parameter name="carrierPartyId">
+                <description>The ID of the carrier service party in the system.</description>
+            </parameter>
+            <parameter name="placedDateStart" type="Timestamp" format="yyyy-MM-dd">
+                <description>Find orders placed at or after this date.</description>
+            </parameter>
+            <parameter name="placedDateEnd" type="Timestamp" format="yyyy-MM-dd">
+                <description>Find orders placed at or before this date.</description>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orders" type="List">
+                <parameter name="orderInfo" type="Map">
+                    <parameter name="orderId">
+                        <description>The ID for the order in the system.</description>
+                    </parameter>
+                    <parameter name="orderName">
+                        <description>The name for the sales order.</description>
+                    </parameter>
+                    <parameter name="statusId">
+                        <description>The current status of the order in the system.</description>
+                    </parameter>
+                    <parameter name="currencyUom">
+                        <description>The three letter code describing the currency.</description>
+                    </parameter>
+                    <parameter name="salesChannelEnumId" entity-name="mantle.order.OrderHeader">
+                        <description>The sales channel ID from where the order originated.</description>
+                    </parameter>
+                    <parameter name="placedDate" type="Timestamp" format="yyyy-MM-dd">
+                        <description>The date when the order was placed.</description>
+                    </parameter>
+                    <parameter name="externalOrderId">
+                        <description>The ID for the order in the external system.</description>
+                    </parameter>
+                    <parameter name="grandTotal" type="BigDecimal">
+                        <description>The total price of the order.</description>
+                    </parameter>
+                    <parameter name="customer_details" type="Map">
+                        <parameter name="partyId">
+                            <description>The party ID of the customer in the system.</description>
+                        </parameter>
+                        <parameter name="customerId">
+                            <description>The ID of the customer in the external system.</description>
+                        </parameter>
+                        <parameter name="firstName">
+                            <description>The first name of the customer.</description>
+                        </parameter>
+                        <parameter name="middleName">
+                            <description>The middle name of the customer.</description>
+                        </parameter>
+                        <parameter name="lastName">
+                            <description>The last name of the customer.</description>
+                        </parameter>
+                        <parameter name="email">
+                            <description>The email address of the customer.</description>
+                        </parameter>
+                    </parameter>
+                    <parameter name="billing_details" type="Map">
+                        <parameter name="address" type="Map">
+                            <description>The billing address for the order.</description>
+                            <parameter name="id">
+                                <description>The ID of the ContactMech for the address in the system.</description>
+                            </parameter>
+                            <parameter name="toName">
+                                <description>The customer's name for the address.</description>
+                            </parameter>
+                            <parameter name="address1">
+                                <description>The address line 1 of the address.</description>
+                            </parameter>
+                            <parameter name="address2">
+                                <description>The address line 2 of the address.</description>
+                            </parameter>
+                            <parameter name="city">
+                                <description>The city of the address.</description>
+                            </parameter>
+                            <parameter name="stateProvinceGeoId">
+                                <description>The ID for the state code of the address in the system.</description>
+                            </parameter>
+                            <parameter name="countryGeoId">
+                                <description>The ID for the country code of the address in the system.</description>
+                            </parameter>
+                            <parameter name="postalCode">
+                                <description>The postal code of the address.</description>
+                            </parameter>
+                        </parameter>
+                        <parameter name="phone" type="Map">
+                            <description>The billing phone details for the order.</description>
+                            <parameter name="id">
+                                <description>The ID of the ContactMech for the phone in the system.</description>
+                            </parameter>
+                            <parameter name="countryCode">
+                                <description>The country code of the contact number.</description>
+                            </parameter>
+                            <parameter name="areaCode">
+                                <description>The area code of the contact number.</description>
+                            </parameter>
+                            <parameter name="contactNumber">
+                                <description>The contact number of the customer.</description>
+                            </parameter>
+                        </parameter>
+                    </parameter>
+                    <parameter name="order_parts" type="List">
+                        <description>The list of order parts.</description>
+                        <parameter name="orderPartMap" type="Map">
+                            <description>The order part details.</description>
+                            <parameter name="id">
+                                <description>The ID of the Order Part in the system.</description>
+                            </parameter>
+                            <parameter name="partStatusId">
+                                <description>The current status of the Order Part.</description>
+                            </parameter>
+                            <parameter name="item_details" type="List">
+                                <description>The list of items in the order part.</description>
+                                <parameter name="items" type="Map">
+                                    <parameter name="id">
+                                        <description>The ID of the Order Item in the system.</description>
+                                    </parameter>
+                                    <parameter name="productId">
+                                        <description>The ID of the product in the system.</description>
+                                    </parameter>
+                                    <parameter name="sku">
+                                        <description>The sku of the product.</description>
+                                    </parameter>
+                                    <parameter name="productName">
+                                        <description>The name of the product.</description>
+                                    </parameter>
+                                    <parameter name="quantity" type="Integer">
+                                        <description>The quantity of the product.</description>
+                                    </parameter>
+                                    <parameter name="unitAmount" type="BigDecimal">
+                                        <description>The unit amount of the product.</description>
+                                    </parameter>
+                                    <parameter name="tax_details" type="List">
+                                        <description>The list of tax details for the product.</description>
+                                        <parameter name="taxMap" type="Map">
+                                            <parameter name="amount" type="BigDecimal">
+                                                <description>The tax amount applicable for the product.</description>
+                                            </parameter>
+                                            <parameter name="percentage" type="BigDecimal">
+                                                <description>The tax percentage applicable for the product.</description>
+                                            </parameter>
+                                        </parameter>
+                                    </parameter>
+                                </parameter>
+                            </parameter>
+                            <parameter name="facilityId">
+                                <description>The ID of the facility in the system.</description>
+                            </parameter>
+                            <parameter name="carrierPartyId">
+                                <description>The ID of the carrier service party in the system.</description>
+                            </parameter>
+                            <parameter name="shipmentMethodEnumId">
+                                <description>The ID of the shipment method in the system.</description>
+                            </parameter>
+                            <parameter name="shipping_details" type="Map">
+                                <parameter name="address" type="Map">
+                                    <description>The shipping address for the order.</description>
+                                    <parameter name="id">
+                                        <description>The ID of the ContactMech for the address in the system.</description>
+                                    </parameter>
+                                    <parameter name="toName">
+                                        <description>The customer's name for the address.</description>
+                                    </parameter>
+                                    <parameter name="address1">
+                                        <description>The address line 1 of the address.</description>
+                                    </parameter>
+                                    <parameter name="address2">
+                                        <description>The address line 2 of the address.</description>
+                                    </parameter>
+                                    <parameter name="city">
+                                        <description>The city of the address.</description>
+                                    </parameter>
+                                    <parameter name="stateProvinceGeoId">
+                                        <description>The ID for the state code of the address in the system.</description>
+                                    </parameter>
+                                    <parameter name="countryGeoId">
+                                        <description>The ID for the country code of the address in the system.</description>
+                                    </parameter>
+                                    <parameter name="postalCode">
+                                        <description>The postal code of the address.</description>
+                                    </parameter>
+                                </parameter>
+                                <parameter name="phone" type="Map">
+                                    <description>The shipping phone details for the order.</description>
+                                    <parameter name="id">
+                                        <description>The ID of the ContactMech for the phone in the system.</description>
+                                    </parameter>
+                                    <parameter name="countryCode">
+                                        <description>The country code of the contact number.</description>
+                                    </parameter>
+                                    <parameter name="areaCode">
+                                        <description>The area code of the contact number.</description>
+                                    </parameter>
+                                    <parameter name="contactNumber">
+                                        <description>The contact number of the customer.</description>
+                                    </parameter>
+                                </parameter>
+                            </parameter>
+                            <parameter name="shippingCost" type="BigDecimal">
+                                <description>The shipping charge for the order items.</description>
+                            </parameter>
+                            <parameter name="shippingInstructions">
+                                <description>The shipping instructions for the order.</description>
+                            </parameter>
+                        </parameter>
+                    </parameter>
+                </parameter>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="mantle.order.OrderHeaderAndPart" list="orderHeaderAndPartsList">
+                <search-form-inputs default-order-by="-placedDate"/>
+                <econdition field-name="orderId" ignore-if-empty="true"/>
+                <econdition field-name="statusId" ignore-if-empty="true"/>
+                <econdition field-name="customerPartyId" ignore-if-empty="true"/>
+                <econdition field-name="facilityId" ignore-if-empty="true"/>
+                <econdition field-name="shipmentMethodEnumId" ignore-if-empty="true"/>
+                <econdition field-name="carrierPartyId" ignore-if-empty="true"/>
+                <econdition field-name="placedDate" operator="greater-equals" from="placedDateStart" ignore-if-empty="true"/>
+                <econdition field-name="placedDate" operator="less-equals" from="placedDateEnd" ignore-if-empty="true"/>
+            </entity-find>
+
+            <set field="orders" from="[]"/>
+            <iterate list="orderHeaderAndPartsList" entry="orderHeaderAndPart">
+                <!-- Finding if order already collected in orders list, for orders with multiple parts -->
+                <set field="orderInList" from="orders.find{it.orderId.equals(orderHeaderAndPart.orderId)}"/>
+
+                <!-- Condition added to prepare Order Information only once for each order -->
+                <!-- Note: This is added since we have multiple records for orders with multiple parts -->
+                <if condition="!orderInList">
+
+                    <!-- Get currencyUom abbreviation from currencyUomId -->
+                    <entity-find-one entity-name="moqui.basic.Uom" value-field="currencyUom">
+                        <field-map field-name="uomId" from="orderHeaderAndPart?.currencyUomId"/>
+                    </entity-find-one>
+
+                    <set field="orderInfoMap" from="[orderId:orderHeaderAndPart.orderId,
+                         orderName:orderHeaderAndPart.orderName, statusId:orderHeaderAndPart.statusId, 
+                         currencyUom:currencyUom?.abbreviation,
+                         salesChannelEnumId:orderHeaderAndPart.salesChannelEnumId,
+                         placedDate:ec.l10n.format(orderHeaderAndPart.placedDate, 'yyyy-MM-dd'),
+                         externalOrderId:orderHeaderAndPart.externalId, grandTotal:orderHeaderAndPart.grandTotal]"/>
+
+                    <!-- Preparing customer details -->
+                    <service-call name="co.hotwax.oms.v1.CustomerServices.find#Customers" out-map="customers"
+                            in-map="[partyId:orderHeaderAndPart.customerPartyId]"/>
+
+                    <set field="customer_details" from="customers?.customers[0]"/>
+
+                    <!-- Preparing Billing Details -->
+                    <!-- Note: used distinct, as Billing Details are created for all Order Parts if multiple in Create Order API -->
+                    <entity-find entity-name="mantle.order.OrderPartContactMech" list="orderPartContactMechs" distinct="true">
+                        <econdition field-name="orderId" from="orderHeaderAndPart.orderId"/>
+                        <econdition field-name="contactMechPurposeId" operator="in" from="['PostalBilling','PhoneBilling']"/>
+                    </entity-find>
+
+                    <!-- Billing Address Details -->
+                    <set field="orderPartBillingAddress" from="orderPartContactMechs.find{'PostalBilling'.equals(it.contactMechPurposeId)}"/>
+                    <entity-find-one entity-name="mantle.party.contact.ContactMechPostalAddress" value-field="billingAddress">
+                        <field-map field-name="contactMechId" from="orderPartBillingAddress.contactMechId"/>
+                    </entity-find-one>
+
+                    <set field="billingAddressMap" from="[id:billingAddress.contactMechId,
+                         toName:billingAddress.toName ?: '', address1:billingAddress.address1,
+                         address2:billingAddress.address2 ?: '', city:billingAddress.city,
+                         stateProvinceGeoId:billingAddress.stateProvinceGeoId ?: '',
+                         countryGeoId:billingAddress.countryGeoId, postalCode: billingAddress.postalCode]"/>
+
+                    <!-- Billing Phone Details -->
+                    <set field="orderPartBillingPhone" from="orderPartContactMechs.find{'PhoneBilling'.equals(it.contactMechPurposeId)}"/>
+                    <if condition="orderPartBillingPhone">
+                        <entity-find-one entity-name="mantle.party.contact.ContactMechTelecomNumber" value-field="billingPhone">
+                            <field-map field-name="contactMechId" from="orderPartBillingPhone.contactMechId"/>
+                        </entity-find-one>
+
+                        <set field="billingPhoneMap" from="[id:billingPhone.contactMechId,
+                            countryCode:billingPhone.countryCode ?: '', areaCode:billingPhone.areaCode ?: '',
+                            contactNumber:billingPhone.contactNumber]"/>
+                    </if>
+
+                    <set field="billingDetails" from="[address:billingAddressMap, phone:billingPhoneMap ?: [:] ]"/>
+
+                    <!-- Preparing Order Part details -->
+                    <set field="orderPartsList" from="orderHeaderAndPartsList.findAll{it.orderId.equals(orderHeaderAndPart.orderId)}"/>
+                    <set field="orderParts" from="[]"/>
+                    <iterate list="orderPartsList" entry="orderPart">
+
+                        <!-- Preparing Order Item details -->
+                        <entity-find entity-name="mantle.order.OrderItemDetail" list="orderItemsList">
+                            <econdition field-name="orderId" from="orderPart.orderId"/>
+                            <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
+                            <select-field field-name="orderItemSeqId,productId,itemDescription,quantity,
+                                    unitAmount,itemTypeEnumId,parentItemSeqId,sourcePercentage"/>
+                        </entity-find>
+
+                        <set field="orderItems" from="[]"/>
+                        <iterate list="orderItemsList" entry="orderItem">
+                            <if condition="'ItemProduct'.equals(orderItem.itemTypeEnumId)">
+
+                                <!-- Get product sku from Order Item's productId -->
+                                <entity-find-one entity-name="mantle.product.Product" value-field="product">
+                                    <field-map field-name="productId" from="orderItem.productId"/>
+                                </entity-find-one>
+
+                                <set field="orderItemMap" from="[id:orderItem.orderItemSeqId,
+                                    productId:orderItem.productId, sku:product.pseudoId,
+                                    product_name:orderItem.itemDescription ?: '',
+                                    quantity:orderItem.quantity, unitAmount:orderItem.unitAmount]"/>
+
+                                <!-- Preparing Order Item Tax details -->
+                                <!-- Check added for parentItemSeqId to get tax details for the Order Item being prepared -->
+                                <set field="itemTaxDetails" from="orderItemsList.findAll{'ItemSalesTax'.equals(it.itemTypeEnumId) &amp;&amp; it.parentItemSeqId.equals(orderItem.orderItemSeqId)}"/>
+                                <if condition="itemTaxDetails">
+                                    <set field="tax_details" from="[]"/>
+                                    <iterate list="itemTaxDetails" entry="itemTaxDetail">
+                                        <set field="taxDetail" from="[amount:itemTaxDetail.unitAmount,
+                                         percentage:itemTaxDetail.sourcePercentage]"/>
+                                        <script>tax_details.add(taxDetail)</script>
+                                    </iterate>
+
+                                    <set field="orderItemMap" from="orderItemMap + [tax_details:tax_details]"/>
+                                </if>
+                                <script>orderItems.add(orderItemMap)</script>
+                            </if>
+                        </iterate>
+
+                        <!-- Preparing Shipping Details -->
+                        <set field="shippingAddressMap" from="[:]"/>
+                        <set field="shippingPhoneMap" from="[:]"/>
+                        <if condition="orderPart.postalContactMechId">
+                            <entity-find-one entity-name="mantle.party.contact.ContactMechPostalAddress" value-field="shippingAddress">
+                                <field-map field-name="contactMechId" from="orderPart.postalContactMechId"/>
+                            </entity-find-one>
+                            <set field="shippingAddressMap" from="[id:shippingAddress.contactMechId,
+                                 toName:shippingAddress.toName ?: '', address1:shippingAddress.address1,
+                                 address2:shippingAddress.address2 ?: '', city:shippingAddress.city,
+                                 stateProvinceGeoId:shippingAddress.stateProvinceGeoId ?: '',
+                                 countryGeoId:shippingAddress.countryGeoId, postalCode:shippingAddress.postalCode]"/>
+                        </if>
+                        <if condition="orderPart.telecomContactMechId">
+                            <entity-find-one entity-name="mantle.party.contact.ContactMechTelecomNumber" value-field="shippingPhone">
+                                <field-map field-name="contactMechId" from="orderPart.telecomContactMechId"/>
+                            </entity-find-one>
+                            <set field="shippingPhoneMap" from="[id:shippingPhone.contactMechId,
+                                 countryCode:shippingPhone.countryCode ?: '',
+                                 areaCode:shippingPhone.areaCode ?: '',
+                                 contactNumber:shippingPhone.contactNumber]"/>
+                        </if>
+                        <set field="shippingDetails" from="[address:shippingAddressMap, phone:shippingPhoneMap]"/>
+
+                        <!-- Shipping Cost for Order Part -->
+                        <set field="orderItemShipping" from="orderItemsList.find{'ItemShipping'.equals(it.itemTypeEnumId)}"/>
+
+                        <set field="orderPartMap" from="[id:orderPart.orderPartSeqId,
+                             partStatusId:orderPart.partStatusId, item_details:orderItems,
+                             facilityId:orderPart.facilityId,
+                             shipmentMethodEnumId:orderPart.shipmentMethodEnumId ?: '',
+                             carrierPartyId:orderPart.carrierPartyId ?: '',
+                             shipping_details:shippingDetails,
+                             shippingCost:orderItemShipping?.unitAmount ?: 0.0,
+                             shippingInstructions:orderPart.shippingInstructions ?: '']"/>
+
+                        <script>orderParts.add(orderPartMap)</script>
+                    </iterate>
+
+                    <!-- Preparing the Order Map with all details -->
+                    <set field="orderInfoMap" from="orderInfoMap + [customer_details:customer_details,
+                         billing_details:billingDetails, order_parts:orderParts]"/>
+
+                    <script>orders.add(orderInfoMap)</script>
+                </if>
+            </iterate>
+        </actions>
+    </service>
+</services>

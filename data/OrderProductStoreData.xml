@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="ext-order-demo">
+
+    <!-- Default Vendor Party configuration for Headless OMS -->
+    <mantle.party.Party
+            partyId="OMS_DEFAULT_VENDOR"
+            partyTypeEnumId="PtyOrganization"
+            ownerPartyId="OMS_DEFAULT_VENDOR">
+        <organization organizationName="Ziziwork Retail &amp; Wholesale"/>
+        <roles roleTypeId="OrgInternal"/>
+    </mantle.party.Party>
+
+    <!-- Default Product Store configuration for Headless OMS -->
+    <mantle.product.store.ProductStore
+            productStoreId="OMS_DEFAULT_STORE"
+            storeName="Ziziwork Retail Store"
+            organizationPartyId="OMS_DEFAULT_VENDOR"
+            defaultLocale="en_US" defaultCurrencyUomId="USD">
+        <!-- Ship Options for the store -->
+        <shipOptions carrierPartyId="UPS" shipmentMethodEnumId="ShMthGround" sequenceNum="1"/>
+        <shipOptions carrierPartyId="UPS" shipmentMethodEnumId="ShMthNextDay" sequenceNum="2"/>
+        <shipOptions carrierPartyId="UPS" shipmentMethodEnumId="ShMthNextDayPri" sequenceNum="3"/>
+        <shipOptions carrierPartyId="UPS" shipmentMethodEnumId="ShMthSecondDay" sequenceNum="4"/>
+        <shipOptions carrierPartyId="UPS" shipmentMethodEnumId="ShMthThirdDay" sequenceNum="5"/>
+    </mantle.product.store.ProductStore>
+
+    <!-- TODO Update the hostname pattern that should map to the store -->
+    <mantle.product.store.ProductStoreSetting productStoreId="OMS_DEFAULT_STORE" settingTypeEnumId="PsstHostname" fromDate="0" settingValue=".*"/>
+
+</entity-facade-xml>

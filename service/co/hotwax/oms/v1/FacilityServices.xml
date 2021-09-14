@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <!-- Create Facility -->
+    <service verb="create" noun="Facility">
+        <description>
+            Allows a fulfillment location to be created with basic location data.
+            Also creates the primary address for the location if provided in the request.
+        </description>
+        <in-parameters>
+            <parameter name="locationId" required="true">
+                <description>The unique ID of the fulfillment location in the external system.</description>
+            </parameter>
+            <parameter name="locationName" required="true">
+                <description>The name of the fulfillment location.</description>
+            </parameter>
+            <parameter name="locationType" default-value="FcTpRetailStore">
+                <description>The type of the fulfillment location.</description>
+            </parameter>
+            <!-- TODO discuss the use of ownerPartyId field -->
+            <parameter name="ownerPartyId">
+                <description>The ID of the vendor organization for the fulfillment location.</description>
+            </parameter>
+            <parameter name="address1">
+                <description>The first line of the address for the fulfillment location.</description>
+            </parameter>
+            <parameter name="address2">
+                <description>The additional field for the address details.</description>
+            </parameter>
+            <parameter name="city">
+                <description>The city where the address is located in.</description>
+            </parameter>
+            <parameter name="stateProvinceGeoId">
+                <description>The state code where the address is located in.</description>
+            </parameter>
+            <parameter name="countryGeoId">
+                <description>The country code for the address.</description>
+            </parameter>
+            <parameter name="postalCode">
+                <description>The postal code for the address.</description>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="locationId">
+                <description>The unique ID of the fulfillment location in the external system.</description>
+            </parameter>
+            <parameter name="facilityId">
+                <description>The unique ID generated for the fulfillment location in the internal system.</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <!-- Using OOTB create#Facility -->
+            <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="context"
+                    in-map="context + [pseudoId:locationId, facilityName:locationName,
+                    facilityTypeEnumId:locationType]"/>
+
+            <!-- Creating default pick location for the facility -->
+            <service-call name="mantle.facility.FacilityServices.create#FacilityLocation" out-map="context"
+                    in-map="[facilityId:facilityId, locationSeqId:'DEFAULT_PICK_LOC',
+                    locationTypeEnumId:'FltPick']"/>
+        </actions>
+    </service>
+
+    <!-- GET Facility Details -->
+    <service verb="find" noun="Facilities">
+        <description>
+            Find facilities by specifying one or more possible parameters.
+        </description>
+        <in-parameters>
+            <parameter name="facilityId">
+                <description>The unique ID assigned to the fulfillment location in the internal system.</description>
+            </parameter>
+            <parameter name="locationId">
+                <description>The unique ID of the fulfillment location in the external system.</description>
+            </parameter>
+            <parameter name="locationName">
+                <description>The full or partial name of the fulfillment location.</description>
+            </parameter>
+            <parameter name="locationType">
+                <description>The type of the fulfillment location.</description>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="facilities" type="List">
+                <parameter name="facility" type="Map">
+                    <parameter name="facilityId">
+                        <description>The unique ID assigned to the fulfillment location in the internal system.</description>
+                    </parameter>
+                    <parameter name="locationId">
+                        <description>The unique ID of the fulfillment location in the external system.</description>
+                    </parameter>
+                    <parameter name="locationName">
+                        <description>The name of the fulfillment location.</description>
+                    </parameter>
+                    <parameter name="locationType">
+                        <description>The type of the fulfillment location.</description>
+                    </parameter>
+                    <parameter name="ownerPartyId">
+                        <description>The ID of the vendor organization for the fulfillment location.</description>
+                    </parameter>
+                    <parameter name="address1">
+                        <description>The first line of the address for the fulfillment location.</description>
+                    </parameter>
+                    <parameter name="address2">
+                        <description>The additional details for the address.</description>
+                    </parameter>
+                    <parameter name="city" required="true">
+                        <description>The city where the address is located in.</description>
+                    </parameter>
+                    <parameter name="stateProvinceGeoId">
+                        <description>The state code where the address is located in.</description>
+                    </parameter>
+                    <parameter name="countryGeoId" required="true">
+                        <description>The country code for the address.</description>
+                    </parameter>
+                    <parameter name="postalCode" required="true">
+                        <description>The postal code for the address.</description>
+                    </parameter>
+                </parameter>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <entity-find entity-name="mantle.facility.Facility" list="facilityList" cache="true">
+                <econdition field-name="pseudoId" from="locationId" ignore-if-empty="true"/>
+                <econdition field-name="facilityId" ignore-if-empty="true"/>
+                <econdition field-name="facilityName" value="%${locationName}%" operator="like" ignore="!locationName" ignore-case="true"/>
+                <econdition field-name="facilityTypeEnumId" from="locationType" ignore-if-empty="true"/>
+                <select-field field-name="facilityId,pseudoId,facilityName,facilityTypeEnumId,ownerPartyId"/>
+                <order-by field-name="facilityName"/>
+            </entity-find>
+
+            <set field="facilities" from="[]"/>
+
+            <!-- Preparing Facility Details -->
+            <iterate list="facilityList" entry="facility">
+                <!-- Get Facility Address -->
+                <entity-find entity-name="mantle.facility.FacilityContactMechPostalAddress" list="facilityAddress">
+                    <date-filter/>
+                    <econdition field-name="facilityId" from="facility.facilityId"/>
+                    <econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
+                    <select-field field-name="facilityId,address1,address2,city,stateProvinceGeoId,countryGeoId,postalCode"/>
+                </entity-find>
+
+                <script>facilities.add([facilityId:facility.facilityId, locationId:facility.pseudoId,
+                    locationName:facility.facilityName, locationType:facility.facilityTypeEnumId]
+                    + (!facilityAddress.isEmpty() ? facilityAddress[0] : []))</script>
+            </iterate>
+        </actions>
+    </service>
+
+</services>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <!-- Service to get ProductStore Id from the HostName, used in OrderServices.create#Order -->
+    <service verb="get" noun="ProductStoreIdFromHostName">
+        <in-parameters>
+            <parameter name="requestHostName"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="productStoreId"/>
+        </out-parameters>
+        <actions>
+            <set field="productStoreId" from="null"/>
+            <if condition="!requestHostName"><return/></if>
+
+            <entity-find entity-name="mantle.product.store.ProductStoreSetting" list="hostSettingList">
+                <econdition field-name="settingTypeEnumId" value="PsstHostname"/>
+                <date-filter/><order-by field-name="-fromDate"/>
+            </entity-find>
+            <iterate list="hostSettingList" entry="hostSetting">
+                <set field="hostPattern" from="hostSetting.settingValue"/>
+                <if condition="hostPattern != null &amp;&amp; ((String) requestHostName).matches((String) hostPattern)">
+                    <set field="productStoreId" from="hostSetting.productStoreId"/></if>
+            </iterate>
+
+            <if condition="!productStoreId"><log level="warn" message="No store found for hostname ${requestHostName}"/></if>
+        </actions>
+    </service>
+
+</services>
+
+

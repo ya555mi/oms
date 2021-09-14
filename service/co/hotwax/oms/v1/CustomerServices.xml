@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <!-- Create Customer -->
+    <service verb="create" noun="Customer">
+        <description>Creates a new customer.</description>
+        <in-parameters>
+            <parameter name="customerId">
+                <description>The ID for the customer in the external system.</description>
+            </parameter>
+            <parameter name="firstName" required="true">
+                <description>The customer's first name.</description>
+            </parameter>
+            <parameter name="middleName">
+                <description>The customer's middle name.</description>
+            </parameter>
+            <parameter name="lastName" required="true">
+                <description>The customer's last name.</description>
+            </parameter>
+            <parameter name="email" required="true">
+                <description>The email address of the customer.</description><text-email/>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="partyId">
+                <description>The party ID generated for the customer.</description>
+            </parameter>
+            <parameter name="customerId">
+                <description>The ID for the customer in the external system.</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <!-- creating Person and Party  -->
+            <service-call name="mantle.party.PartyServices.create#Person" out-map="context"
+                    in-map="context + [roleTypeId:'Customer', externalId:customerId]" />
+            <!-- storing email address -->
+            <service-call name="mantle.party.ContactServices.create#EmailAddress" out-map="context"
+                    in-map="context + [emailAddress:email, contactMechPurposeId:'EmailPrimary']"/>
+        </actions>
+    </service>
+
+	<!-- GET customers service -->
+    <service verb="find" noun="Customers">
+        <description>
+            Find customers by party ID or email address.
+        </description>
+        <in-parameters>
+            <parameter name="partyId">
+                <description>The unique party Id assigned to the customer in the system.</description>
+            </parameter>
+            <parameter name="email">
+                <description>The email address of the customer.</description>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="customers" type="List">
+                <parameter name="customerMap" type="Map">
+                    <parameter name="partyId">
+                        <description>The unique party ID assigned to the customer in the system.</description>
+                    </parameter>
+                    <parameter name="customerId">
+                        <description>The ID of the customer in the external system.</description>
+                    </parameter>
+                    <parameter name="firstName">
+                        <description>The first name of the customer.</description>
+                    </parameter>
+                    <parameter name="middleName">
+                        <description>The middle name of the customer.</description>
+                    </parameter>
+                    <parameter name="lastName">
+                        <description>The last name of the customer.</description>
+                    </parameter>
+                    <parameter name="email">
+                        <description>The email address of the customer.</description>
+                    </parameter>
+                </parameter>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <!-- Using Dynamic View for fetching GET customer response data -->
+            <!-- This is done since the current API schema expects minimal customer data -->
+            <script><![CDATA[
+                import org.moqui.impl.entity.EntityDynamicViewImpl
+                import org.moqui.impl.entity.EntityFindImpl
+                import org.moqui.impl.entity.EntityDefinition
+                import org.moqui.entity.EntityCondition.ComparisonOperator
+
+                EntityDynamicViewImpl dynamicView = new EntityDynamicViewImpl(ec.entity)
+
+                dynamicView.addMemberEntity("PTY", "mantle.party.Party", null, null, null)
+                dynamicView.addMemberEntity("PTRL", "mantle.party.PartyRole", "PTY", null, [partyId: ""])
+                dynamicView.addMemberEntity("PER", "mantle.party.Person", "PTY", null, [partyId: "partyId"])
+                dynamicView.addMemberEntity("EMPCM", "mantle.party.contact.PartyContactMech", "PTY", true, [partyId: "partyId"])
+                dynamicView.addMemberEntity("EMCM", "mantle.party.contact.ContactMech", "EMPCM", true, [contactMechId: "contactMechId"])
+
+                dynamicView.addAlias("PTY", "partyId")
+                dynamicView.addAlias("PTY", "externalId")
+
+                dynamicView.addAlias("PTRL", "roleTypeId")
+
+                dynamicView.addAlias("PER", "firstName")
+                dynamicView.addAlias("PER", "middleName")
+                dynamicView.addAlias("PER", "lastName")
+
+                dynamicView.addAlias("EMCM", "email", "infoString", null)
+                dynamicView.addAlias("EMPCM", "contactMechPurposeId")
+
+                EntityDefinition entityDef = dynamicView.makeEntityDefinition()
+
+                EntityFindImpl ef = new EntityFindImpl(ec.entity, entityDef)
+                //Default conditions to get only "Customer" type parties, and returning records for CM for EmailAddress.
+                ef.condition("roleTypeId", "Customer").condition("contactMechPurposeId", "EmailPrimary")
+
+                if (partyId)
+                    ef.condition("partyId", partyId)
+
+                if(email)
+                    ef.condition("email", ComparisonOperator.LIKE, "%" + email + "%")
+
+                EntityList customersList = ef.selectFields(Arrays.asList('partyId, externalId, email, firstName, middleName, lastName')).list()
+
+                customers = []
+                for(customer in customersList) {
+                    customerMap = [partyId:customer.partyId, customerId:customer.externalId,
+                        firstName:customer.firstName, middleName:customer.middleName,
+                        lastName:customer.lastName, email:customer.email]
+                    customers.add(customerMap)
+                }
+            ]]></script>
+        </actions>
+    </service>
+</services>

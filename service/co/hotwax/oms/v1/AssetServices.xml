@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <!-- Record Inventory -->
+    <service verb="record" noun="Inventory">
+        <description>
+            Sets the total inventory count for a product at a fulfillment location.
+            This requires either productId or SKU, either locationId or facilityId and available quantity of the product.
+        </description>
+        <in-parameters>
+            <parameter name="productId">
+                <description>The ID of the product in the system.</description>
+            </parameter>
+            <parameter name="sku">
+                <description>The unique SKU of the product.</description>
+            </parameter>
+            <parameter name="facilityId">
+                <description>The unique ID of the fulfillment location in the internal system.</description>
+            </parameter>
+            <parameter name="locationId">
+                <description>The unique ID of the fulfillment location in the external system.</description>
+            </parameter>
+            <parameter name="quantity" type="Integer" required="true">
+                <description>The total quantity of the product available at the fulfillment location.</description>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="productId">
+                <description>The ID of the product in the system.</description>
+            </parameter>
+            <parameter name="sku">
+                <description>The unique SKU of the product.</description>
+            </parameter>
+            <parameter name="facilityId">
+                <description>The unique ID of the fulfillment location in the internal system.</description>
+            </parameter>
+            <parameter name="locationId">
+                <description>The unique ID of the fulfillment location in the external system.</description>
+            </parameter>
+            <parameter name="quantity" type="Integer">
+                <description>The total quantity of the product available at the fulfillment location.</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <if condition="!productId &amp;&amp; !sku">
+                <return error="true" message="At least one of {productId/sku} is required."/>
+            </if>
+
+            <if condition="!facilityId &amp;&amp; !locationId">
+                <return error="true" message="At least one of {facilityId/locationId} is required."/>
+            </if>
+
+            <!-- Validate if product existing, and get productId if only sku in the request -->
+            <entity-find entity-name="mantle.product.Product" list="productList" cache="true">
+                <econdition field-name="productId" ignore-if-empty="true"/>
+                <econdition field-name="pseudoId" from="sku" ignore-if-empty="true"/>
+            </entity-find>
+
+            <if condition="!productList">
+                <return error="true" message="Product not found."/>
+            </if>
+
+            <!-- Validate if facility existing and get facilityId from locationId -->
+            <entity-find entity-name="mantle.facility.Facility" list="facilityList" cache="true">
+                <econdition field-name="facilityId" ignore-if-empty="true"/>
+                <econdition field-name="pseudoId" from="locationId" ignore-if-empty="true"/>
+            </entity-find>
+
+            <if condition="!facilityList">
+                <return error="true" message="Facility not found."/>
+            </if>
+
+            <!-- productId and facilityId required for record#PhysicalInventoryQuantity service -->
+            <if condition="!productId">
+                <set field="productId" from="productList[0].productId"/>
+            </if>
+            <if condition="!facilityId">
+                <set field="facilityId" from="facilityList[0].facilityId"/>
+            </if>
+
+            <!-- Using OOTB record#PhysicalInventoryQuantity, as,
+                1. It creates/update the Asset record with the incoming quantity, and,
+                2. Creates new records for AssetDetail with the quantityChange. -->
+            <!-- Note: For now, using the default pick location to record inventory for the facility;
+                 added to use the pick location for fulfillment, to update later as required -->
+            <service-call name="mantle.product.AssetServices.record#PhysicalInventoryQuantity"
+                    in-map="context + [locationSeqId:'DEFAULT_PICK_LOC']" out-map="context"/>
+
+            <!-- Set external id out parameters -->
+            <if condition="!sku">
+                <set field="sku" from="productList[0].pseudoId"/>
+            </if>
+            <if condition="!locationId">
+                <set field="locationId" from="facilityList[0].pseudoId"/>
+            </if>
+
+            <!-- Clear the messages if success -->
+            <!-- This is done to remove message of quantityChange from record#PhysicalInventoryQuantity in the response -->
+            <script>ec.message.clearAll()</script>
+        </actions>
+    </service>
+
+    <!-- Get Inventory -->
+    <!-- TODO Checked the get#AvailableInventoryMulti service, to discuss the use as it gives overall count in input facilities -->
+    <service verb="get" noun="AvailableInventory">
+        <description>
+            Retrieves the available inventory information for a product by productId or sku
+            across all fulfillment locations in the system, or at a specific location if
+            facilityId or locationId is provided in the request.
+        </description>
+        <in-parameters>
+            <parameter name="productId">
+                <description>The ID of the product in the system.</description>
+            </parameter>
+            <parameter name="sku">
+                    <description>The SKU of the product.</description>
+            </parameter>
+            <parameter name="facilityId">
+                <description>The unique ID of the fulfillment location in the internal system.</description>
+            </parameter>
+            <parameter name="locationId">
+                <description>The unique ID of the fulfillment location in the external system.</description>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="result" type="List">
+                <parameter name="inventoryInfo" type="Map">
+                    <parameter name="productId">
+                        <description>The ID of the product in the system.</description>
+                    </parameter>
+                    <parameter name="sku">
+                        <description>The SKU of the product.</description>
+                    </parameter>
+                    <parameter name="facilityId">
+                        <description>The unique ID of the fulfillment location in the internal system.</description>
+                    </parameter>
+                    <parameter name="locationId">
+                        <description>The external ID of the fulfillment location in the system where the inventory belongs to.</description>
+                    </parameter>
+                    <parameter name="locationName">
+                        <description>The name of the fulfillment location.</description>
+                    </parameter>
+                    <parameter name="availableToPromiseTotal" type="Integer">
+                        <description>The available quantity of the product at the fulfillment location.</description>
+                    </parameter>
+                </parameter>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <if condition="!productId &amp;&amp; !sku">
+                <return error="true" message="At least one of {productId/sku} is required."/>
+            </if>
+
+            <!-- Added validation, else it returns 0 even if incorrect productId. -->
+            <!-- This gives incorrect impression of such product existing but not available. -->
+            <entity-find entity-name="mantle.product.Product" list="productList" cache="true">
+                <econdition field-name="productId" ignore-if-empty="true"/>
+                <econdition field-name="pseudoId" from="sku" ignore-if-empty="true"/>
+            </entity-find>
+
+            <if condition="!productList">
+                <return error="true" message="Product not found."/>
+            </if>
+
+            <if condition="!productId">
+                <set field="productId" from="productList[0].productId"/>
+            </if>
+
+            <if condition="locationId || facilityId"><then>
+                <!-- Validating if location existing -->
+                <entity-find entity-name="mantle.facility.Facility" list="facilityList" cache="true">
+                    <econdition field-name="facilityId" ignore-if-empty="true"/>
+                    <econdition field-name="pseudoId" from="locationId" ignore-if-empty="true"/>
+                </entity-find>
+                <if condition="!facilityList">
+                    <return error="true" message="Facility not found."/>
+                </if>
+            </then><else>
+                <!-- Get all facilities to return inventory information for the product -->
+                <entity-find entity-name="mantle.facility.Facility" list="facilityList" cache="true"/>
+                <set field="facilityIds" from="facilityList*.facilityId"/>
+            </else></if>
+
+            <set field="result" from="[]"/>
+            <iterate list="facilityList" entry="facility">
+                <service-call name="mantle.product.AssetServices.get#AvailableInventory" out-map="inventoryOut"
+                        in-map="[productId:productId, facilityId:facility.facilityId]" />
+                <set field="inventoryInfo" from="[productId:productId, sku:productList[0].pseudoId,
+                    facilityId:facility.facilityId, locationId:facility.pseudoId,
+                    locationName:facility.facilityName,
+                    availableToPromiseTotal:inventoryOut.availableToPromiseTotal]"/>
+                <script>result.add(inventoryInfo)</script>
+            </iterate>
+        </actions>
+    </service>
+
+</services>

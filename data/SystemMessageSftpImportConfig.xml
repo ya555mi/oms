@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="ext-seed-initial">
+
+	<!-- Note: To update the sftp server connection details as per configuration to be done -->
+	<moqui.service.message.SystemMessageRemote systemMessageRemoteId="OMSDataImportSftp"
+			description="SFTP server connection details for data import"
+			sendUrl="" username="" password=""/>
+
+	<moqui.service.job.ServiceJob jobName="ImportProductSftp_poll"
+			description="SFTP Poll Product Import"
+			serviceName="org.moqui.sftp.SftpMessageServices.poll#SystemMessageSftp"
+			cronExpression="0 0/15 * * * ?" paused="Y">
+		<parameters parameterName="systemMessageTypeId" parameterValue="ImportProduct"/>
+		<parameters parameterName="systemMessageRemoteId" parameterValue="OMSDataImportSftp"/>
+	</moqui.service.job.ServiceJob>
+
+	<moqui.service.job.ServiceJob jobName="ImportFacilitySftp_poll"
+			description="SFTP Poll Facility Import"
+			serviceName="org.moqui.sftp.SftpMessageServices.poll#SystemMessageSftp"
+			cronExpression="0 0/15 * * * ?" paused="Y">
+		<parameters parameterName="systemMessageTypeId" parameterValue="ImportFacility"/>
+		<parameters parameterName="systemMessageRemoteId" parameterValue="OMSDataImportSftp"/>
+	</moqui.service.job.ServiceJob>
+
+	<moqui.service.job.ServiceJob jobName="ImportInventorySftp_poll"
+			description="SFTP Poll Inventory Import"
+			serviceName="org.moqui.sftp.SftpMessageServices.poll#SystemMessageSftp"
+			cronExpression="0 0/15 * * * ?" paused="Y">
+		<parameters parameterName="systemMessageTypeId" parameterValue="ImportInventory"/>
+		<parameters parameterName="systemMessageRemoteId" parameterValue="OMSDataImportSftp"/>
+	</moqui.service.job.ServiceJob>
+
+</entity-facade-xml>

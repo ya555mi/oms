@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="demo">
+
+    <!-- Demo User for OMS APIs: James Brown (jamesbrown@example.com) -->
+    <mantle.party.Party partyId="JamesBrown" partyTypeEnumId="PtyPerson">
+        <person firstName="James" lastName="Brown"/>
+
+        <moqui.security.UserAccount userId="JamesBrown" username="james.brown" userFullName="James Brown"
+                currentPassword="c817c6a20ba374d19f279cc60031044012f210f51653d09e84ae3c7ed7864741"
+                passwordHashType="SHA-256" passwordSalt="MVvqJ6qp" emailAddress="jamesbrown@example.com">
+            <groups userGroupId="ADMIN" fromDate="1265184000000"/>
+            <groups userGroupId="OMS_USERS" fromDate="1265184000000"/>
+        </moqui.security.UserAccount>
+
+        <mantle.party.contact.ContactMech contactMechId="JB_EMAIL" contactMechTypeEnumId="CmtEmailAddress" infoString="jamesbrown@example.com">
+            <parties contactMechPurposeId="EmailPrimary" fromDate="1265184000000"/>
+        </mantle.party.contact.ContactMech>
+    </mantle.party.Party>
+
+</entity-facade-xml>

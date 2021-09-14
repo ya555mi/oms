@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <service verb="store" noun="ProductInterface" type="interface">
+        <in-parameters>
+            <parameter name="sku" required="true">
+                <description>The unique SKU of the product.</description>
+            </parameter>
+            <parameter name="productName" required="true">
+                <description>The name of the product.</description>
+            </parameter>
+            <parameter name="description">
+                <description>The description of the product.</description>
+            </parameter>
+            <parameter name="listPrice" type="BigDecimal">
+                <description>The list price of the product.</description>
+            </parameter>
+            <parameter name="priceUom">
+                <description>The three-letter code describing the currency.</description>
+            </parameter>
+            <parameter name="productStoreId">
+                <description>The ID of the product store.</description>
+            </parameter>
+            <parameter name="features" type="List">
+                <description>The list of product features.</description>
+                <parameter name="featureMap" type="Map">
+                    <parameter name="description" required="true">
+                        <description>The description of the product feature.</description>
+                    </parameter>
+                    <parameter name="type" required="true">
+                        <description>The product feature type.</description>
+                    </parameter>
+                </parameter>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <!-- Returning Product Id and SKU -->
+            <parameter name="productId">
+                <description>The unique ID created for the product.</description>
+            </parameter>
+            <parameter name="sku">
+                <description>The unique SKU of the product.</description>
+            </parameter>
+        </out-parameters>
+    </service>
+
+    <!-- Wrapper service for store product API end-point-->
+    <service verb="store" noun="ProductRestImpl">
+        <description>
+            Creates a new product. Accepts the list price and product features as applicable.
+            If product's SKU is existing in the system, the API will update the product information.
+        </description>
+        <implements service="co.hotwax.oms.v1.ProductServices.store#ProductInterface"/>
+        <actions>
+            <!-- get ProductStore ID from ProductStoreSetting of hostname-->
+            <service-call name="co.hotwax.oms.v1.StoreServices.get#ProductStoreIdFromHostName"
+                    in-map="[requestHostName:ec.web.getHostName(false)]" out-map="productStoreIdContext"/>
+            <set field="defaultProductStoreId" from="productStoreIdContext?.productStoreId"/>
+
+            <!-- Store Product -->
+            <service-call name="co.hotwax.oms.v1.ProductServices.store#Product" out-map="context"
+                    in-map="context + [productStoreId: defaultProductStoreId]"/>
+
+        </actions>
+    </service>
+
+    <!-- Create/Update Product -->
+    <service verb="store" noun="Product">
+        <description>
+            Store (create or update) a product.
+            Also accepts the list price and product features as applicable.
+        </description>
+        <implements service="co.hotwax.oms.v1.ProductServices.store#ProductInterface"/>
+        <in-parameters>
+            <parameter name="productStoreId" required="true"/>
+        </in-parameters>
+        <actions>
+            <!-- Validate features list -->
+            <iterate list="features" entry="feature">
+                <if condition="!feature.description || !feature.type">
+                    <message error="true">Field cannot be empty for {description, type} in the features.</message>
+                </if>
+                <entity-find-count entity-name="moqui.basic.Enumeration" count-field="featureTypeCount" cache="true">
+                    <econdition field-name="enumId" from="feature.type"/>
+                    <econdition field-name="enumTypeId" value="ProductFeatureType"/>
+                </entity-find-count>
+                <if condition="featureTypeCount == 0">
+                    <!-- NOTE: Added the allowed values for color and size types in the message, to update this as per need in the future. -->
+                    <message error="true">Invalid value for feature type: ${feature.type}. Allowed values: ['PftSize', 'PftColor']</message>
+                </if>
+            </iterate>
+            <check-errors/>
+
+            <!-- Find Product by SKU -->
+            <entity-find entity-name="mantle.product.Product" list="productList" for-update="true">
+                <econdition field-name="pseudoId" from="sku"/>
+            </entity-find>
+            <set field="product" from="productList ? productList[0] : null"/>
+
+            <!-- Create/Update Product as a Finished Good-->
+            <if condition="product">
+                <then>
+                    <set field="productId" from="product.productId"/>
+                    <set field="product.productName" from="productName"/>
+                    <set field="product.description" from="description"/>
+                    <service-call name="update#mantle.product.Product" in-map="product"/>
+                </then>
+                <else>
+                    <service-call name="create#mantle.product.Product" out-map="productOut"
+                            in-map="[pseudoId:sku, productTypeEnumId:'PtAsset', productName:productName,
+                            description:description, assetTypeEnumId:'AstTpInventory',
+                            assetClassEnumId:'AsClsInventoryFin']"/>
+                    <set field="productId" from="productOut.productId"/>
+                </else>
+            </if>
+
+            <!-- Handling Product Price -->
+            <if condition="listPrice">
+                <!-- Get priceUomId in the system for the incoming priceUom abbreviated value -->
+                <if condition="priceUom">
+                    <entity-find entity-name="moqui.basic.Uom" list="uomList">
+                        <econdition field-name="abbreviation" from="priceUom"/>
+                        <econdition field-name="uomTypeEnumId" value="UT_CURRENCY_MEASURE"/>
+                    </entity-find>
+                    <set field="priceUomId" from="uomList ? uomList[0].uomId : null"/>
+                </if>
+                <!-- For scenario of priceUomId null - priceUom not supplied or not found,
+                     Get priceUomId from default currencyUomId from Product Store -->
+                <if condition="!priceUomId">
+                    <entity-find-one entity-name="mantle.product.store.ProductStore" value-field="productStore"/>
+                    <set field="priceUomId" from="productStore?.defaultCurrencyUomId"/>
+                </if>
+
+                <!-- Check if price record existing -->
+                <set field="productPriceConds" from="[productId:productId, pricePurposeEnumId:'PppPurchase',
+                        priceTypeEnumId:'PptList', priceUomId:priceUomId]"/>
+                <entity-find entity-name="mantle.product.ProductPrice" list="productPriceList" for-update="true">
+                    <econdition-object field="productPriceConds"/>
+                </entity-find>
+                <set field="productPrice" from="productPriceList ? productPriceList[0] : null"/>
+
+                <!-- Create/Update ProductPrice -->
+                <if condition="productPrice">
+                    <then>
+                        <set field="productPrice.price" from="listPrice"/>
+                        <service-call name="update#mantle.product.ProductPrice" in-map="productPrice"/>
+                    </then>
+                    <else-if condition="listPrice">
+                        <service-call name="create#mantle.product.ProductPrice" out-map="context"
+                                in-map="[productId:productId, price:listPrice,
+                                priceUomId:priceUomId, pricePurposeEnumId:'PppPurchase',
+                                priceTypeEnumId:'PptList', fromDate:ec.user.nowTimestamp,
+                                productStoreId: productStoreId]"/>
+                    </else-if>
+                </if>
+            </if>
+
+            <!-- Handling Product Features -->
+            <iterate list="features" entry="productFeature">
+                <!-- Using OOTB service for creating Product Features, which includes:
+                    1. check for existing features,
+                    2. Creates ProductFeature if not existing, and
+                    3. Applies the features to the Product -->
+                <service-call name="mantle.product.ProductServices.create#ProductFeature" out-map="context"
+                              in-map="[productId:productId, description:productFeature.description,
+                        productFeatureTypeEnumId:productFeature.type, ownerPartyId:'_NA_']"/>
+            </iterate>
+
+            <!-- Clear the messages if success -->
+            <!-- This is done to avoid warning messages of create#ProductFeature in the response -->
+            <script>ec.message.clearAll()</script>
+        </actions>
+    </service>
+</services>

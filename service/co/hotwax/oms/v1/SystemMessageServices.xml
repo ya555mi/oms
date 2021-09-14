@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <!-- consume service to import data using OOTB EntityDataLoader
+         from Moqui json data file content read from SFTP location -->
+    <service verb="consume" noun="DataImportSystemMessage">
+        <implements service="org.moqui.impl.SystemMessageServices.consume#SystemMessage"/>
+        <actions>
+            <entity-find-one entity-name="moqui.service.message.SystemMessage" value-field="systemMessage"/>
+            <set field="dataString" from="systemMessage.messageText"/>
+
+            <script><![CDATA[
+                org.moqui.entity.EntityDataLoader edl = ec.entity.makeDataLoader()
+                if (dataString) {
+                    edl.jsonText(dataString)
+                    long recordsLoaded = edl.load()
+                    ec.message.addMessage("Loaded ${recordsLoaded} records.")
+                }
+            ]]></script>
+        </actions>
+    </service>
+
+</services>

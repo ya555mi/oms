@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed-initial">
+
+    <!-- Artifact Authorization for OMS APIs -->
+    <moqui.security.UserGroup userGroupId="OMS_USERS" description="Headless OMS API Users"/>
+    <moqui.security.ArtifactGroup artifactGroupId="OMS_API" description="Headless OMS Rest API"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="OMS_API" artifactTypeEnumId="AT_REST_PATH"
+            inheritAuthz="Y" artifactName="/oms"/>
+    <moqui.security.ArtifactAuthz artifactAuthzId="OMS_API_ALL" userGroupId="OMS_USERS"
+            artifactGroupId="OMS_API" authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
+
+    <!-- store setting used for dynamically setting the productStoreId depending on the hostname -->
+    <moqui.basic.Enumeration enumCode="product_store_id_from_hostname" description="Product Store ID From Hostname" enumId="PsstHostname" enumTypeId="ProductStoreSettingType"/>
+
+</entity-facade-xml>
