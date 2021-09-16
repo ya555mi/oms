@@ -22,7 +22,7 @@ along with this software (see the LICENSE.md file). If not, see
         curl -X DELETE http://localhost:9200/mantle_sales_invoice?pretty
         curl -X DELETE http://localhost:9200/mantle_sales_invoice_item?pretty
     -->
-
+    <!-- ========== Product ========== -->
     <dataDocuments dataDocumentId="MantleProduct" indexName="mantle" documentName="Product"
                    primaryEntityName="mantle.product.Product" documentTitle="ProductNameTemplate"
                    manualDataServiceName="mantle.product.ProductServices.get#ProductManualDocumentData">
@@ -90,7 +90,7 @@ along with this software (see the LICENSE.md file). If not, see
 
     <!-- Sales OrderPart -->
     <dataDocuments dataDocumentId="MantleSalesOrderPart" indexName="mantle_sales" documentName="Sales Order Part"
-            primaryEntityName="mantle.order.OrderPart" documentTitle="${orderId}:${orderPartSeqId}">
+                   primaryEntityName="mantle.order.OrderPart" documentTitle="${orderId}:${orderPartSeqId}">
         <fields fieldSeqId="01" fieldPath="orderId"/>
         <fields fieldSeqId="02" fieldPath="orderPartSeqId"/>
         <fields fieldSeqId="03" fieldPath="statusId" fieldNameAlias="partStatusId"/>
@@ -138,7 +138,7 @@ along with this software (see the LICENSE.md file). If not, see
 
     <!-- Sales OrderItem -->
     <dataDocuments dataDocumentId="MantleSalesOrderItem" indexName="mantle_sales" documentName="Sales Order Item"
-            primaryEntityName="mantle.order.OrderItem" documentTitle="${orderId}:${orderItemSeqId}">
+                   primaryEntityName="mantle.order.OrderItem" documentTitle="${orderId}:${orderItemSeqId}">
         <fields fieldSeqId="01" fieldPath="orderId"/>
         <fields fieldSeqId="02" fieldPath="orderItemSeqId"/>
         <fields fieldSeqId="03" fieldPath="parentItemSeqId"/>
@@ -216,4 +216,5 @@ along with this software (see the LICENSE.md file). If not, see
 
         <conditions conditionSeqId="01" fieldNameAlias="vendorRoleTypeId" fieldValue="OrgInternal"/>
     </dataDocuments>
+
 </entity-facade-xml>
