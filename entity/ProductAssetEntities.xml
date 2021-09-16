@@ -81,7 +81,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="originFacilityId" type="id"><description>Origin Facility, where manufactured or came from.</description></field>
         <field name="acquireOrderId" type="id"/>
         <field name="acquireOrderItemSeqId" type="id"/>
-<!--        <field name="acquireWorkEffortId" type="id"><description>For assets created from production runs, etc.</description></field>-->
         <field name="acquireShipmentId" type="id"/>
         <field name="acquireCost" type="currency-amount" enable-audit-log="update"/>
         <field name="acquireCostUomId" type="id" enable-audit-log="update"/>
@@ -123,8 +122,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="acquireOrderId" related="orderId"/>
             <key-map field-name="acquireOrderItemSeqId" related="orderItemSeqId"/>
         </relationship>
-        <!--<relationship type="one" title="Acquire" related="mantle.work.effort.WorkEffort" short-alias="acquireWorkEffort">
-            <key-map field-name="acquireWorkEffortId"/></relationship>-->
         <relationship type="one" title="Acquire" related="mantle.shipment.Shipment" short-alias="acquireShipment">
             <key-map field-name="acquireShipmentId"/></relationship>
         <relationship type="one" title="AcquireCost" related="moqui.basic.Uom" short-alias="acquireCostUom">
@@ -318,7 +315,6 @@ along with this software (see the LICENSE.md file). If not, see
             <detail relationship="lot"/><detail relationship="geoPoint"/>
 
             <detail relationship="acquireOrderItem"/>
-<!--            <detail relationship="acquireWorkEffort"/>-->
             <detail relationship="acquireShipment"/><detail relationship="acquireCostUom"/>
             <detail relationship="depreciationType"/><detail relationship="taxDepreciationType"/>
 
@@ -349,8 +345,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="orderItemSeqId" type="id"/>
         <field name="returnId" type="id"/>
         <field name="returnItemSeqId" type="id"/>
-<!--        <field name="workEffortId" type="id"/>-->
-<!--        <field name="assetMaintenanceId" type="id"/>-->
         <field name="assetIssuanceId" type="id"/>
         <field name="assetReceiptId" type="id"/>
         <field name="physicalInventoryId" type="id"/>
@@ -366,8 +360,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" related="mantle.product.Product" short-alias="product"/>
         <relationship type="one" related="mantle.order.OrderItem" short-alias="orderItem"/>
         <relationship type="one" related="mantle.order.return.ReturnItem" short-alias="returnItem"/>
-<!--        <relationship type="one" related="mantle.work.effort.WorkEffort" short-alias="workEffort"/>-->
-<!--        <relationship type="one" related="mantle.product.maintenance.AssetMaintenance" short-alias="assetMaintenance"/>-->
         <relationship type="one" related="mantle.product.issuance.AssetIssuance" short-alias="assetIssuance"/>
         <relationship type="one" related="mantle.product.receipt.AssetReceipt" short-alias="assetReceipt"/>
         <relationship type="one" related="mantle.product.asset.PhysicalInventory" short-alias="physicalInventory"/>
@@ -445,37 +437,12 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" related="mantle.product.asset.Asset"/>
         <relationship type="one" related="moqui.basic.StatusItem"/>
     </entity>
-    <!-- unused and probably not useful 20170417:
-    <entity entity-name="AssetProduct" package="mantle.product.asset" cache="never">
-        <field name="assetId" type="id" is-pk="true"/>
-        <field name="productId" type="id" is-pk="true"/>
-        <field name="assetProductTypeEnumId" type="id" is-pk="true"/>
-        <field name="fromDate" type="date-time" is-pk="true"/>
-        <field name="thruDate" type="date-time"/>
-        <field name="comments" type="text-medium"/>
-        <field name="sequenceNum" type="number-integer"/>
-        <field name="quantity" type="number-decimal"/>
-        <field name="quantityUomId" type="id"/>
-        <relationship type="one" related="mantle.product.Product"/>
-        <relationship type="one" related="mantle.product.asset.Asset"/>
-        <relationship type="one" title="AssetProductType" related="moqui.basic.Enumeration">
-            <key-map field-name="assetProductTypeEnumId"/></relationship>
-        <relationship type="one" title="Quantity" related="moqui.basic.Uom"><key-map field-name="quantityUomId"/></relationship>
-        <seed-data>
-            <moqui.basic.EnumerationType description="Asset Product Type" enumTypeId="AssetProductType"/>
-            <moqui.basic.Enumeration description="Use of Asset" enumId="AspTpUse" enumTypeId="AssetProductType"/>
-            <moqui.basic.Enumeration description="Sale of Asset" enumId="AspTpSale" enumTypeId="AssetProductType"/>
-        </seed-data>
-    </entity>
-    -->
-
     <entity entity-name="AssetPaymentMethod" package="mantle.product.asset">
         <field name="assetId" type="id" is-pk="true"/>
         <field name="paymentMethodId" type="id" is-pk="true"/>
         <field name="typeEnumId" type="id"/>
         <field name="sequenceNum" type="number-integer"/>
         <relationship type="one" related="mantle.product.asset.Asset"/>
-<!--        <relationship type="one" related="mantle.account.method.PaymentMethod"/>-->
         <relationship type="one" title="AssetPaymentMethodType" related="moqui.basic.Enumeration">
             <key-map field-name="typeEnumId"/></relationship>
         <seed-data>
@@ -624,9 +591,7 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="invoiceItemSeqId" type="id"/>
         <field name="returnId" type="id"/>
         <field name="returnItemSeqId" type="id"/>
-<!--        <field name="workEffortId" type="id"/>-->
         <field name="facilityId" type="id"/>
-<!--        <field name="assetMaintenanceId" type="id"/>-->
         <field name="issuedByUserId" type="id"/>
         <field name="issuedDate" type="date-time"/>
         <field name="quantity" type="number-decimal" enable-audit-log="update"/>
@@ -638,16 +603,10 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" related="mantle.shipment.Shipment" short-alias="shipment"/>
         <relationship type="one-nofk" related="mantle.shipment.ShipmentItem" short-alias="shipmentItem"/><!-- nofk as may have a productId but not be issued to a Shipment -->
         <relationship type="one" related="mantle.shipment.ShipmentItemSource" short-alias="shipmentItemSource"/>
-        <!--<relationship type="one-nofk" related="mantle.account.invoice.Invoice" short-alias="invoice"/>
-        <relationship type="one" related="mantle.account.invoice.InvoiceItem" short-alias="invoiceItem"/>-->
         <relationship type="one" related="mantle.order.return.ReturnItem" short-alias="returnItem">
             <key-map field-name="returnId"/><key-map field-name="returnItemSeqId"/></relationship>
         <relationship type="one" related="mantle.product.Product" short-alias="product"/>
-<!--        <relationship type="one" related="mantle.work.effort.WorkEffort" short-alias="workEffort"/>-->
         <relationship type="one" related="mantle.facility.Facility" short-alias="facility"/>
-<!--        <relationship type="one" related="mantle.product.maintenance.AssetMaintenance" short-alias="assetMaintenance"/>-->
-        <!--<relationship type="many" related="mantle.work.effort.WorkEffortProduct" short-alias="workEffortProducts">
-            <key-map field-name="workEffortId"/><key-map field-name="productId"/></relationship>-->
         <relationship type="one" title="IssuedBy" related="moqui.security.UserAccount" short-alias="issuedByUserAccount">
             <key-map field-name="issuedByUserId"/></relationship>
         <relationship type="one" title="AcctgTransResult" related="moqui.basic.Enumeration" short-alias="acctgTransResult">
@@ -684,206 +643,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" title="AssetReservationOrder" related="moqui.basic.Enumeration" short-alias="reservationOrderEnum">
             <key-map field-name="reservationOrderEnumId"/></relationship>
     </entity>
-
-    <!-- ========================================================= -->
-    <!-- mantle.product.maintenance -->
-    <!-- ========================================================= -->
-<!--
-    <entity entity-name="AssetMaintenance" package="mantle.product.maintenance" cache="never">
-        <field name="assetMaintenanceId" type="id" is-pk="true"/>
-        <field name="assetId" type="id"/>
-        <field name="statusId" type="id" enable-audit-log="true"/>
-        <field name="maintenanceDate" type="date-time"/>
-        <field name="maintenanceTypeEnumId" type="id"/>
-        <field name="productMaintenanceId" type="id">
-            <description>Optional, though should be filled in to determine upcoming maintenance for all scheduled
-                maintenance</description>
-        </field>
-        <field name="taskWorkEffortId" type="id"/>
-        <field name="intervalQuantity" type="number-decimal"/>
-        <field name="intervalUomId" type="id">
-            <description>UOM for intervalQuantity; ignored if intervalProductMeterId is used</description></field>
-        &lt;!&ndash; <field name="intervalMeterTypeId" type="id"><description>Meter Type for intervalQuantity; if used intervalUomId is generally not used (ie one or the other)</description></field> &ndash;&gt;
-        <field name="intervalProductMeterId" type="id"/>
-        <field name="purchaseOrderId" type="id"/>
-        <field name="userId" type="id" default="ec.user.userId"/>
-        <field name="comments" type="text-long"/>
-        <relationship type="one" related="mantle.product.asset.Asset"/>
-        <relationship type="one" title="AssetMaintenance" related="moqui.basic.StatusItem"/>
-        <relationship type="one" title="MaintenanceType" related="moqui.basic.Enumeration">
-            <key-map field-name="maintenanceTypeEnumId"/></relationship>
-        <relationship type="one" related="ProductMaintenance"/>
-        <relationship type="one" title="Task" related="mantle.work.effort.WorkEffort">
-            <key-map field-name="taskWorkEffortId"/></relationship>
-        <relationship type="one" title="Interval" related="moqui.basic.Uom">
-            <key-map field-name="intervalUomId"/></relationship>
-        &lt;!&ndash; <relationship type="one" title="Interval" related="ProductMeterType">
-            <key-map field-name="intervalMeterTypeId"/></relationship> &ndash;&gt;
-        <relationship type="one" title="Interval" related="mantle.product.maintenance.ProductMeter">
-            <key-map field-name="intervalProductMeterId"/></relationship>
-        <relationship type="one" title="Purchase" related="mantle.order.OrderHeader">
-            <key-map field-name="purchaseOrderId"/></relationship>
-        <relationship type="one" related="moqui.security.UserAccount"/>
-        <seed-data>
-            &lt;!&ndash; Asset Maintenance Status &ndash;&gt;
-            <moqui.basic.StatusType description="Asset Maintenance Status" statusTypeId="AssetMaintenance"/>
-            <moqui.basic.StatusItem description="Created" sequenceNum="1" statusId="AsMntCreated" statusTypeId="AssetMaintenance"/>
-            <moqui.basic.StatusItem description="Scheduled" sequenceNum="3" statusId="AsMntScheduled" statusTypeId="AssetMaintenance"/>
-            <moqui.basic.StatusItem description="In Process" sequenceNum="5" statusId="AsMntInProcess" statusTypeId="AssetMaintenance"/>
-            <moqui.basic.StatusItem description="Completed" sequenceNum="10" statusId="AsMntCompleted" statusTypeId="AssetMaintenance"/>
-            <moqui.basic.StatusItem description="Cancelled" sequenceNum="99" statusId="AsMntCancelled" statusTypeId="AssetMaintenance"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="AsMntCreated" toStatusId="AsMntScheduled" transitionName="Scheduled"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="AsMntCreated" toStatusId="AsMntInProcess" transitionName="In-Process"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="AsMntCreated" toStatusId="AsMntCancelled" transitionName="Cancel"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="AsMntScheduled" toStatusId="AsMntInProcess" transitionName="In-Process"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="AsMntScheduled" toStatusId="AsMntCancelled" transitionName="Cancel"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="AsMntInProcess" toStatusId="AsMntCompleted" transitionName="Complete"/>
-
-            &lt;!&ndash; Maintenance Type &ndash;&gt;
-            <moqui.basic.EnumerationType description="Maintenance Type" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Vehicle Maintenance" enumId="MntTpVehicle" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Oil Change" enumId="MntTpOilChange" parentEnumId="MntTpVehicle" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Belt Replacement" enumId="MntTpBeltReplace" parentEnumId="MntTpVehicle" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Re-Fuel" enumId="MntTpRefuel" parentEnumId="MntTpVehicle" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Tune Up" enumId="MntTpTuneUp" parentEnumId="MntTpVehicle" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Battery Replace" enumId="MntTpBatteryReplace" parentEnumId="MntTpVehicle" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Battery Check" enumId="MntTpBatteryCheck" parentEnumId="MntTpVehicle" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Lubricate Chassis" enumId="MntTpLubeChassis" parentEnumId="MntTpVehicle" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Tires Rotate" enumId="MntTpTiresRotate" parentEnumId="MntTpVehicle" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Tire Replacement" enumId="MntTpTireReplacement" parentEnumId="MntTpVehicle" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="HVAC Maintenance" enumId="MntTpHvac" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Air Filter Replace" enumId="MntTpAirFilterRepl" parentEnumId="MntTpHvac" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Refrigerant Check/Recharge" enumId="MntTpRefrChkChrg" parentEnumId="MntTpHvac" enumTypeId="MaintenanceType"/>
-            <moqui.basic.Enumeration description="Cleaning" enumId="MntTpCleaning" enumTypeId="MaintenanceType"/>
-        </seed-data>
-    </entity>
-    <entity entity-name="AssetMaintenanceContent" package="mantle.product.maintenance" cache="never">
-        <field name="assetMaintenanceId" type="id" is-pk="true"/>
-        <field name="contentDate" type="date-time" default="ec.user.nowTimestamp" is-pk="true"/>
-        <field name="contentTypeEnumId" type="id"/>
-        <field name="contentLocation" type="text-medium"/>
-        <field name="description" type="text-long"/>
-        <field name="userId" type="id" default="ec.user.userId"/>
-        <relationship type="one" related="mantle.product.maintenance.AssetMaintenance"/>
-        <relationship type="one" title="AssetMaintContentType" related="moqui.basic.Enumeration">
-            <key-map field-name="contentTypeEnumId"/></relationship>
-        <relationship type="one" related="moqui.security.UserAccount"/>
-    </entity>
-    <entity entity-name="AssetMaintenanceOrderItem" package="mantle.product.maintenance" cache="never">
-        <field name="assetMaintenanceId" type="id" is-pk="true"/>
-        <field name="orderId" type="id" is-pk="true"/>
-        <field name="orderItemSeqId" type="id" is-pk="true"/>
-        <relationship type="one" related="mantle.product.maintenance.AssetMaintenance"/>
-        <relationship type="one" related="mantle.order.OrderHeader"/>
-        <relationship type="one-nofk" related="mantle.order.OrderItem">
-            <key-map field-name="orderId"/>
-            <key-map field-name="orderItemSeqId"/>
-        </relationship>
-    </entity>
-    <entity entity-name="AssetMeter" package="mantle.product.maintenance" cache="never">
-        &lt;!&ndash; TODO: deprecate this, use mantle.work.measurement.Measurement instead &ndash;&gt;
-        <field name="assetId" type="id" is-pk="true"/>
-        <field name="readingDate" type="date-time" is-pk="true"/>
-        <field name="productMeterTypeId" type="id"/>
-        <field name="productMeterId" type="id"/>
-        <field name="meterValue" type="number-decimal" enable-audit-log="update"/>
-        <field name="readingReasonEnumId" type="id"/>
-        <field name="assetMaintenanceId" type="id"/>
-        <field name="workEffortId" type="id"/>
-        <field name="userId" type="id" default="ec.user.userId"/>
-        <relationship type="one" related="mantle.product.asset.Asset"/>
-        <relationship type="one" related="mantle.product.maintenance.AssetMaintenance"/>
-        <relationship type="one" related="mantle.product.maintenance.ProductMeterType"/>
-        <relationship type="one" related="moqui.security.UserAccount"/>
-    </entity>
-    <entity entity-name="AssetRegistration" package="mantle.product.maintenance" cache="never">
-        <field name="assetId" type="id" is-pk="true"/>
-        <field name="assetRegSeqId" type="id" is-pk="true"/>
-        <field name="fromDate" type="date-time"/>
-        <field name="thruDate" type="date-time"/>
-        <field name="registrationDate" type="date-time"/>
-        <field name="govAgencyPartyId" type="id"/>
-        <field name="registrationNumber" type="text-medium"/>
-        <field name="licenseNumber" type="text-medium"/>
-        <relationship type="one" related="mantle.product.asset.Asset"/>
-        <relationship type="one" title="GovAgency" related="Party">
-            <key-map field-name="govAgencyPartyId"/></relationship>
-    </entity>
-
-    <entity entity-name="ProductMeter" package="mantle.product.maintenance">
-        <field name="productMeterId" type="id" is-pk="true"/>
-        <field name="productId" type="id"/>
-        <field name="productMeterTypeId" type="id"/>
-        <field name="meterUomId" type="id"/>
-        <field name="meterName" type="text-medium"/>
-        <relationship type="one" related="mantle.product.Product"/>
-        <relationship type="one" related="mantle.product.maintenance.ProductMeterType"/>
-        <relationship type="one" title="Meter" related="moqui.basic.Uom">
-            <key-map field-name="meterUomId"/></relationship>
-    </entity>
-    <entity entity-name="ProductMeterType" package="mantle.product.maintenance">
-        <field name="productMeterTypeId" type="id" is-pk="true"/>
-        <field name="description" type="text-medium"/>
-        <field name="defaultUomId" type="id">
-            <description>This is optional and if applicable can describe the meter better</description>
-        </field>
-        <relationship type="one" title="Default" related="moqui.basic.Uom">
-            <key-map field-name="defaultUomId"/></relationship>
-        <seed-data>
-            &lt;!&ndash; Product Meter Type &ndash;&gt;
-            <mantle.product.maintenance.ProductMeterType description="Speedometer" productMeterTypeId="PdMtrSpeedometer"/>
-            <mantle.product.maintenance.ProductMeterType description="Tachometer" productMeterTypeId="PdMtrTachometer"/>
-            <mantle.product.maintenance.ProductMeterType description="Distance Meter" productMeterTypeId="PdMtrDistance"/>
-            <mantle.product.maintenance.ProductMeterType description="Motor Time Meter" productMeterTypeId="PdMtrMotorTime"/>
-            <mantle.product.maintenance.ProductMeterType description="Use Count Meter" productMeterTypeId="PdMtrUseCount"/>
-            <mantle.product.maintenance.ProductMeterType description="Copy Count Meter" productMeterTypeId="PdMtrCopyCount"/>
-            <mantle.product.maintenance.ProductMeterType description="Trip Meter" productMeterTypeId="PdMtrTripMeter"/>
-            <mantle.product.maintenance.ProductMeterType description="Tachograph" productMeterTypeId="PdMtrTachograph"/>
-            <mantle.product.maintenance.ProductMeterType description="Taximeter" productMeterTypeId="PdMtrTaximeter"/>
-            <mantle.product.maintenance.ProductMeterType description="Event Data Recorder" productMeterTypeId="PdMtrEventDataRec"/>
-            <mantle.product.maintenance.ProductMeterType description="Pedometer" productMeterTypeId="PdMtrPedometer"/>
-            <mantle.product.maintenance.ProductMeterType description="Odometer" productMeterTypeId="PdMtrOdometer"/>
-            <mantle.product.maintenance.ProductMeterType description="Thermometer" productMeterTypeId="PdMtrThermometer"/>
-        </seed-data>
-    </entity>
-    <entity entity-name="ProductMaintenance" package="mantle.product.maintenance">
-        <description>This is used to specify the details for scheduled maintenance.</description>
-        <field name="productMaintenanceId" type="id" is-pk="true"/>
-        <field name="productId" type="id"/>
-        <field name="maintenanceTypeEnumId" type="id"/>
-        <field name="description" type="text-medium"/>
-        <field name="comments" type="text-long"/>
-        &lt;!&ndash;<field name="templateWorkEffortId" type="id">
-            <description>Template of Maintenance Plan. WorkEffort may have WorkEffortAssoc records for tasks/breakdown
-                details.</description></field>&ndash;&gt;
-        <field name="intervalQuantity" type="number-decimal"/>
-        <field name="intervalProductMeterId" type="id"/>
-        <field name="intervalUomId" type="id">
-            <description>UOM for intervalQuantity; ignored if intervalProductMeterId is used</description></field>
-        &lt;!&ndash; this isn't really needed with intervalProductMeterId, but leaving commented in case there is a scenario for it:
-        <field name="intervalMeterTypeId" type="id">
-            <description>Meter Type for intervalQuantity; if used intervalUomId is generally not used (ie one or the
-                other)</description>
-        </field>
-        &ndash;&gt;
-        <field name="repeatCount" type="number-integer">
-            <description>If 0 or null means no limit to repeat count; can be used with multiple ProductMaintenance
-                records for a single MaintenanceType in cases where maintenance intervals are not evenly distributed,
-                or only need to be done once like a break-in period</description>
-        </field>
-        <relationship type="one" related="mantle.product.Product"/>
-        <relationship type="one" title="MaintenanceType" related="moqui.basic.Enumeration">
-            <key-map field-name="maintenanceTypeEnumId"/></relationship>
-        &lt;!&ndash;<relationship type="one" title="Template" related="mantle.work.effort.WorkEffort">
-            <key-map field-name="templateWorkEffortId"/></relationship>&ndash;&gt;
-        <relationship type="one" title="Interval" related="moqui.basic.Uom">
-            <key-map field-name="intervalUomId"/></relationship>
-        &lt;!&ndash; <relationship type="one" title="Interval" related="mantle.product.maintenance.ProductMeterType">
-            <key-map field-name="intervalMeterTypeId"/></relationship> &ndash;&gt;
-        <relationship type="one" title="Interval" related="mantle.product.maintenance.ProductMeter">
-            <key-map field-name="intervalProductMeterId"/></relationship>
-    </entity>-->
-
     <!-- ========================================================= -->
     <!-- mantle.product.receipt -->
     <!-- ========================================================= -->
@@ -901,7 +660,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="invoiceItemSeqId" type="id"/>
         <field name="returnId" type="id"/>
         <field name="returnItemSeqId" type="id"/>
-<!--        <field name="workEffortId" type="id"/>-->
         <field name="receivedByUserId" type="id"/>
         <field name="receivedDate" type="date-time"/>
         <field name="itemDescription" type="text-medium"/>
@@ -917,12 +675,8 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one-nofk" related="mantle.shipment.ShipmentItem" short-alias="shipmentItem"/>
         <relationship type="one-nofk" related="mantle.shipment.ShipmentPackage" short-alias="shipmentPackage">
             <key-map field-name="shipmentId"/><key-map field-name="shipmentPackageSeqId"/></relationship>
-<!--        <relationship type="one" related="mantle.account.invoice.InvoiceItem" short-alias="invoiceItem"/>-->
         <relationship type="one" related="mantle.order.return.ReturnItem" short-alias="returnItem">
             <key-map field-name="returnId"/><key-map field-name="returnItemSeqId"/></relationship>
-<!--        <relationship type="one" related="mantle.work.effort.WorkEffort" short-alias="workEffort"/>-->
-<!--        <relationship type="many" related="mantle.work.effort.WorkEffortProduct" short-alias="workEffortProducts">-->
-<!--            <key-map field-name="workEffortId"/><key-map field-name="productId"/></relationship>-->
         <relationship type="one" title="ReceivedBy" related="moqui.security.UserAccount" short-alias="receivedByUserAccount">
             <key-map field-name="receivedByUserId"/></relationship>
         <relationship type="one" title="RejectionReason" related="moqui.basic.Enumeration" short-alias="rejectionReason">

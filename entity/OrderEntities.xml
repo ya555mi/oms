@@ -68,7 +68,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="orderRevision" type="number-integer"/>
 
         <field name="currencyUomId" type="id"/>
-<!--        <field name="billingAccountId" type="id"/>-->
         <field name="productStoreId" type="id"/>
         <field name="salesChannelEnumId" type="id"/>
 
@@ -97,7 +96,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="processingStatusId"/></relationship>
         <relationship type="one" title="Currency" related="moqui.basic.Uom" short-alias="currencyUom">
             <key-map field-name="currencyUomId"/></relationship>
-<!--        <relationship type="one" related="mantle.account.billing.BillingAccount" short-alias="billingAccount"/>-->
         <relationship type="one" related="mantle.product.store.ProductStore" short-alias="productStore"/>
         <relationship type="one" title="SalesChannel" related="moqui.basic.Enumeration" short-alias="salesChannel">
             <key-map field-name="salesChannelEnumId"/></relationship>
@@ -124,8 +122,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="orderId"/></relationship>
         <relationship type="many" related="mantle.order.OrderEmailMessage" short-alias="emailMessages">
             <key-map field-name="orderId"/></relationship>
-        <!--<relationship type="many" related="mantle.account.payment.Payment" short-alias="payments">
-            <key-map field-name="orderId"/></relationship>-->
         <relationship type="many" title="Child" related="mantle.order.OrderHeader" short-alias="childOrders">
             <key-map field-name="orderId" related="parentOrderId"/></relationship>
 
@@ -353,7 +349,6 @@ along with this software (see the LICENSE.md file). If not, see
 
         <field name="itemTypeEnumId" type="id"/>
         <field name="productId" type="id" enable-audit-log="update"/>
-        <!-- for future reference when configurable products are supported: <field name="productConfigSavedId" type="id"/> -->
         <field name="productFeatureId" type="id"/>
         <field name="otherPartyProductId" type="text-short"/>
         <field name="productParameterSetId" type="id">
@@ -393,7 +388,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="promoCodeId" type="id"/>
         <field name="promoCodeText" type="text-medium"><description>Promo code(s) entered by customer used for the item, may be from external system</description></field>
 
-<!--        <field name="subscriptionId" type="id"/>-->
         <field name="finAccountId" type="id"><description>Populate along with finAccountTransId for gift card/certificate/etc purchase and replenishment</description></field>
         <field name="finAccountTransId" type="id"/>
         <field name="overrideGlAccountId" type="id">
@@ -420,7 +414,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="many" title="Child" related="mantle.order.OrderItem" short-alias="children">
             <key-map field-name="orderId"/><key-map field-name="orderItemSeqId" related="parentItemSeqId"/></relationship>
         <relationship type="one" related="mantle.product.Product" short-alias="product"/>
-        <!-- <relationship type="one" related="mantle.product.config.ProductConfigSaved"/> -->
         <relationship type="one" related="mantle.product.feature.ProductFeature" short-alias="feature"/>
         <relationship type="one" related="mantle.product.ProductParameterSet" short-alias="productParameterSet"/>
         <relationship type="one" title="Quantity" related="moqui.basic.Uom" short-alias="quantityUom">
@@ -434,8 +427,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" related="mantle.product.store.ProductStorePromoCode" short-alias="storePromoCode"/>
 
         <relationship type="one" related="mantle.product.subscription.Subscription" short-alias="subscription"/>
-        <!--<relationship type="one" related="mantle.account.financial.FinancialAccount" short-alias="financialAccount"/>
-        <relationship type="one" related="mantle.account.financial.FinancialAccountTrans" short-alias="financialAccountTrans"/>-->
         <relationship type="one" title="Override" related="mantle.ledger.account.GlAccount" short-alias="overrideGlAccount">
             <key-map field-name="overrideGlAccountId"/></relationship>
         <relationship type="one" related="SalesOpportunity" short-alias="opportunity"/>
@@ -658,20 +649,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" related="mantle.order.OrderHeader" short-alias="orderHeader"/>
         <relationship type="one" related="mantle.product.store.ProductStorePromoCode" short-alias="storePromoCode"/>
     </entity>
-    <!--<entity entity-name="OrderItemWorkEffort" package="mantle.order" cache="never">
-        <field name="orderId" type="id" is-pk="true"/>
-        <field name="orderItemSeqId" type="id" is-pk="true"/>
-        <field name="workEffortId" type="id" is-pk="true"/>
-        <field name="requiredWork" type="text-indicator">
-            <description>If Y require WorkEffort Status of Complete, Closed, or Cancelled to consider OrderItem fulfilled</description></field>
-        <field name="forStatusId" type="id">
-            <description>Task must be Complete or Closed before change to this status (soft rule, depending on code in place)</description></field>
-        <relationship type="one" related="mantle.order.OrderItem"/>
-&lt;!&ndash;        <relationship type="one" related="mantle.work.effort.WorkEffort"/>&ndash;&gt;
-        <relationship type="one" title="OrderHeader" related="moqui.basic.StatusItem" short-alias="forStatus">
-            <key-map field-name="forStatusId"/></relationship>
-    </entity>
--->
     <!-- ========================================================= -->
     <!-- mantle.order.return -->
     <!-- ========================================================= -->
@@ -693,7 +670,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="useSingleRefundPayment" type="text-indicator">
             <description>If Y create a single refund Payment, otherwise look for Credit Card order payments and refund first against those</description></field>
         <field name="finAccountId" type="id"/>
-        <!-- maybe support later: <field name="billingAccountId" type="id"/> -->
         <field name="entryDate" type="date-time"/>
         <field name="postalContactMechId" type="id"><description>If customer is internal org is shipment destination, otherwise is origin</description></field>
         <field name="telecomContactMechId" type="id"><description>If customer is internal org is shipment destination, otherwise is origin</description></field>
@@ -713,8 +689,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="customerPartyId"/></relationship>
         <relationship type="one" title="Vendor" related="mantle.party.Party" short-alias="vendor">
             <key-map field-name="vendorPartyId"/></relationship>
-        <!--<relationship type="one" related="mantle.account.financial.FinancialAccount" short-alias="financialAccount"/>
-        <relationship type="one" related="mantle.account.method.PaymentMethod" short-alias="paymentMethod"/>-->
         <relationship type="one" title="Postal" related="mantle.party.contact.ContactMech" short-alias="postal">
             <key-map field-name="postalContactMechId"/></relationship>
         <relationship type="one" related="mantle.party.contact.PostalAddress" short-alias="postalAddress">
@@ -841,9 +815,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="finAccountTransId" type="id" enable-audit-log="update"/>
         <field name="refundPaymentId" type="id" enable-audit-log="update"/>
 
-        <!-- doesn't make sense, may be multiple payments: <field name="originalPaymentId" type="id"/> -->
-        <!-- maybe future: <field name="billingAccountId" type="id"/> -->
-
         <relationship type="one" related="mantle.order.return.ReturnHeader" short-alias="returnHeader"/>
         <relationship type="one-nofk" title="Parent" related="mantle.order.return.ReturnItem" short-alias="parent">
             <key-map field-name="returnId"/><key-map field-name="parentItemSeqId" related="returnItemSeqId"/></relationship>
@@ -867,19 +838,12 @@ along with this software (see the LICENSE.md file). If not, see
 
         <relationship type="one" title="Replacement" related="mantle.order.OrderHeader" short-alias="replacementOrder">
             <key-map field-name="replacementOrderId"/></relationship>
-<!--        <relationship type="one" related="mantle.account.financial.FinancialAccountTrans" short-alias="financialAccountTrans"/>-->
-        <!--<relationship type="one" title="Refund" related="mantle.account.payment.Payment" short-alias="refundPayment">
-            <key-map field-name="refundPaymentId"/></relationship>-->
-
         <relationship type="many" related="mantle.product.issuance.AssetIssuance" short-alias="issuances">
             <key-map field-name="returnId"/><key-map field-name="returnItemSeqId"/></relationship>
         <relationship type="many" related="mantle.product.receipt.AssetReceipt" short-alias="receipts">
             <key-map field-name="returnId"/><key-map field-name="returnItemSeqId"/></relationship>
         <relationship type="many" related="mantle.shipment.ShipmentItemSource" short-alias="shipmentSources">
             <key-map field-name="returnId"/><key-map field-name="returnItemSeqId"/></relationship>
-        <!--<relationship type="many" related="mantle.order.return.ReturnItemBilling" short-alias="billings">
-            <key-map field-name="returnId"/><key-map field-name="returnItemSeqId"/></relationship>-->
-
         <index name="RTN_ITM_BYORDITM"><index-field name="orderId"/><index-field name="orderItemSeqId"/></index>
 
         <seed-data>
@@ -907,16 +871,4 @@ along with this software (see the LICENSE.md file). If not, see
             <moqui.basic.Enumeration enumId="RrspManual" description="Manual" enumTypeId="ReturnResponse"/>
         </seed-data>
     </entity>
-    <!--<entity entity-name="ReturnItemBilling" package="mantle.order.return" cache="never">
-        <field name="returnId" type="id" is-pk="true"/>
-        <field name="returnItemSeqId" type="id" is-pk="true"/>
-        <field name="invoiceId" type="id" is-pk="true"/>
-        <field name="invoiceItemSeqId" type="id" is-pk="true"/>
-        <field name="assetReceiptId" type="id"/>
-        <field name="quantity" type="number-decimal"/>
-        <field name="amount" type="currency-amount"/>
-        <relationship type="one" related="mantle.order.return.ReturnItem"/>
-        <relationship type="one" related="mantle.account.invoice.InvoiceItem"/>
-        <relationship type="one" related="mantle.product.receipt.AssetReceipt"/>
-    </entity>-->
 </entities>
