@@ -269,7 +269,7 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" related="mantle.product.store.ProductStore" short-alias="store"/>
         <relationship type="one" title="PaymentInstrument" related="moqui.basic.Enumeration" short-alias="paymentInstrument">
             <key-map field-name="paymentInstrumentEnumId"/></relationship>
-        <relationship type="one" related="mantle.account.method.PaymentGatewayConfig" short-alias="config"/>
+<!--        <relationship type="one" related="mantle.account.method.PaymentGatewayConfig" short-alias="config"/>-->
     </entity>
 
     <entity entity-name="ProductStoreProduct" package="mantle.product.store" use="configuration" cache="true">
@@ -432,7 +432,7 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="shipmentMethodEnumId"/></relationship>
     </entity>
 
-    <!--<entity entity-name="ProductStoreWikiSpace" package="mantle.product.store">
+    <entity entity-name="ProductStoreWikiSpace" package="mantle.product.store">
         <description>Used to configure a WikiSpace to use for a given store, space type, and locale instead of directly referencing a wikiSpaceId.</description>
         <field name="storeWikiSpaceId" type="id" is-pk="true"/>
         <field name="productStoreId" type="id"/>
@@ -441,25 +441,25 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="fromDate" type="date-time"/>
         <field name="thruDate" type="date-time"/>
         <field name="wikiSpaceId" type="id"/>
-        &lt;!&ndash; future: <field name="allowSplit" type="text-indicator"><description>If all matching records have a 'Y' randomize and remember the
-            wikiSpaceId used instead of using from/thru date pattern (filter, get most recent by fromDate) to determine a single space.</description></field> &ndash;&gt;
-        &lt;!&ndash; future, for version tagging once implemented: <field name="spaceTag" type="text-short"/> &ndash;&gt;
+        <!-- future: <field name="allowSplit" type="text-indicator"><description>If all matching records have a 'Y' randomize and remember the
+            wikiSpaceId used instead of using from/thru date pattern (filter, get most recent by fromDate) to determine a single space.</description></field> -->
+        <!-- future, for version tagging once implemented: <field name="spaceTag" type="text-short"/> -->
         <relationship type="one" related="mantle.product.store.ProductStore" short-alias="store"/>
         <relationship type="one" title="ProductStoreWikiSpaceType" related="moqui.basic.Enumeration" short-alias="type">
             <key-map field-name="spaceTypeEnumId"/></relationship>
         <relationship type="one" related="moqui.resource.wiki.WikiSpace" short-alias="wikiSpace"/>
         <seed-data>
-            &lt;!&ndash; NOTE: these enumId values go in URLs to keep small &ndash;&gt;
+            <!-- NOTE: these enumId values go in URLs to keep small -->
             <moqui.basic.EnumerationType description="Product Store Wiki Space Type" enumTypeId="ProductStoreWikiSpaceType"/>
-            &lt;!&ndash; full page content like about us, policies, etc &ndash;&gt;
+            <!-- full page content like about us, policies, etc -->
             <moqui.basic.Enumeration description="Content - Full Page" enumId="PstFull" enumTypeId="ProductStoreWikiSpaceType"/>
-            &lt;!&ndash; blog post content like about us, policies, etc &ndash;&gt;
+            <!-- blog post content like about us, policies, etc -->
             <moqui.basic.Enumeration description="Content - Blog Posts" enumId="PstBlog" enumTypeId="ProductStoreWikiSpaceType"/>
-            &lt;!&ndash; page snippet content including banners, carousel slides, etc; often referred to through a WikiPageCategory &ndash;&gt;
+            <!-- page snippet content including banners, carousel slides, etc; often referred to through a WikiPageCategory -->
             <moqui.basic.Enumeration description="Content - Snippet" enumId="PstSnip" enumTypeId="ProductStoreWikiSpaceType"/>
-            &lt;!&ndash; templates for information pages like header, footer, home, category, product, search, etc; server rendered, change frequently &ndash;&gt;
+            <!-- templates for information pages like header, footer, home, category, product, search, etc; server rendered, change frequently -->
             <moqui.basic.Enumeration description="Template - Information (home, product, etc)" enumId="PstTmpSrv" enumTypeId="ProductStoreWikiSpaceType"/>
-            &lt;!&ndash; templates for interactive pages like checkout, profile, etc; client rendered, change less frequently &ndash;&gt;
+            <!-- templates for interactive pages like checkout, profile, etc; client rendered, change less frequently -->
             <moqui.basic.Enumeration description="Template - Interactive (checkout, profile, etc)" enumId="PstTmpClt" enumTypeId="ProductStoreWikiSpaceType"/>
         </seed-data>
     </entity>
@@ -469,14 +469,14 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="storeWikiContentId" type="id" is-pk="true"/>
         <field name="productStoreId" type="id"/>
         <field name="contentTypeEnumId" type="id"/>
-        &lt;!&ndash; maybe at this level... <field name="locale" type="text-short"/> &ndash;&gt;
+        <!-- maybe at this level... <field name="locale" type="text-short"/> -->
         <field name="fromDate" type="date-time"/>
         <field name="thruDate" type="date-time"/>
         <field name="spaceTypeEnumId" type="id"/>
         <field name="pagePath" type="text-medium"/>
-        &lt;!&ndash; for AB testing add field with percentage weight for each alternative; should also remember in session for user so the randomly selected option is consistent &ndash;&gt;
-        &lt;!&ndash; future: <field name="allowSplit" type="text-indicator"><description>If all matching records have a 'Y' randomize and remember the
-            wikiSpaceId used instead of using from/thru date pattern (filter, get most recent by fromDate) to determine a single space.</description></field> &ndash;&gt;
+        <!-- for AB testing add field with percentage weight for each alternative; should also remember in session for user so the randomly selected option is consistent -->
+        <!-- future: <field name="allowSplit" type="text-indicator"><description>If all matching records have a 'Y' randomize and remember the
+            wikiSpaceId used instead of using from/thru date pattern (filter, get most recent by fromDate) to determine a single space.</description></field> -->
         <relationship type="one" related="mantle.product.store.ProductStore" short-alias="store"/>
         <relationship type="one" title="ProductStoreContentType" related="moqui.basic.Enumeration" short-alias="type">
             <key-map field-name="contentTypeEnumId"/></relationship>
@@ -493,12 +493,12 @@ along with this software (see the LICENSE.md file). If not, see
             <moqui.basic.Enumeration enumCode="template_client_search" description="Search Template - Client" enumId="PsctSearchTemplate" enumTypeId="ProductStoreContentType"/>
             <moqui.basic.Enumeration enumCode="template_client_category" description="Category Template - Client" enumId="PsctCategoryTemplate" enumTypeId="ProductStoreContentType"/>
             <moqui.basic.Enumeration enumCode="template_client_product" description="Product Template - Client" enumId="PsctProductTemplate" enumTypeId="ProductStoreContentType"/>
-            &lt;!&ndash; consolidate these
+            <!-- consolidate these
             <moqui.basic.Enumeration enumCode="template_client_categoryProduct" description="Category Product Template - Client" enumId="PsctCategoryProductTemplate" enumTypeId="ProductStoreContentType"/>
             <moqui.basic.Enumeration enumCode="template_client_productImage" description="Product Image Template - Client" enumId="PsctProductImageTemplate" enumTypeId="ProductStoreContentType"/>
             <moqui.basic.Enumeration enumCode="template_client_productReview" description="Product Review Template - Client" enumId="PsctProductReviewTemplate" enumTypeId="ProductStoreContentType"/>
             <moqui.basic.Enumeration enumCode="template_client_starRating" description="Star Rating Template - Client" enumId="PsctProductTemplate" enumTypeId="ProductStoreContentType"/>
-            &ndash;&gt;
+            -->
 
             <moqui.basic.Enumeration enumCode="template_client_login" description="Login Template - Client" enumId="PsctLoginTemplate" enumTypeId="ProductStoreContentType"/>
             <moqui.basic.Enumeration enumCode="template_client_resetPassword" description="Reset Password Template - Client" enumId="PsctResetPasswordTemplate" enumTypeId="ProductStoreContentType"/>
@@ -519,7 +519,7 @@ along with this software (see the LICENSE.md file). If not, see
             <moqui.basic.Enumeration enumCode="template_server_product" description="Product Template - Server" enumId="PsctProductTemplateServer" enumTypeId="ProductStoreContentType"/>
         </seed-data>
     </entity>
--->
+
     <entity entity-name="ProductStoreGroup" package="mantle.product.store">
         <field name="productStoreGroupId" type="id" is-pk="true"/>
         <field name="storeGroupTypeEnumId" type="id"/>
