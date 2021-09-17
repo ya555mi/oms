@@ -75,11 +75,11 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
             <if condition="facility != null"><set field="facilityId" from="facility.facilityId"/></if>
 
-            <!-- Invoice -->
+            <!--&lt;!&ndash; Invoice &ndash;&gt;
             <entity-find-one entity-name="mantle.account.invoice.Invoice" value-field="invoice">
                 <field-map field-name="invoiceId" from="lookupId"/></entity-find-one>
             <if condition="invoice != null"><set field="invoiceId" from="invoice.invoiceId"/></if>
-
+-->
             <!-- OrderHeader -->
             <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader">
                 <field-map field-name="orderId" from="lookupId"/></entity-find-one>
@@ -150,10 +150,10 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
 
             <!-- Payment -->
-            <entity-find-one entity-name="mantle.account.payment.Payment" value-field="payment">
+            <entity-find-one entity-name="mantle.order.payment.Payment" value-field="payment">
                 <field-map field-name="paymentId" from="lookupId"/></entity-find-one>
             <if condition="payment == null">
-                <entity-find-one entity-name="mantle.account.payment.Payment" value-field="payment">
+                <entity-find-one entity-name="mantle.order.payment.Payment" value-field="payment">
                     <field-map field-name="paymentRefNum" from="lookupId"/></entity-find-one>
             </if>
             <if condition="payment != null"><set field="paymentId" from="payment.paymentId"/></if>
@@ -200,15 +200,15 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
             <if condition="shipment != null"><set field="shipmentId" from="shipment.shipmentId"/></if>
 
-            <!-- WorkEffort -->
+            <!--&lt;!&ndash; WorkEffort &ndash;&gt;
             <entity-find-one entity-name="mantle.work.effort.WorkEffort" value-field="workEffort">
                 <field-map field-name="workEffortId" from="lookupId"/></entity-find-one>
             <if condition="workEffort != null"><set field="workEffortId" from="workEffort.workEffortId"/></if>
 
-            <!-- AcctgTrans -->
+            &lt;!&ndash; AcctgTrans &ndash;&gt;
             <entity-find-one entity-name="mantle.ledger.transaction.AcctgTrans" value-field="acctgTrans">
                 <field-map field-name="acctgTransId" from="lookupId"/></entity-find-one>
-            <if condition="acctgTrans != null"><set field="acctgTransId" from="acctgTrans.acctgTransId"/></if>
+            <if condition="acctgTrans != null"><set field="acctgTransId" from="acctgTrans.acctgTransId"/></if>-->
         </actions>
     </service>
 
