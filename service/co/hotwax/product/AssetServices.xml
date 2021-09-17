@@ -105,7 +105,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
 
             <!-- compile set of assetPoolId values -->
-            <service-call name="mantle.product.AssetServices.get#AssetPools" out-map="poolsOut"
+            <service-call name="co.hotwax.product.AssetServices.get#AssetPools" out-map="poolsOut"
                     in-map="[productStoreId:productStoreId, vendorPartyId:vendorPartyId, customerPartyId:customerPartyId]"/>
             <set field="assetPoolIdSet" from="poolsOut.assetPoolIdSet"/>
 
@@ -136,7 +136,7 @@ along with this software (see the LICENSE.md file). If not, see
                     </entity-find>
                     <set field="availableFromComponents" from="0.0"/>
                     <iterate list="assocList" entry="assoc">
-                        <service-call name="mantle.product.AssetServices.get#AvailableInventory" out-map="compAvailOut" out-map-add-to-existing="false"
+                        <service-call name="co.hotwax.product.AssetServices.get#AvailableInventory" out-map="compAvailOut" out-map-add-to-existing="false"
                                 in-map="[productId:assoc.toProductId, facilityId:facilityId, productStoreId:productStoreId,
                                     vendorPartyId:vendorPartyId, customerPartyId:customerPartyId]"/>
                         <!-- NOTE: digits to round? asset qty can be non-integer, but most products are and we want that -->
@@ -170,7 +170,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="!orderPart.facilityId &amp;&amp; !orderHeader.productStoreId">
                 <return type="warning" message="Cannot get available inventory for order ${orderId} part ${orderPartSeqId}, no facility on order part and no store on header"/></if>
 
-            <service-call name="mantle.product.AssetServices.get#AvailableInventory" out-map="context"
+            <service-call name="co.hotwax.product.AssetServices.get#AvailableInventory" out-map="context"
                     in-map="[productId:productId, facilityId:orderPart.facilityId, productStoreId:orderHeader.productStoreId,
                         vendorPartyId:orderPart.vendorPartyId, customerPartyId:orderPart.customerPartyId]"/>
 
@@ -305,7 +305,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
 
             <!-- compile set of assetPoolId values -->
-            <service-call name="mantle.product.AssetServices.get#AssetPools" out-map="poolsOut"
+            <service-call name="co.hotwax.product.AssetServices.get#AssetPools" out-map="poolsOut"
                     in-map="[productStoreId:productStoreId, vendorPartyId:vendorPartyId, customerPartyId:customerPartyId]"/>
             <set field="assetPoolIdSet" from="poolsOut.assetPoolIdSet"/>
 
@@ -349,7 +349,7 @@ along with this software (see the LICENSE.md file). If not, see
                         </entity-find>
                         <set field="availableFromComponents" from="0.0"/>
                         <iterate list="assocList" entry="assoc">
-                            <service-call name="mantle.product.AssetServices.get#AvailableInventory" out-map="compAvailOut" out-map-add-to-existing="false"
+                            <service-call name="co.hotwax.product.AssetServices.get#AvailableInventory" out-map="compAvailOut" out-map-add-to-existing="false"
                                     in-map="[productId:assoc.toProductId, facilityId:facilityId, productStoreId:productStoreId,
                                     vendorPartyId:vendorPartyId, customerPartyId:customerPartyId]"/>
                             <!-- NOTE: digits to round? asset qty can be non-integer, but most products are and we want that -->
@@ -400,7 +400,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="ownerPartyId"><set field="asset.ownerPartyId" from="ownerPartyId"/></if>
             <entity-update value-field="asset"/>
 
-            <service-call name="mantle.ledger.AssetAutoPostServices.repost#Asset" in-map="[assetId:assetId]"/>
+            <service-call name="co.hotwax.ledger.AssetAutoPostServices.repost#Asset" in-map="[assetId:assetId]"/>
             <!-- TODO: consider re-evaluating all reservations if ownerPartyId changes, may need to bump or inventory may be available for not available reservations -->
         </actions>
     </service>
@@ -424,7 +424,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <select-field field-name="assetId"/>
             </entity-find>
             <iterate list="assetList" entry="asset">
-                <service-call name="mantle.product.AssetServices.update#AssetAcquireCost"
+                <service-call name="co.hotwax.product.AssetServices.update#AssetAcquireCost"
                         in-map="[assetId:asset.assetId, acquireCost:acquireCost, ownerPartyId:ownerPartyId]"/>
             </iterate>
             <message>Updated Acquire Cost to ${acquireCost?.toPlainString()} on ${assetList.size()} Asset records for Product ${productId}, Facility ${facilityId?:'*'}, Received From ${receivedDate_from?:'*'} Thru ${receivedDate_thru?:'*'}</message>
@@ -470,7 +470,7 @@ along with this software (see the LICENSE.md file). If not, see
             <!-- never let quantityOnHandTotal stay negative, do a physical inventory found for the difference -->
             <!-- NOTE: this may be better to do at a higher level in some cases, but this will make sure -->
             <if condition="asset.quantityOnHandTotal &lt; 0">
-                <service-call name="mantle.product.AssetServices.record#PhysicalInventoryChange"
+                <service-call name="co.hotwax.product.AssetServices.record#PhysicalInventoryChange"
                         in-map="[productId:asset.productId, facilityId:asset.facilityId, locationSeqId:asset.locationSeqId,
                             quantityChange:-asset.quantityOnHandTotal, varianceReasonEnumId:'InVrFound',
                             assetList:[asset]]"/>
@@ -525,7 +525,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                 <!-- NOTE: check reservations? for all or only those changed above? maybe better as a separate service since this is heavy/slow logic?
                   - Don't do this, instead if needed call mantle.product.AssetServices.check#FacilityReservations service.
-                <service-call name="mantle.product.AssetServices.check#AssetReservations" in-map="[assetId:asset.assetId]"/> -->
+                <service-call name="co.hotwax.product.AssetServices.check#AssetReservations" in-map="[assetId:asset.assetId]"/> -->
             </iterate>
 
             <message>Checking ${recordsChecked} Asset record totals for Product ${productId?:'*'} Facility ${facilityId?:'*'}, updated ${recordsUpdated} with incorrect totals</message>
@@ -623,7 +623,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <order-by field-name="productId"/>
                 </entity-find>
                 <iterate list="orderItemList" entry="orderItem">
-                    <service-call name="mantle.product.AssetServices.reserve#AssetForOrderItem"
+                    <service-call name="co.hotwax.product.AssetServices.reserve#AssetForOrderItem"
                             in-map="[orderId:orderId, orderItemSeqId:orderItem.orderItemSeqId, productStore:productStore, forceReserve:forceReserve]"/>
                 </iterate>
             </iterate>
@@ -661,7 +661,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
 
             <!-- reserve assets, or update reservations as needed -->
-            <service-call name="mantle.product.AssetServices.reserve#AssetForOrderItem" in-map="context"/>
+            <service-call name="co.hotwax.product.AssetServices.reserve#AssetForOrderItem" in-map="context"/>
         </actions>
     </service>
     <service verb="reserve" noun="AssetForOrderItem" no-tx-cache="true">
@@ -720,7 +720,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <!-- before finding remaining quantity and getting existing reservations, resetReservations if specified -->
             <if condition="resetReservations">
-                <service-call name="mantle.product.AssetServices.remove#OrderItemReservations" in-map="context"/></if>
+                <service-call name="co.hotwax.product.AssetServices.remove#OrderItemReservations" in-map="context"/></if>
 
             <!-- start with full item quantity -->
             <set field="quantityRemaining" from="componentQuantity != null ? componentQuantity : orderItem.quantity"/>
@@ -756,7 +756,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="quantityRemaining &lt; 0">
                 <set field="quantityToDeduct" from="-quantityRemaining"/>
                 <iterate list="existingResList" entry="existingRes">
-                    <service-call name="mantle.product.AssetServices.reduce#AssetReservation" out-map="reduceArOut" out-map-add-to-existing="false"
+                    <service-call name="co.hotwax.product.AssetServices.reduce#AssetReservation" out-map="reduceArOut" out-map-add-to-existing="false"
                             in-map="[assetReservationId:existingRes.assetReservationId, quantityToDeduct:quantityToDeduct, reserveIncreasedAsset:true]"/>
                     <set field="quantityToDeduct" from="quantityToDeduct - reduceArOut.quantityDeducted"/>
                     <if condition="quantityToDeduct == 0"><break/></if>
@@ -820,7 +820,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
 
             <!-- get assetPoolId values this order qualifies for (by store, vendor, customer) -->
-            <service-call name="mantle.product.AssetServices.get#AssetPools" out-map="poolsOut"
+            <service-call name="co.hotwax.product.AssetServices.get#AssetPools" out-map="poolsOut"
                     in-map="[productStoreId:orderHeader.productStoreId, vendorPartyId:orderPart?.vendorPartyId,
                         customerPartyId:orderPart?.customerPartyId]"/>
             <set field="assetPoolIdSet" from="poolsOut.assetPoolIdSet"/>
@@ -860,7 +860,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <set field="quantityToReserve" from="asset.quantityOnHandTotal &gt; checkQuantityRemaining ? checkQuantityRemaining : asset.quantityOnHandTotal"/>
                     <if condition="quantityToReserve &gt; asset.availableToPromiseTotal">
                         <!-- displace existing reservations for explicit assetIds -->
-                        <service-call name="mantle.product.AssetServices.displace#AssetReservations"
+                        <service-call name="co.hotwax.product.AssetServices.displace#AssetReservations"
                                 in-map="[assetId:asset.assetId, orderId:orderId, orderItemSeqId:orderItemSeqId, quantity:quantityToReserve]"/>
                         <entity-find-one entity-name="mantle.product.asset.Asset" value-field="asset" for-update="true">
                             <field-map field-name="assetId" from="asset.assetId"/></entity-find-one>
@@ -1074,7 +1074,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <if condition="assoc.productId == assoc.toProductId">
                         <return error="true" message="Pick Assembly Product ${assoc.productId} has itself for a component product, remove the Manufacturing BOM Association"/></if>
 
-                    <service-call name="mantle.product.AssetServices.reserve#AssetForOrderItem"
+                    <service-call name="co.hotwax.product.AssetServices.reserve#AssetForOrderItem"
                             in-map="[orderId:orderId, orderItemSeqId:orderItemSeqId, productStore:productStore, forceReserve:forceReserve,
                                 componentProductId:assoc.toProductId, componentQuantity:((assoc.quantity ?: 1.0) * quantityRemaining)]"/>
                 </iterate>
@@ -1103,7 +1103,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="newResAssetId" from="existingResAssetList ? existingResAssetList.get(0).assetId : null"/>
                 <if condition="!newResAssetId">
                     <!-- no asset... create a shell one to record the reservation and detail against -->
-                    <service-call name="mantle.product.AssetServices.create#ProductAssetAdHoc" out-map="assetOut"
+                    <service-call name="co.hotwax.product.AssetServices.create#ProductAssetAdHoc" out-map="assetOut"
                             in-map="[productId:productId, facilityId:inventoryFacilityId, ownerPartyId:organizationPartyId,
                                 createdDate:nowTimestamp]"/>
                     <set field="newResAssetId" from="assetOut.assetId"/>
@@ -1133,7 +1133,7 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find entity-name="mantle.product.issuance.AssetReservation" list="existingResList" for-update="true">
                 <econdition field-name="orderId"/><econdition field-name="orderItemSeqId"/></entity-find>
             <iterate list="existingResList" entry="existingRes">
-                <service-call name="mantle.product.AssetServices.reduce#AssetReservation"
+                <service-call name="co.hotwax.product.AssetServices.reduce#AssetReservation"
                         in-map="[assetReservationId:existingRes.assetReservationId, reserveIncreasedAsset:true]"/>
             </iterate>
         </actions>
@@ -1150,7 +1150,7 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find entity-name="mantle.product.issuance.AssetReservation" list="existingResList" for-update="true">
                 <econdition field-name="orderId"/></entity-find>
             <iterate list="existingResList" entry="existingRes">
-                <service-call name="mantle.product.AssetServices.reduce#AssetReservation"
+                <service-call name="co.hotwax.product.AssetServices.reduce#AssetReservation"
                         in-map="[assetReservationId:existingRes.assetReservationId, reserveIncreasedAsset:true]"/>
             </iterate>
         </actions>
@@ -1207,7 +1207,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <if condition="reserveIncreasedAsset">
                 <!-- with ATP increased reserve newly available inventory -->
-                <service-call name="mantle.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:existingRes.assetId]"/>
+                <service-call name="co.hotwax.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:existingRes.assetId]"/>
             </if>
         </actions>
     </service>
@@ -1244,7 +1244,7 @@ along with this software (see the LICENSE.md file). If not, see
                 </if>
 
                 <!-- remove item reservations -->
-                <service-call name="mantle.product.AssetServices.remove#OrderItemReservations"
+                <service-call name="co.hotwax.product.AssetServices.remove#OrderItemReservations"
                         in-map="[orderId:resOrderItem.orderId, orderItemSeqId:resOrderItem.orderItemSeqId]"/>
 
                 <!-- look up OrderPart, OrderHeader to see if item qualifies for re-reserve, and get order by fields -->
@@ -1261,7 +1261,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <iterate list="orderItemInfoList" entry="orderItemInfo">
                 <!-- NOTE: a reservation existed so forceReserve:true -->
-                <service-call name="mantle.product.AssetServices.reserve#AssetForOrderItem"
+                <service-call name="co.hotwax.product.AssetServices.reserve#AssetForOrderItem"
                         in-map="[orderId:orderItemInfo.orderId, orderItemSeqId:orderItemInfo.orderItemSeqId, forceReserve:true]"/>
             </iterate>
         </actions>
@@ -1314,7 +1314,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <!-- make sure quantityToMove is less than res.quantityNotIssued, don't move issued quantities! -->
                 <if condition="quantityToMove &gt; res.quantityNotIssued"><set field="quantityToMove" from="res.quantityNotIssued"/></if>
                 <if condition="quantityToMove &gt; 0.0">
-                    <service-call name="mantle.product.AssetServices.move#AssetReservation"
+                    <service-call name="co.hotwax.product.AssetServices.move#AssetReservation"
                             out-map="moveArOut" out-map-add-to-existing="false"
                             in-map="[assetId:assetId, assetReservationId:res.assetReservationId, quantity:quantityToMove]"/>
                     <set field="availableRemaining" from="availableRemaining - (moveArOut.quantityMoved ?: 0.0)"/>
@@ -1347,7 +1347,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="orderItem" from="assetReservation.orderItem"/>
                 <set field="orderPart" from="orderItem.part"/>
                 <set field="orderHeader" from="orderItem.header"/>
-                <service-call name="mantle.product.AssetServices.get#AssetPools" out-map="poolsOut"
+                <service-call name="co.hotwax.product.AssetServices.get#AssetPools" out-map="poolsOut"
                         in-map="[productStoreId:orderHeader.productStoreId, vendorPartyId:orderPart?.vendorPartyId,
                             customerPartyId:orderPart?.customerPartyId]"/>
                 <set field="assetPoolIdSet" from="poolsOut.assetPoolIdSet"/>
@@ -1481,7 +1481,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <set field="quantityReserved" from="assetRes.quantityNotIssued"/>
                     <set field="quantityToMove" from="quantityReserved &gt; remainingQuantity ? remainingQuantity : quantityReserved"/>
                     <if condition="quantityToMove &gt; 0.0">
-                        <service-call name="mantle.product.AssetServices.move#AssetReservation" out-map="moveArOut" out-map-add-to-existing="false"
+                        <service-call name="co.hotwax.product.AssetServices.move#AssetReservation" out-map="moveArOut" out-map-add-to-existing="false"
                                 in-map="[assetId:assetId, assetReservationId:assetRes.assetReservationId, quantity:quantityToMove]"/>
                         <set field="remainingQuantity" from="remainingQuantity - quantityToMove"/>
                     </if>
@@ -1507,7 +1507,7 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find entity-name="mantle.product.issuance.AssetReservation" list="assetReservationList">
                 <econdition field-name="assetId"/></entity-find>
             <iterate list="assetReservationList" entry="assetReservation">
-                <service-call name="mantle.product.AssetServices.check#AssetReservationValid"
+                <service-call name="co.hotwax.product.AssetServices.check#AssetReservationValid"
                         in-map="[assetReservationId:assetReservation.assetReservationId,
                             assetReservation:assetReservation, asset:asset]"/>
             </iterate>
@@ -1515,7 +1515,7 @@ along with this software (see the LICENSE.md file). If not, see
             <!-- refresh Asset, check ATP -->
             <entity-find-one entity-name="mantle.product.asset.Asset" value-field="asset" for-update="true"/>
             <if condition="asset.availableToPromiseTotal &gt; 0.0">
-                <service-call name="mantle.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:assetId]"/>
+                <service-call name="co.hotwax.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:assetId]"/>
             </if>
         </actions>
     </service>
@@ -1590,7 +1590,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <if condition="orderItem == null"><set field="orderItem" from="assetReservation.orderItem"/></if>
                     <if condition="orderPart == null"><set field="orderPart" from="orderItem.part"/></if>
                     <if condition="orderHeader == null"><set field="orderHeader" from="orderItem.header"/></if>
-                    <service-call name="mantle.product.AssetServices.get#AssetPools" out-map="poolsOut"
+                    <service-call name="co.hotwax.product.AssetServices.get#AssetPools" out-map="poolsOut"
                             in-map="[productStoreId:orderHeader.productStoreId, vendorPartyId:orderPart?.vendorPartyId,
                                 customerPartyId:orderPart?.customerPartyId]"/>
                     <set field="assetPoolIdSet" from="poolsOut.assetPoolIdSet"/>
@@ -1605,12 +1605,12 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="quantityNotValid" from="assetReservation.quantity"/>
 
                 <!-- reservation not valid, delete and try to re-reserve for OrderItem -->
-                <service-call name="mantle.product.AssetServices.reduce#AssetReservation"
+                <service-call name="co.hotwax.product.AssetServices.reduce#AssetReservation"
                         in-map="[assetReservationId:assetReservationId, reserveIncreasedAsset:true]"/>
                 <if condition="!assetReservation.orderId || !assetReservation.orderItemSeqId"><then>
                     <log level="warn" message="AssetReservation ${assetReservationId} has no order item and is no longer valid but cannot re-reserve"/>
                 </then><else>
-                    <service-call name="mantle.product.AssetServices.reserve#AssetForOrderItem"
+                    <service-call name="co.hotwax.product.AssetServices.reserve#AssetForOrderItem"
                             in-map="[orderId:assetReservation.orderId, orderItemSeqId:assetReservation.orderItemSeqId,
                                 skipAssetIds:[asset.assetId]]"/>
                 </else></if>
@@ -1639,7 +1639,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <select-field field-name="assetReservationId"/>
             </entity-find>
             <iterate list="assetReservationList" entry="assetReservation">
-                <service-call name="mantle.product.AssetServices.check#AssetReservationValid"
+                <service-call name="co.hotwax.product.AssetServices.check#AssetReservationValid"
                         out-map="checkValidOut" out-map-add-to-existing="false"
                         in-map="[assetReservationId:assetReservation.assetReservationId]"/>
                 <if condition="checkValidOut.reservationInvalid">
@@ -1655,7 +1655,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <select-field field-name="assetId"/>
             </entity-find>
             <iterate list="assetList" entry="asset">
-                <service-call name="mantle.product.AssetServices.reserve#IncreasedAsset"
+                <service-call name="co.hotwax.product.AssetServices.reserve#IncreasedAsset"
                         out-map="reserveOut" out-map-add-to-existing="false"
                         in-map="[assetId:asset.assetId]"/>
                 <set field="quantityMoved" from="quantityMoved + (reserveOut.quantityMoved ?: 0.0)"/>
@@ -1730,10 +1730,10 @@ along with this software (see the LICENSE.md file). If not, see
                     <set field="curMoveQuantity" from="resQuantityRemaining &gt; resToMove.quantityNotIssued ? resToMove.quantityNotIssued : resQuantityRemaining"/>
 
                     <!-- NOTE in this case we want to reduce#AssetReservation but not reserveIncreasedAsset so that still available for the displace -->
-                    <service-call name="mantle.product.AssetServices.reduce#AssetReservation" out-map="reduceArOut" out-map-add-to-existing="false"
+                    <service-call name="co.hotwax.product.AssetServices.reduce#AssetReservation" out-map="reduceArOut" out-map-add-to-existing="false"
                             in-map="[assetReservationId:resToMove.assetReservationId, quantityToDeduct:curMoveQuantity, reserveIncreasedAsset:false]"/>
 
-                    <service-call name="mantle.product.AssetServices.reserve#AssetForOrderItem"
+                    <service-call name="co.hotwax.product.AssetServices.reserve#AssetForOrderItem"
                             in-map="[orderId:resToMove.orderId, orderItemSeqId:resToMove.orderItemSeqId, skipAssetIds:[assetId]]"/>
 
                     <set field="resQuantityRemaining" from="resQuantityRemaining - reduceArOut.quantityDeducted"/>
@@ -1754,7 +1754,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <if condition="resQuantityToClear == 0.0"><break/></if>
                     <set field="curReduceQuantity" from="resQuantityToClear &gt; oiOtherRes.quantityNotIssued ? oiOtherRes.quantityNotIssued : resQuantityToClear"/>
                     <!-- NOTE in this case we want to reduce#AssetReservation but not reserveIncreasedAsset so that still available for the displace -->
-                    <service-call name="mantle.product.AssetServices.reduce#AssetReservation" out-map="reduceArOut"
+                    <service-call name="co.hotwax.product.AssetServices.reduce#AssetReservation" out-map="reduceArOut"
                             in-map="[assetReservationId:oiOtherRes.assetReservationId, quantityToDeduct:curReduceQuantity, reserveIncreasedAsset:false]"/>
                     <set field="resQuantityToClear" from="resQuantityToClear - reduceArOut.quantityDeducted"/>
                 </iterate>
@@ -1804,7 +1804,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <!-- reserve the newly available Asset, if needed -->
             <if condition="quantityDiff &gt; 0.0 &amp;&amp; asset.productId">
-                <service-call name="mantle.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:assetId]"/></if>
+                <service-call name="co.hotwax.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:assetId]"/></if>
 
             <!-- on decrease adjust reservations down and re-reserve -->
             <if condition="quantityDiff &lt; 0.0 &amp;&amp; asset.productId">
@@ -1834,16 +1834,16 @@ along with this software (see the LICENSE.md file). If not, see
                         <set field="quantityToReduce" from="reduceQuantityRemaining &gt; res.quantityNotIssued ? res.quantityNotIssued : reduceQuantityRemaining"/>
 
                         <!-- NOTE could reserveIncreasedAsset here but would do no good, point is to bring ATP from negative to zero -->
-                        <service-call name="mantle.product.AssetServices.reduce#AssetReservation" out-map="reduceArOut" out-map-add-to-existing="false"
+                        <service-call name="co.hotwax.product.AssetServices.reduce#AssetReservation" out-map="reduceArOut" out-map-add-to-existing="false"
                                 in-map="[assetReservationId:res.assetReservationId, quantityToDeduct:quantityToReduce, reserveIncreasedAsset:false]"/>
-                        <service-call name="mantle.product.AssetServices.reserve#AssetForOrderItem"
+                        <service-call name="co.hotwax.product.AssetServices.reserve#AssetForOrderItem"
                                 in-map="[orderId:res.orderId, orderItemSeqId:res.orderItemSeqId, skipAssetIds:[assetId]]"/>
 
                         <set field="reduceQuantityRemaining" from="reduceQuantityRemaining - reduceArOut.quantityDeducted"/>
                     </iterate>
                     <!-- NOTE DEJ 20190413 this call is not needed since reserve#AssetForOrderItem is called for each reduced reservation, and it is a dangerous service so best to avoid: -->
                     <!-- now that quantityNotAvailable is updated see if we can reserve those on other assets -->
-                    <!-- <service-call name="mantle.product.AssetServices.checkReserve#ProductAssets" in-map="[productId:asset.productId]"/> -->
+                    <!-- <service-call name="co.hotwax.product.AssetServices.checkReserve#ProductAssets" in-map="[productId:asset.productId]"/> -->
                 </if>
             </if>
         </actions>
@@ -1868,7 +1868,7 @@ along with this software (see the LICENSE.md file). If not, see
                 </entity-find>
                 <if condition="availAssetList.size() == 0"><break/></if>
                 <!- - move reservation(s) to this asset - ->
-                <service-call name="mantle.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:availAssetList[0].assetId]"/>
+                <service-call name="co.hotwax.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:availAssetList[0].assetId]"/>
                 <!- - see if we have any more not available reservations - ->
                 <entity-find-count entity-name="mantle.product.issuance.AssetReservation" count-field="notAvailResCount">
                     <econdition field-name="productId"/><econdition field-name="quantityNotAvailable" operator="greater" from="0.0"/></entity-find-count>
@@ -2088,13 +2088,13 @@ along with this software (see the LICENSE.md file). If not, see
                             <set field="existingIssuance" from="existingIssuanceList[0]"/>
                             <service-call name="update#mantle.product.issuance.AssetIssuance"
                                     in-map="[assetIssuanceId:existingIssuance.assetIssuanceId, quantity:(existingIssuance.quantity + quantityToIssue)]"/>
-                            <service-call name="mantle.product.AssetServices.change#AssetQuantity" in-map="baseMap + [assetId:asset.assetId,
+                            <service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="baseMap + [assetId:asset.assetId,
                                 effectiveDate:issuedDate, quantityDiff:-quantityToIssue, assetIssuanceId:existingIssuance.assetIssuanceId]"/>
                         </then><else>
                             <!-- create an issuance -->
                             <service-call name="create#mantle.product.issuance.AssetIssuance" out-map="issueOut" in-map="baseMap +
                                 [assetId:asset.assetId, issuedDate:issuedDate, issuedByUserId:ec.user.userId, quantity:quantityToIssue]"/>
-                            <service-call name="mantle.product.AssetServices.change#AssetQuantity" in-map="baseMap + [assetId:asset.assetId,
+                            <service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="baseMap + [assetId:asset.assetId,
                                 effectiveDate:issuedDate, quantityDiff:-quantityToIssue, assetIssuanceId:issueOut.assetIssuanceId]"/>
                         </else></if>
                     </if>
@@ -2122,13 +2122,13 @@ along with this software (see the LICENSE.md file). If not, see
                         <set field="existingIssuance" from="existingIssuanceList[0]"/>
                         <service-call name="update#mantle.product.issuance.AssetIssuance"
                                 in-map="[assetIssuanceId:existingIssuance.assetIssuanceId, quantity:(existingIssuance.quantity + quantityRemaining)]"/>
-                        <service-call name="mantle.product.AssetServices.change#AssetQuantity" in-map="baseMap + [assetId:asset.assetId,
+                        <service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="baseMap + [assetId:asset.assetId,
                                 effectiveDate:issuedDate, quantityDiff:-quantityRemaining, assetIssuanceId:existingIssuance.assetIssuanceId]"/>
                     </then><else>
                         <!-- create an issuance -->
                         <service-call name="create#mantle.product.issuance.AssetIssuance" out-map="issueOut" in-map="baseMap +
                             [assetId:lastAsset.assetId, issuedDate:issuedDate, issuedByUserId:ec.user.userId, quantity:quantityRemaining]"/>
-                        <service-call name="mantle.product.AssetServices.change#AssetQuantity" in-map="baseMap + [assetId:lastAsset.assetId,
+                        <service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="baseMap + [assetId:lastAsset.assetId,
                             effectiveDate:issuedDate, quantityDiff:-quantityRemaining, assetIssuanceId:issueOut.assetIssuanceId]"/>
                     </else></if>
                 </if>
@@ -2178,7 +2178,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="asset == null"><return error="true" message="Asset not found with ID ${assetId}"/></if>
 
             <if condition="quantity &amp;&amp; quantityUomId"><then>
-                <service-call name="mantle.shipment.ShipmentServices.convert#ProductBoxQuantity" out-map="cvtQty"
+                <service-call name="co.hotwax.shipment.ShipmentServices.convert#ProductBoxQuantity" out-map="cvtQty"
                         in-map="[productId:asset.productId, originalQuantity:quantity, originalQuantityUomId:quantityUomId]"/>
                 <set field="quantity" from="cvtQty.convertedQuantity"/>
             </then><else-if condition="!quantity">
@@ -2253,13 +2253,13 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="existingIssuance" from="existingIssuanceList[0]"/>
                 <service-call name="update#mantle.product.issuance.AssetIssuance" in-map="baseMap +
                         [assetIssuanceId:existingIssuance.assetIssuanceId, quantity:(existingIssuance.quantity + quantity)]"/>
-                <service-call name="mantle.product.AssetServices.change#AssetQuantity" in-map="baseMap +
+                <service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="baseMap +
                         [effectiveDate:issuedDate, quantityDiff:-quantity, assetIssuanceId:existingIssuance.assetIssuanceId]"/>
             </then><else>
                 <!-- create an issuance -->
                 <service-call name="create#mantle.product.issuance.AssetIssuance" out-map="issueOut"
                         in-map="baseMap + [issuedDate:issuedDate, issuedByUserId:ec.user.userId, quantity:quantity]"/>
-                <service-call name="mantle.product.AssetServices.change#AssetQuantity" in-map="baseMap +
+                <service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="baseMap +
                         [effectiveDate:issuedDate, quantityDiff:-quantity, assetIssuanceId:issueOut.assetIssuanceId]"/>
             </else></if>
         </actions>
@@ -2286,7 +2286,7 @@ along with this software (see the LICENSE.md file). If not, see
             <iterate list="assetList" entry="asset">
                 <set field="curQuantity" from="asset.availableToPromiseTotal &gt; remainingQuantity ? remainingQuantity : asset.availableToPromiseTotal"/>
                 <if condition="curQuantity">
-                    <service-call name="mantle.product.AssetServices.issue#AssetToWorkEffort"
+                    <service-call name="co.hotwax.product.AssetServices.issue#AssetToWorkEffort"
                             in-map="[workEffortId:workEffortId, assetId:asset.assetId, issuedDate:issuedDate, quantity:curQuantity]"/>
                     <set field="remainingQuantity" from="remainingQuantity - curQuantity"/>
                     <if condition="remainingQuantity == 0"><break/></if>
@@ -2351,7 +2351,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
 
             <!-- compile set of assetPoolId values -->
-            <service-call name="mantle.product.AssetServices.get#AssetPools" out-map="poolsOut"
+            <service-call name="co.hotwax.product.AssetServices.get#AssetPools" out-map="poolsOut"
                     in-map="[productStoreId:productStoreId, vendorPartyId:vendorPartyId, customerPartyId:customerPartyId]"/>
             <set field="assetPoolIdSet" from="poolsOut.assetPoolIdSet"/>
 
@@ -2378,7 +2378,7 @@ along with this software (see the LICENSE.md file). If not, see
             <iterate list="assetList" entry="asset">
                 <set field="curQuantity" from="asset.availableToPromiseTotal &gt; quantityRemaining ? quantityRemaining : asset.availableToPromiseTotal"/>
                 <if condition="curQuantity">
-                    <service-call name="mantle.product.AssetServices.issue#Asset"
+                    <service-call name="co.hotwax.product.AssetServices.issue#Asset"
                             in-map="baseMap + [quantity:curQuantity, issuedDate:issuedDate, assetId:asset.assetId]"/>
                     <set field="quantityRemaining" from="quantityRemaining - curQuantity"/>
                     <if condition="quantityRemaining == 0.0"><break/></if>
@@ -2402,10 +2402,10 @@ along with this software (see the LICENSE.md file). If not, see
                     <set field="curQuantity" from="asset.quantityOnHandTotal &gt; quantityRemaining ? quantityRemaining : asset.quantityOnHandTotal"/>
                     <if condition="curQuantity">
                         <!-- handle reservations, moving other reservations as needed to handle current quantity assumed to be physically present -->
-                        <service-call name="mantle.product.AssetServices.displace#AssetReservations"
+                        <service-call name="co.hotwax.product.AssetServices.displace#AssetReservations"
                                 in-map="[assetId:asset.assetId, quantity:curQuantity]"/>
 
-                        <service-call name="mantle.product.AssetServices.issue#Asset"
+                        <service-call name="co.hotwax.product.AssetServices.issue#Asset"
                                 in-map="baseMap + [quantity:curQuantity, issuedDate:issuedDate, assetId:asset.assetId]"/>
                         <set field="quantityRemaining" from="quantityRemaining - curQuantity"/>
                         <if condition="quantityRemaining == 0.0"><break/></if>
@@ -2426,15 +2426,15 @@ along with this software (see the LICENSE.md file). If not, see
                         <order-by field-name="-receivedDate,-assetId"/>
                     </entity-find>
                     <if condition="recentAssetList"><then>
-                        <service-call name="mantle.product.AssetServices.issue#Asset"
+                        <service-call name="co.hotwax.product.AssetServices.issue#Asset"
                                 in-map="baseMap + [quantity:quantityRemaining, issuedDate:issuedDate, assetId:recentAssetList[0].assetId]"/>
                         <set field="quantityRemaining" from="0.0"/>
                     </then><else>
                         <!-- no asset... create a shell one to record the reservation and detail against -->
-                        <service-call name="mantle.product.AssetServices.create#ProductAssetAdHoc" out-map="createAssetOut"
+                        <service-call name="co.hotwax.product.AssetServices.create#ProductAssetAdHoc" out-map="createAssetOut"
                                 in-map="[productId:productId, facilityId:facilityId, ownerPartyId:vendorPartyId,
                                     createdDate:nowTimestamp]"/>
-                        <service-call name="mantle.product.AssetServices.issue#Asset"
+                        <service-call name="co.hotwax.product.AssetServices.issue#Asset"
                                 in-map="baseMap + [quantity:quantityRemaining, issuedDate:issuedDate, assetId:createAssetOut.assetId]"/>
                         <set field="quantityRemaining" from="0.0"/>
                     </else></if>
@@ -2526,7 +2526,7 @@ along with this software (see the LICENSE.md file). If not, see
             </then><else>
                 <if condition="reserveAsset &amp;&amp; (orderId || assetIssuance.orderId)">
                     <!-- no reservation, try reserve for order item using this asset with freshly available inventory -->
-                    <service-call name="mantle.product.AssetServices.reserve#AssetForOrderItem"
+                    <service-call name="co.hotwax.product.AssetServices.reserve#AssetForOrderItem"
                             in-map="[orderId:(orderId ?: assetIssuance.orderId), orderItemSeqId:(orderItemSeqId ?: assetIssuance.orderItemSeqId),
                                 assetId:assetIssuance.assetId]"/>
                 </if>
@@ -2583,7 +2583,7 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="assetIssuance.issuedDate" from="issuedDate"/>
             <entity-update value-field="assetIssuance"/>
             <!-- if issuedDate was changed then after updating the AssetIssuance record repost the GL TX -->
-            <service-call name="mantle.ledger.AssetAutoPostServices.repost#AssetIssuance"
+            <service-call name="co.hotwax.ledger.AssetAutoPostServices.repost#AssetIssuance"
                     in-map="[assetIssuanceId:assetIssuance.assetIssuanceId]"/>
             <!-- AssetDetail.effectiveDate is based on issuedDate, so update those too -->
             <entity-find entity-name="mantle.product.asset.AssetDetail" list="assetDetailList" for-update="true">
@@ -2810,7 +2810,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <!-- call through AssetDetail create? NO, would get called from the move#AssetReservation record recursively -->
             <!-- reserve the newly available Asset, if needed -->
-            <service-call name="mantle.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:assetId]"/>
+            <service-call name="co.hotwax.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:assetId]"/>
         </actions>
     </service>
 
@@ -2871,7 +2871,7 @@ along with this software (see the LICENSE.md file). If not, see
             <!-- Ensure the ShipmentItem has sufficient remaining quantity -->
             <set field="newQuantityRemaining" from="(quantityDiff ?: 0) + (quantityRejectedDiff ?: 0)"/>
             <if condition="newQuantityRemaining &amp;&amp; shipmentId">
-                <service-call name="mantle.shipment.ShipmentServices.ensure#ShipmentItemQuantityRemaining"
+                <service-call name="co.hotwax.shipment.ShipmentServices.ensure#ShipmentItemQuantityRemaining"
                         in-map="[shipmentId:shipmentId, productId:asset.productId, newQuantityRemaining:newQuantityRemaining]"/>
             </if>
 
@@ -2928,17 +2928,17 @@ along with this software (see the LICENSE.md file). If not, see
                             assetReceiptId:assetReceiptId]"/>
 
                 <!-- reserve the newly available Asset, if needed -->
-                <service-call name="mantle.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:assetId]"/>
+                <service-call name="co.hotwax.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:assetId]"/>
             </if>
 
-            <if condition="quantityDiff != 0"><service-call name="mantle.product.AssetServices.change#AssetQuantity" in-map="context"/></if>
+            <if condition="quantityDiff != 0"><service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="context"/></if>
 
             <!-- if acquireCost is updated adjust the GL, if set from null do GL posting -->
             <!-- if quantityAccepted is updated and GL entry exists adjust the GL! -->
             <if condition="(acquireCost != null &amp;&amp; acquireCost != oldAcquireCost) ||
                     (quantityAccepted != null &amp;&amp; quantityAccepted != originalAssetReceipt.quantityAccepted) ||
                     (receivedDate != null &amp;&amp; oldReceivedDate != receivedDate)">
-                <service-call name="mantle.ledger.AssetAutoPostServices.repost#Asset" in-map="[assetId:assetId]"/>
+                <service-call name="co.hotwax.ledger.AssetAutoPostServices.repost#Asset" in-map="[assetId:assetId]"/>
             </if>
         </actions>
     </service>
@@ -2992,7 +2992,7 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
         <actions>
             <if condition="toScanLocation">
-                <service-call name="mantle.product.AssetServices.check#ScanLocation" out-map="toScanOut"
+                <service-call name="co.hotwax.product.AssetServices.check#ScanLocation" out-map="toScanOut"
                         in-map="[facilityId:facilityId, locationSeqId:toLocationSeqId, containerId:toContainerId, scanLocation:toScanLocation]"/>
                 <set field="toLocationSeqId" from="toLocationSeqId ?: toScanOut.locationSeqId"/>
                 <set field="toContainerId" from="toContainerId ?: toScanOut.containerId"/>
@@ -3062,7 +3062,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="curQuantity" from="quantityRemaining &gt; asset.quantityOnHandTotal ? asset.quantityOnHandTotal : quantityRemaining"/>
                 <!-- <log level="warn" message="quantity ${quantity} quantityRemaining ${quantityRemaining} curQuantity ${curQuantity}"/> -->
                 <if condition="curQuantity != 0.0">
-                    <service-call name="mantle.product.AssetServices.move#Asset"
+                    <service-call name="co.hotwax.product.AssetServices.move#Asset"
                             in-map="[assetId:asset.assetId, facilityId:facilityId, quantity:curQuantity,
                                 locationSeqId:toLocationSeqId, containerId:toContainerId, assetPoolId:toAssetPoolId]"/>
                     <set field="quantityRemaining" from="quantityRemaining - curQuantity"/>
@@ -3081,7 +3081,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <if condition="verifyLocationSeqId?.trim() != locationSeqId">
                 <return type="danger" message="Verify Location did not match move From Location"/></if>
-            <service-call name="mantle.product.AssetServices.move#Product" in-map="context" out-map="context"/>
+            <service-call name="co.hotwax.product.AssetServices.move#Product" in-map="context" out-map="context"/>
         </actions>
     </service>
     <service verb="check" noun="ScanLocation">
@@ -3180,7 +3180,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="!facilityId"><set field="facilityId" from="asset.facilityId"/></if>
 
             <!-- checks and normalizes facilityId, locationSeqId, containerId, scanLocation -->
-            <service-call name="mantle.product.AssetServices.check#ScanLocation" in-map="context" out-map="context"/>
+            <service-call name="co.hotwax.product.AssetServices.check#ScanLocation" in-map="context" out-map="context"/>
 
             <!-- get facilityId and locationSeqId from Container, do here instead of relying on EECA rule just in case involves a move to another facility -->
             <if condition="!containerId &amp;&amp; asset.containerId">
@@ -3261,7 +3261,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <!-- between increase new Asset and reduce old Asset move AssetReservation(s) -->
                 <if condition="moveAssetReservationId"><then>
                     <!-- <log level="warn" message="In move from Asset ${asset.assetId} moving reservation ${moveAssetReservationId} to new Asset ${newAssetId}"/> -->
-                    <service-call name="mantle.product.AssetServices.move#AssetReservation" out-map="moveArOut"
+                    <service-call name="co.hotwax.product.AssetServices.move#AssetReservation" out-map="moveArOut"
                             in-map="[assetId:newAssetId, assetReservationId:moveAssetReservationId, quantity:quantity]"/>
                 </then><else>
                     <!-- move reservations if necessary so ATP doesn't go negative
@@ -3289,7 +3289,7 @@ along with this software (see the LICENSE.md file). If not, see
                             <!-- make sure quantityToMove is less than res.quantityNotIssued, don't move issued quantities! -->
                             <if condition="quantityToMove &gt; res.quantityNotIssued"><set field="quantityToMove" from="res.quantityNotIssued"/></if>
                             <if condition="quantityToMove &gt; 0">
-                                <service-call name="mantle.product.AssetServices.move#AssetReservation" out-map="moveArOut" out-map-add-to-existing="false"
+                                <service-call name="co.hotwax.product.AssetServices.move#AssetReservation" out-map="moveArOut" out-map-add-to-existing="false"
                                         in-map="[assetId:newAssetId, assetReservationId:res.assetReservationId, quantity:quantityToMove]"/>
                                 <set field="availableRemaining" from="availableRemaining - moveArOut.quantityMoved"/>
                             </if>
@@ -3329,11 +3329,11 @@ along with this software (see the LICENSE.md file). If not, see
             <!-- if assetPoolId was set but is now null call increased inventory service so backordered reservations can use -->
             <!-- do something similar if facilityId changes -->
             <if condition="asset.assetPoolId != newAsset.assetPoolId || asset.facilityId != newAsset.facilityId">
-                <service-call name="mantle.product.AssetServices.check#AssetReservations" in-map="[assetId:newAsset.assetId]"/>
+                <service-call name="co.hotwax.product.AssetServices.check#AssetReservations" in-map="[assetId:newAsset.assetId]"/>
             </if>
             <!-- if me to Pick location and has available quantity, look for reservations against non-Pick locations and move them here -->
             <if condition="checkFacLoc?.locationTypeEnumId == 'FltPick' &amp;&amp; newAsset.availableToPromiseTotal &gt; 0.0">
-                <service-call name="mantle.product.AssetServices.move#ReservationsFromNonPickLocations" in-map="[assetId:newAsset.assetId]"/>
+                <service-call name="co.hotwax.product.AssetServices.move#ReservationsFromNonPickLocations" in-map="[assetId:newAsset.assetId]"/>
             </if>
 
             <set field="newFacLoc" from="newAsset.location"/>
@@ -3406,7 +3406,7 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="quantityChange" from="quantity - currentQoh"/>
             <if condition="quantityChange != 0.0"><then>
                 <message>Quantity specified (${ec.l10n.format(quantity, null)}) differs from current on hand (${ec.l10n.format(currentQoh, null)}) by ${ec.l10n.format(quantityChange, null)}, adjusting (Prod:${productId}, Fac:${facilityId}, Loc:${locationSeqId?:(strictAll||strictLocation?'None':'Any')}, Lot:${lotId?:(strictAll||strictLot?'None':'Any')}, Owner:${ownerPartyId?:(strictAll?'None':'Any')}, Pool:${assetPoolId?:(strictAll?'None':'Any')}, Stts:${statusId?:(strictAll?'None':'Any')})</message>
-                <service-call name="mantle.product.AssetServices.record#PhysicalInventoryChange" in-map="context"/>
+                <service-call name="co.hotwax.product.AssetServices.record#PhysicalInventoryChange" in-map="context"/>
             </then><else>
                 <message type="success">Quantity specified (${ec.l10n.format(quantity, null)}) matched current records, no adjustment needed</message>
             </else></if>
@@ -3482,7 +3482,7 @@ along with this software (see the LICENSE.md file). If not, see
                         <!-- NOTE: no real reason for iterating here, will always add it all to the first Asset record; leaving it for now to make more complex logic easier in the future -->
                         <set field="quantityDiff" from="quantityRemaining"/>
                         <if condition="quantityDiff != 0">
-                            <service-call name="mantle.product.AssetServices.change#AssetQuantity" in-map="context + [assetId:asset.assetId]"/></if>
+                            <service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="context + [assetId:asset.assetId]"/></if>
                         <set field="quantityRemaining" from="quantityRemaining - quantityDiff"/>
                         <script>assetIdList.add(asset.assetId)</script>
                         <if condition="quantityRemaining == 0"><break/></if>
@@ -3491,7 +3491,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <!-- NOTE: with the change to query assetList above instead of only using passed assetList this will not happen as frequently but is still needed -->
                     <set field="quantityRemaining" from="0.0"/>
                     <!-- no passed assetList and quantityChange > 0, create new Asset -->
-                    <service-call name="mantle.product.AssetServices.create#ProductAssetAdHoc" out-map="context"
+                    <service-call name="co.hotwax.product.AssetServices.create#ProductAssetAdHoc" out-map="context"
                             in-map="context + [createdDate:physicalInventoryDate]"/>
                     <service-call name="create#mantle.product.asset.AssetDetail" out-map="context"
                             in-map="[assetId:assetId, effectiveDate:physicalInventoryDate, quantityOnHandDiff:quantityChange,
@@ -3499,7 +3499,7 @@ along with this software (see the LICENSE.md file). If not, see
                                 physicalInventoryId:physicalInventoryId, physicalInventoryCountId:physicalInventoryCountId,
                                 varianceReasonEnumId:varianceReasonEnumId]"/>
                     <!-- reserve the newly available Asset, if needed -->
-                    <service-call name="mantle.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:assetId]"/>
+                    <service-call name="co.hotwax.product.AssetServices.reserve#IncreasedAsset" in-map="[assetId:assetId]"/>
                     <script>assetIdList.add(assetId)</script>
                 </else></if>
             </then><else-if condition="quantityChange &lt; 0.0">
@@ -3539,7 +3539,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <set field="quantityOnHandTotal" from="lockedAssetQoh.get(asset.assetId)"/>
                     <set field="quantityDiff" from="quantityRemaining &gt; quantityOnHandTotal ? quantityOnHandTotal : quantityRemaining"/>
                     <if condition="quantityDiff != 0.0">
-                        <service-call name="mantle.product.AssetServices.change#AssetQuantity" in-map="context +
+                        <service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="context +
                                 [assetId:asset.assetId, quantityDiff:-quantityDiff]"/>
                         <set field="quantityRemaining" from="quantityRemaining - quantityDiff"/>
                         <script>assetIdList.add(asset.assetId)</script>
@@ -3601,7 +3601,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <if condition="assetDetail.effectiveDate != physicalInventoryDate">
                     <service-call name="update#mantle.product.asset.AssetDetail"
                             in-map="[assetDetailId:assetDetail.assetDetailId, effectiveDate:physicalInventoryDate]"/>
-                    <service-call name="mantle.ledger.AssetAutoPostServices.repost#PhysicalInventoryVariance"
+                    <service-call name="co.hotwax.ledger.AssetAutoPostServices.repost#PhysicalInventoryVariance"
                             in-map="[assetDetailId:assetDetail.assetDetailId]"/>
                 </if>
             </iterate>

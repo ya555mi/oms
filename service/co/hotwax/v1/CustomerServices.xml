@@ -31,10 +31,10 @@
         </out-parameters>
         <actions>
             <!-- creating Person and Party  -->
-            <service-call name="mantle.party.PartyServices.create#Person" out-map="context"
+            <service-call name="co.hotwax.party.PartyServices.create#Person" out-map="context"
                     in-map="context + [roleTypeId:'Customer', externalId:customerId]" />
             <!-- storing email address -->
-            <service-call name="mantle.party.ContactServices.create#EmailAddress" out-map="context"
+            <service-call name="co.hotwax.party.ContactServices.create#EmailAddress" out-map="context"
                     in-map="context + [emailAddress:email, contactMechPurposeId:'EmailPrimary']"/>
         </actions>
     </service>

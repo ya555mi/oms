@@ -50,12 +50,12 @@
         </out-parameters>
         <actions>
             <!-- Using OOTB create#Facility -->
-            <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="context"
+            <service-call name="co.hotwax.facility.FacilityServices.create#Facility" out-map="context"
                     in-map="context + [pseudoId:locationId, facilityName:locationName,
                     facilityTypeEnumId:locationType]"/>
 
             <!-- Creating default pick location for the facility -->
-            <service-call name="mantle.facility.FacilityServices.create#FacilityLocation" out-map="context"
+            <service-call name="co.hotwax.facility.FacilityServices.create#FacilityLocation" out-map="context"
                     in-map="[facilityId:facilityId, locationSeqId:'DEFAULT_PICK_LOC',
                     locationTypeEnumId:'FltPick']"/>
         </actions>

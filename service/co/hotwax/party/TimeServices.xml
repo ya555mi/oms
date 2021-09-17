@@ -35,7 +35,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <!-- add next child periods as needed -->
                     <set field="lastChildPeriod" from="childPeriodList.get(childPeriodList.size() - 1)"/>
                     <while condition="lastChildPeriod.thruDate &lt; parentPeriod.thruDate">
-                        <service-call name="mantle.party.TimeServices.getOrCreate#NextTimePeriod" out-map="createNextChildOut"
+                        <service-call name="co.hotwax.party.TimeServices.getOrCreate#NextTimePeriod" out-map="createNextChildOut"
                                       in-map="[timePeriodId:lastChildPeriod.timePeriodId]" out-map-add-to-existing="false"/>
                         <set field="lastChildPeriod" from="createNextChildOut.nextTimePeriod"/>
                         <script>childPeriodList.add(createNextChildOut.nextTimePeriod)</script>
@@ -60,7 +60,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <if condition="mostRecentPeriodList"><then>
                         <set field="lastChildPeriod" from="mostRecentPeriodList.get(0)"/>
                     </then><else>
-                        <service-call name="mantle.party.TimeServices.getOrCreate#TimePeriod" out-map="lastChildOut"
+                        <service-call name="co.hotwax.party.TimeServices.getOrCreate#TimePeriod" out-map="lastChildOut"
                                 in-map="[partyId:parentPeriod.partyId, timePeriodTypeId:childPeriodType.timePeriodTypeId,
                                     fromDate:parentPeriod.fromDate, parentPeriodId:parentPeriod.timePeriodId]"/>
                         <set field="lastChildPeriod" from="lastChildOut.timePeriod"/>
@@ -69,7 +69,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                     <!-- create next periods until we're to/past the thruDate of the current parentPeriod -->
                     <while condition="lastChildPeriod.thruDate &lt; parentPeriod.thruDate">
-                        <service-call name="mantle.party.TimeServices.getOrCreate#NextTimePeriod" out-map="createNextChildOut"
+                        <service-call name="co.hotwax.party.TimeServices.getOrCreate#NextTimePeriod" out-map="createNextChildOut"
                                       in-map="[timePeriodId:lastChildPeriod.timePeriodId]" out-map-add-to-existing="false"/>
                         <set field="lastChildPeriod" from="createNextChildOut.nextTimePeriod"/>
                         <script>childPeriodList.add(lastChildPeriod)</script>
@@ -80,7 +80,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <if condition="childPeriod.timePeriodTypeId == timePeriodTypeId"><then>
                     <script>timePeriodList.add(childPeriod)</script>
                 </then><else>
-                    <service-call name="mantle.party.TimeServices.get#DescendantPeriods" out-map="childGetOut" out-map-add-to-existing="false"
+                    <service-call name="co.hotwax.party.TimeServices.get#DescendantPeriods" out-map="childGetOut" out-map-add-to-existing="false"
                                   in-map="[parentPeriodId:childPeriod.timePeriodId, timePeriodTypeId:timePeriodTypeId, createMissing:createMissing]"/>
                     <script>if (childGetOut.timePeriodList) timePeriodList.addAll(childGetOut.timePeriodList)</script>
                 </else></if>
@@ -124,7 +124,7 @@ along with this software (see the LICENSE.md file). If not, see
                         <set field="parentPeriodId" from="previousPeriod.parentPeriodId"/>
                     </then><else>
                         <!-- find the next parent TimePeriod (gets nextTimePeriodId, nextTimePeriod) -->
-                        <service-call name="mantle.party.TimeServices.getOrCreate#NextTimePeriod"
+                        <service-call name="co.hotwax.party.TimeServices.getOrCreate#NextTimePeriod"
                                 in-map="[timePeriodId:previousPeriod.parentPeriodId]" out-map="createNextParentOut"/>
                         <set field="parentPeriodId" from="createNextParentOut.nextTimePeriodId"/>
                     </else></if>
@@ -339,7 +339,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="timePeriod" from="existingPeriodList.get(0)"/>
                 <set field="timePeriodId" from="timePeriod.timePeriodId"/>
             </then><else>
-                <service-call name="mantle.party.TimeServices.create#TimePeriod" in-map="context" out-map="createTpOut"/>
+                <service-call name="co.hotwax.party.TimeServices.create#TimePeriod" in-map="context" out-map="createTpOut"/>
                 <set field="timePeriodId" from="createTpOut.timePeriodId"/>
                 <entity-find-one entity-name="mantle.party.time.TimePeriod" value-field="timePeriod"/>
             </else></if>
@@ -357,7 +357,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="nextTimePeriodList"><then>
                 <set field="nextTimePeriod" from="nextTimePeriodList[0]"/>
             </then><else>
-                <service-call name="mantle.party.TimeServices.create#TimePeriod" out-map="createTpOut"
+                <service-call name="co.hotwax.party.TimeServices.create#TimePeriod" out-map="createTpOut"
                         in-map="[previousPeriodId:timePeriodId]"/>
                 <entity-find-one entity-name="mantle.party.time.TimePeriod" value-field="nextTimePeriod">
                     <field-map field-name="timePeriodId" from="createTpOut.timePeriodId"/></entity-find-one>

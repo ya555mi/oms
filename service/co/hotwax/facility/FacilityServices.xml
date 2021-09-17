@@ -29,11 +29,11 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
         <actions>
             <entity-find-one entity-name="mantle.facility.Facility" value-field="facility"/>
-            <service-call name="mantle.facility.ContactServices.get#FacilityContactInfo" out-map="contactInfo"
+            <service-call name="co.hotwax.facility.ContactServices.get#FacilityContactInfo" out-map="contactInfo"
                     in-map="[facilityId:facilityId, postalContactMechPurposeId:'PostalPrimary',
                         telecomContactMechPurposeId:'PhonePrimary', emailContactMechPurposeId:'EmailPrimary',
                         otherContactMechPurposeId:'WebUrlPrimary']"/>
-            <service-call name="mantle.facility.ContactServices.get#FacilityContactInfo" out-map="contactFaxOut"
+            <service-call name="co.hotwax.facility.ContactServices.get#FacilityContactInfo" out-map="contactFaxOut"
                     in-map="[facilityId:facilityId, telecomContactMechPurposeId:'PhoneFax']"/>
             <script>
                 context.putAll(facility)
@@ -109,13 +109,13 @@ along with this software (see the LICENSE.md file). If not, see
             <service-call name="create#mantle.facility.Facility" out-map="context" in-map="context"/>
 
             <if condition="address1 || city || postalCode">
-                <service-call name="mantle.party.ContactServices.create#PostalAddress" out-map="paOut"
+                <service-call name="co.hotwax.party.ContactServices.create#PostalAddress" out-map="paOut"
                         in-map="context + [contactMechPurposeId:'PostalPrimary']"/></if>
             <if condition="contactNumber">
-                <service-call name="mantle.party.ContactServices.create#TelecomNumber" out-map="phoneOut"
+                <service-call name="co.hotwax.party.ContactServices.create#TelecomNumber" out-map="phoneOut"
                         in-map="context + [contactMechPurposeId:'PhonePrimary']"/></if>
             <if condition="emailAddress">
-                <service-call name="mantle.party.ContactServices.create#EmailAddress" out-map="emOut"
+                <service-call name="co.hotwax.party.ContactServices.create#EmailAddress" out-map="emOut"
                         in-map="[facilityId:facilityId, emailAddress:emailAddress, contactMechPurposeId:'EmailPrimary']"/></if>
         </actions>
     </service>
@@ -141,10 +141,10 @@ along with this software (see the LICENSE.md file). If not, see
                     <econdition field-name="facilityId"/><econdition field-name="contactMechPurposeId" value="PhonePrimary"/>
                 </entity-find>
                 <if condition="phoneFcmList"><then>
-                    <service-call name="mantle.facility.ContactServices.update#FacilityTelecomNumber" out-map="phoneOut"
+                    <service-call name="co.hotwax.facility.ContactServices.update#FacilityTelecomNumber" out-map="phoneOut"
                             in-map="context + [contactMechId:phoneFcmList[0].contactMechId, contactMechPurposeId:'PhonePrimary']"/>
                 </then><else>
-                    <service-call name="mantle.party.ContactServices.create#TelecomNumber" out-map="phoneOut"
+                    <service-call name="co.hotwax.party.ContactServices.create#TelecomNumber" out-map="phoneOut"
                             in-map="context + [contactMechPurposeId:'PhonePrimary']"/>
                 </else></if>
                 <set field="telecomContactMechId" from="phoneOut.contactMechId"/>
@@ -154,10 +154,10 @@ along with this software (see the LICENSE.md file). If not, see
                     <econdition field-name="facilityId"/><econdition field-name="contactMechPurposeId" value="EmailPrimary"/>
                 </entity-find>
                 <if condition="emailFcmList"><then>
-                    <service-call name="mantle.facility.ContactServices.update#FacilityContactOther" out-map="emOut"
+                    <service-call name="co.hotwax.facility.ContactServices.update#FacilityContactOther" out-map="emOut"
                             in-map="[facilityId:facilityId, contactMechId:emailFcmList[0].contactMechId, infoString:emailAddress, contactMechPurposeId:'EmailPrimary']"/>
                 </then><else>
-                    <service-call name="mantle.party.ContactServices.create#EmailAddress" out-map="emOut"
+                    <service-call name="co.hotwax.party.ContactServices.create#EmailAddress" out-map="emOut"
                             in-map="[facilityId:facilityId, emailAddress:emailAddress, contactMechPurposeId:'EmailPrimary']"/>
                 </else></if>
                 <set field="emailContactMechId" from="emOut.contactMechId"/>
@@ -169,10 +169,10 @@ along with this software (see the LICENSE.md file). If not, see
                     <econdition field-name="facilityId"/><econdition field-name="contactMechPurposeId" value="PostalPrimary"/>
                 </entity-find>
                 <if condition="addressFcmList"><then>
-                    <service-call name="mantle.facility.ContactServices.update#FacilityPostalAddress" out-map="paOut"
+                    <service-call name="co.hotwax.facility.ContactServices.update#FacilityPostalAddress" out-map="paOut"
                             in-map="context + [contactMechId:addressFcmList[0].contactMechId, contactMechPurposeId:'PostalPrimary']"/>
                 </then><else>
-                    <service-call name="mantle.party.ContactServices.create#PostalAddress" out-map="paOut"
+                    <service-call name="co.hotwax.party.ContactServices.create#PostalAddress" out-map="paOut"
                             in-map="context + [contactMechPurposeId:'PostalPrimary']"/>
                 </else></if>
             </if>
@@ -273,7 +273,7 @@ along with this software (see the LICENSE.md file). If not, see
                 </if>
                 <!-- see if scanId matches Product.pseudoId, ProductIdentification.idValue, or Product.productId -->
                 <!-- TODO: who would the Product.ownerPartyId be for an incoming shipment, Shipment.toPartyId or let user specify somehow? -->
-                <service-call name="mantle.product.ProductServices.find#ProductByIdValue" out-map="productByIdOut"
+                <service-call name="co.hotwax.product.ProductServices.find#ProductByIdValue" out-map="productByIdOut"
                         in-map="[idValue:scanId]"/>
                 <set field="productId" from="productByIdOut.productId"/>
             </if>
