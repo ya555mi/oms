@@ -213,7 +213,7 @@ along with this software (see the LICENSE.md file). If not, see
         </actions>
     </service>
 
-    <service verb="get" noun="UserNoticeCounts">
+    <!--<service verb="get" noun="UserNoticeCounts">
         <out-parameters>
             <parameter name="partyId"/>
             <parameter name="notificationCount" type="Long"/><parameter name="messageCount" type="Long"/>
@@ -234,7 +234,7 @@ along with this software (see the LICENSE.md file). If not, see
                     .condition("statusId", "not-in", "WeClosed,WeCancelled").condition("workEffortTypeEnumId", "WetTask")
                     .conditionDate("", "", ec.user.nowTimestamp).count()
         </script></actions>
-    </service>
+    </service>-->
     <service verb="setup" noun="UserOrganizationInfo" authenticate="anonymous-view">
         <description>
             Get internal organizations the current user is related to and the user's active organization if set
@@ -944,7 +944,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
         </actions>
     </service>
-    <service verb="scan" noun="PartyBadge">
+    <!--<service verb="scan" noun="PartyBadge">
         <in-parameters>
             <auto-parameters entity-name="mantle.party.PartyBadgeScan" include="nonpk">
                 <exclude field-name="scanResultEnumId"/><exclude field-name="timeEntryId"/></auto-parameters>
@@ -952,11 +952,11 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="scanPurposeEnumId" default-value="PbspAccess"/>
             <parameter name="scanDate" default="ec.user.nowTimestamp"/>
 
-            <!-- parameters for clock in -->
+            &lt;!&ndash; parameters for clock in &ndash;&gt;
             <parameter name="rateTypeEnumId" default-value="RatpStandard"/>
             <parameter name="workTypeEnumId"/>
             <parameter name="workEffortId"/>
-            <!-- parameters for clock out -->
+            &lt;!&ndash; parameters for clock out &ndash;&gt;
             <parameter name="breakHours" type="BigDecimal"/>
             <parameter name="breakMinutes" type="BigDecimal"/>
             <parameter name="pieceCount" type="BigDecimal"/>
@@ -978,7 +978,7 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="partyId" from="partyBadge.partyId"/>
             <set field="organizationPartyId" from="partyBadge.organizationPartyId"/>
 
-            <!-- check valid dates -->
+            &lt;!&ndash; check valid dates &ndash;&gt;
             <if condition="partyBadge.fromDate &amp;&amp; partyBadge.fromDate &gt; ec.user.nowTimestamp">
                 <set field="scanResultEnumId" value="PbsrNotYetValid"/>
                 <service-call name="create#mantle.party.PartyBadgeScan" in-map="context" transaction="force-new"/>
@@ -990,11 +990,11 @@ along with this software (see the LICENSE.md file). If not, see
                 <return error="true" message="Badge expired"/>
             </if>
 
-            <!-- create the PartyBadgeScan record -->
+            &lt;!&ndash; create the PartyBadgeScan record &ndash;&gt;
             <set field="scanResultEnumId" value="PbsrSuccess"/>
             <service-call name="create#mantle.party.PartyBadgeScan" in-map="context"/>
 
-            <!-- handle TimeEntry for clock in and clock out -->
+            &lt;!&ndash; handle TimeEntry for clock in and clock out &ndash;&gt;
             <if condition="breakMinutes"><set field="breakHours" from="(breakHours ?: 0) + (breakMinutes / 60)"/></if>
             <if condition="scanPurposeEnumId in ['PbspClockIn', 'PbspClockOut']">
                 <set field="clientPartyId" from="partyBadge.organizationPartyId"/>
@@ -1006,8 +1006,8 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="openTimeEntry" from="openTimeEntryList ? openTimeEntryList[0] : null"/>
             </if>
             <if condition="scanPurposeEnumId == 'PbspClockIn'"><then>
-                <!-- If scanPurposeEnumId=PbspClockIn call mantle.work.TimeServices.create#TimeEntryClockIn
-                    If there is an open TimeEntry call mantle.work.TimeServices.store#TimeEntry first -->
+                &lt;!&ndash; If scanPurposeEnumId=PbspClockIn call mantle.work.TimeServices.create#TimeEntryClockIn
+                    If there is an open TimeEntry call mantle.work.TimeServices.store#TimeEntry first &ndash;&gt;
                 <if condition="openTimeEntry">
                     <service-call name="co.hotwax.work.TimeServices.store#TimeEntry"
                             in-map="openTimeEntry + [thruDate:scanDate, breakHours:breakHours, pieceCount:pieceCount]"/>
@@ -1019,7 +1019,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <service-call name="update#mantle.party.PartyBadgeScan"
                         in-map="[partyBadgeId:partyBadgeId, scanDate:scanDate, timeEntryId:timeEntryId]"/>
             </then><else-if condition="scanPurposeEnumId == 'PbspClockOut'">
-                <!-- If scanPurposeEnumId=PbspClockOut call mantle.work.TimeServices.store#TimeEntry -->
+                &lt;!&ndash; If scanPurposeEnumId=PbspClockOut call mantle.work.TimeServices.store#TimeEntry &ndash;&gt;
                 <if condition="openTimeEntry"><then>
                     <service-call name="co.hotwax.work.TimeServices.store#TimeEntry"
                             in-map="openTimeEntry + [thruDate:scanDate, breakHours:breakHours, pieceCount:pieceCount]"/>
@@ -1031,7 +1031,7 @@ along with this software (see the LICENSE.md file). If not, see
                 </else></if>
             </else-if></if>
         </actions>
-    </service>
+    </service>-->
 
     <!-- =========================================== -->
     <!-- ========== PartyContent Services ========== -->

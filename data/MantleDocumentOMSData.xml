@@ -8,7 +8,7 @@ copyright and related and neighboring rights to this software to the
 public domain worldwide. This software is distributed without any
 warranty.
 
-You should have received a copy of the CC0 Public Domain Dedication
+You should have received a c7opy of the CC0 Public Domain Dedication
 along with this software (see the LICENSE.md file). If not, see
 <http://creativecommons.org/publicdomain/zero/1.0/>.
 -->
@@ -25,7 +25,7 @@ along with this software (see the LICENSE.md file). If not, see
     <!-- ========== Product ========== -->
     <dataDocuments dataDocumentId="MantleProduct" indexName="mantle" documentName="Product"
                    primaryEntityName="mantle.product.Product" documentTitle="ProductNameTemplate"
-                   manualDataServiceName="mantle.product.ProductServices.get#ProductManualDocumentData">
+                   manualDataServiceName="co.hotwax.product.ProductServices.get#ProductManualDocumentData">
         <fields fieldSeqId="01" fieldPath="productId"/>
         <fields fieldSeqId="02" fieldPath="pseudoId"/>
         <fields fieldSeqId="03" fieldPath="productName" fieldNameAlias="name"/>

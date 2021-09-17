@@ -154,7 +154,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="!shipmentMethodEnumId"><set field="shipmentMethodEnumId" from="orderPart.shipmentMethodEnumId"/></if>
             <if condition="!carrierPartyId"><set field="carrierPartyId" from="orderPart.carrierPartyId"/></if>
             <if condition="!paymentMethodId">
-                <entity-find entity-name="mantle.account.payment.Payment" list="paymentList">
+                <entity-find entity-name="mantle.order.payment.Payment" list="paymentList">
                     <econdition field-name="orderId"/><econdition field-name="orderPartSeqId"/></entity-find>
                 <iterate list="paymentList" entry="payment"><if condition="payment.paymentMethodId">
                     <set field="paymentMethodId" from="payment.paymentMethodId"/></if></iterate>
@@ -261,7 +261,7 @@ along with this software (see the LICENSE.md file). If not, see
         </actions>
     </service>
 
-    <service verb="calculate" noun="OrderItemReturnable" authz-action="view">
+    <!--<service verb="calculate" noun="OrderItemReturnable" authz-action="view">
         <description>Calculate returnable quantity for an OrderItem with pre-queried OrderItemBilling and ReturnItem
             lists, which can be lists for an entire order (ie filtered before calc) and if are null are queried here.</description>
         <in-parameters>
@@ -303,7 +303,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <econdition field-name="orderId"/><econdition field-name="orderItemSeqId"/></entity-find>
             </if>
             <iterate list="orderItemBillingList" entry="oib">
-                <!-- check for when orderItemBillingList is passed in -->
+                &lt;!&ndash; check for when orderItemBillingList is passed in &ndash;&gt;
                 <if condition="oib.orderId != orderId || oib.orderItemSeqId != orderItemSeqId"><continue/></if>
                 <if condition="oib.quantity == 0.0"><continue/></if>
 
@@ -327,7 +327,7 @@ along with this software (see the LICENSE.md file). If not, see
                 </entity-find>
             </if>
             <iterate list="returnItemList" entry="returnItem">
-                <!-- check for when orderItemBillingList is passed in -->
+                &lt;!&ndash; check for when orderItemBillingList is passed in &ndash;&gt;
                 <if condition="returnItem.orderId != orderId || returnItem.orderItemSeqId != orderItemSeqId"><continue/></if>
 
                 <set field="retQuantity" from="returnItem.returnQuantity != null ? returnItem.returnQuantity : 1.0"/>
@@ -339,7 +339,7 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="returnableQuantity" from="invoiceQuantity - returnedQuantity"/>
             <set field="returnableTotal" from="invoiceTotal - returnedTotal"/>
         </actions>
-    </service>
+    </service>-->
     <service verb="add" noun="OrderItemToReturn">
         <in-parameters>
             <parameter name="returnId" required="true"/>
@@ -1010,9 +1010,9 @@ along with this software (see the LICENSE.md file). If not, see
             </iterate>
 
             <!-- if returnInvoiceId set statusId to InvoiceApproved, trigger payment applications based on forInvoiceId -->
-            <if condition="returnInvoiceId">
+            <!--<if condition="returnInvoiceId">
                 <service-call name="update#mantle.account.invoice.Invoice" in-map="[invoiceId:returnInvoiceId, statusId:'InvoiceApproved']"/>
-            </if>
+            </if>-->
         </actions>
     </service>
 

@@ -40,7 +40,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <parameter name="orderPromoCodeDetailList" type="List"><parameter name="orderPromoCode" type="Map"/></parameter>
             <parameter name="paymentList" type="List"><parameter name="payment" type="Map">
-                <auto-parameters entity-name="mantle.account.payment.Payment"/></parameter></parameter>
+                <auto-parameters entity-name="mantle.order.payment.Payment"/></parameter></parameter>
 
             <parameter name="shipmentItemSourceList" type="List"><parameter name="sis" type="Map">
                 <auto-parameters entity-name="mantle.shipment.ShipmentItemSource"/></parameter></parameter>
@@ -89,9 +89,9 @@ along with this software (see the LICENSE.md file). If not, see
                     <auto-parameters entity-name="moqui.basic.Enumeration"/></parameter>
                 <parameter name="carrierPartyDetail" type="Map"/>
                 <parameter name="partPaymentList" type="List"><parameter name="partPayment" type="Map">
-                    <auto-parameters entity-name="mantle.account.payment.Payment"/></parameter></parameter>
+                    <auto-parameters entity-name="mantle.order.payment.Payment"/></parameter></parameter>
                 <parameter name="partPaymentInfoList" type="List"><parameter name="partPaymentInfo" type="Map">
-                    <parameter name="partPayment" type="Map"><auto-parameters entity-name="mantle.account.payment.Payment"/></parameter>
+                    <parameter name="partPayment" type="Map"><auto-parameters entity-name="mantle.order.payment.Payment"/></parameter>
                     <parameter name="statusItem" type="Map"><auto-parameters entity-name="moqui.basic.StatusItem"/></parameter>
                     <parameter name="paymentMethod" type="Map"><auto-parameters entity-name="mantle.account.method.PaymentMethod"/></parameter>
                     <parameter name="creditCard" type="Map"><auto-parameters entity-name="mantle.account.method.CreditCard"/></parameter>
@@ -240,7 +240,7 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find entity-name="mantle.product.store.OrderPromoCodeDetail" list="orderPromoCodeDetailList">
                 <econdition field-name="orderId"/></entity-find>
             <!-- get paymentList -->
-            <entity-find-related value-field="orderHeader" relationship-name="mantle.account.payment.Payment"
+            <entity-find-related value-field="orderHeader" relationship-name="mantle.order.payment.Payment"
                     list="paymentList" order-by-list="['paymentId']"/>
 
             <!-- get ShipmentItemSource list and derived data -->
@@ -346,7 +346,7 @@ along with this software (see the LICENSE.md file). If not, see
             orderPartInfoList = []
             for (EntityValue orderPart in orderPartList) {
                 EntityValue partStatusItem = (EntityValue) orderPart.status
-                EntityValue partSettlementTerm = (EntityValue) orderPart.settlementTerm
+               // EntityValue partSettlementTerm = (EntityValue) orderPart.settlementTerm
 
                 EntityList partOrderItemList = orderItemList.findAll({ it.orderPartSeqId == orderPart.orderPartSeqId })
                 EntityList partNoParentOrderItemList = partOrderItemList.findAll({ it.parentItemSeqId == null })
@@ -466,7 +466,7 @@ along with this software (see the LICENSE.md file). If not, see
                         .parameters([orderId:orderPart.orderId, orderPartSeqId:orderPart.orderPartSeqId]).call()
 
                 orderPartInfoList.add([orderPart:orderPart, partEditable:editableStatusIds.contains(orderPart.statusId),
-                        partStatusItem:partStatusItem, partSettlementTerm:partSettlementTerm,
+                        //partStatusItem:partStatusItem, partSettlementTerm:partSettlementTerm,
                         partOrderItemList:partOrderItemList, partNoParentOrderItemList:partNoParentOrderItemList,
                         partNoParentOrderItemCount:partNoParentOrderItemCount,
                         hasShippableItems:hasShippableItems, singleLot:singleLot, newerInventory:newerInventory,
@@ -740,7 +740,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <!-- Payment/PaymentMethod -->
             <if condition="!postalContactMechIdList">
-                <entity-find entity-name="mantle.account.payment.Payment" list="paymentList">
+                <entity-find entity-name="mantle.order.payment.Payment" list="paymentList">
                     <econdition field-name="orderId"/><econdition field-name="orderPartSeqId"/>
                     <econdition field-name="paymentMethodId" operator="is-not-null"/>
                 </entity-find>
@@ -829,7 +829,7 @@ along with this software (see the LICENSE.md file). If not, see
             <!-- check payments for sufficient authorized, promised (or later statuses for each) -->
             <set field="totalPromised" from="0"/>
             <set field="totalAuthorized" from="0"/>
-            <entity-find entity-name="mantle.account.payment.Payment" list="paymentList">
+            <entity-find entity-name="mantle.order.payment.Payment" list="paymentList">
                 <econdition field-name="orderId"/></entity-find>
             <set field="paymentMethodIdSet" from="new HashSet()"/>
             <iterate list="paymentList" entry="payment">

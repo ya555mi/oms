@@ -691,7 +691,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <mantle.shipment.carrier.ShippingGatewayConfig shippingGatewayConfigId="NA_LOCAL"
                     shippingGatewayTypeEnumId="ShGtwyLocal" description="Local gateway for order shipping rate"
-                    getOrderRateServiceName="mantle.shipment.CarrierServices.get#OrderShippingRateLocal"/>
+                    getOrderRateServiceName="co.hotwax.shipment.CarrierServices.get#OrderShippingRateLocal"/>
         </seed-data>
     </entity>
     <entity entity-name="ShippingGatewayBoxType" package="mantle.shipment.carrier" use="configuration" cache="true">

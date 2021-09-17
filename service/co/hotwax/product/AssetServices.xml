@@ -2154,8 +2154,8 @@ along with this software (see the LICENSE.md file). If not, see
         </actions>
     </service>
 
-    <service verb="issue" noun="AssetToWorkEffort" no-tx-cache="true">
-        <!-- NOTE: tested with transaction="cache" and works fine, but only a small performance improvement (this is a fairly small service) -->
+    <!--<service verb="issue" noun="AssetToWorkEffort" no-tx-cache="true">
+        &lt;!&ndash; NOTE: tested with transaction="cache" and works fine, but only a small performance improvement (this is a fairly small service) &ndash;&gt;
         <description>Issue an Asset to a WorkEffort (production run, etc).</description>
         <in-parameters>
             <parameter name="assetId" required="true" default="defaultAssetId"/>
@@ -2185,13 +2185,13 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="quantity" from="asset.availableToPromiseTotal"/>
             </else-if></if>
 
-            <!-- reserve by availableToPromiseTotal (no reservation here, but respect others) -->
+            &lt;!&ndash; reserve by availableToPromiseTotal (no reservation here, but respect others) &ndash;&gt;
             <if condition="quantity &gt; asset.availableToPromiseTotal">
                 <set field="uomDescription" from="asset?.product?.amountUom?' '+(ec.resource.expand('UomNameTemplate','',asset.product.amountUom)):''"/>
                 <message error="true">Quantity specified (${ec.l10n.format(quantity, '#,##0.00')}${uomDescription}) is greater than the quantity available (${ec.l10n.format(asset.availableToPromiseTotal, '#,##0.00')}${uomDescription})</message>
             </if>
 
-            <!-- if allow over QOH not allowed check now -->
+            &lt;!&ndash; if allow over QOH not allowed check now &ndash;&gt;
             <entity-find-one entity-name="mantle.facility.Facility" value-field="facility" cache="true">
                 <field-map field-name="facilityId" from="asset.facilityId"/></entity-find-one>
             <if condition="facility?.assetAllowIssueOverQoh != 'Y'">
@@ -2199,7 +2199,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <return error="true" message="For work effort ${workEffortId} tried to issue quantity ${quantity} which is greater than quantity on hand ${asset.quantityOnHandTotal} for asset ${asset.assetId}"/></if>
             </if>
 
-            <!-- check consume product -->
+            &lt;!&ndash; check consume product &ndash;&gt;
             <entity-find entity-name="mantle.work.effort.WorkEffortProduct" list="consumeProductList">
                 <econdition field-name="workEffortId"/><econdition field-name="productId" from="asset.productId"/>
                 <econdition field-name="typeEnumId" value="WeptConsume"/>
@@ -2215,7 +2215,7 @@ along with this software (see the LICENSE.md file). If not, see
                 </else-if></if>
             </if>
 
-            <!-- check origin facility -->
+            &lt;!&ndash; check origin facility &ndash;&gt;
             <if condition="asset.originFacilityId">
                 <entity-find entity-name="mantle.work.effort.WorkEffortFacility" list="originFacilityList">
                     <econdition field-name="workEffortId"/><econdition field-name="facilityId" from="asset.originFacilityId"/>
@@ -2237,7 +2237,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <set field="baseMap" from="[workEffortId:workEffortId, assetId:asset.assetId, productId:asset.productId]"/>
 
-            <!-- look for existing AssetIssuance to add to -->
+            &lt;!&ndash; look for existing AssetIssuance to add to &ndash;&gt;
             <entity-find entity-name="mantle.product.issuance.AssetIssuance" list="existingIssuanceList">
                 <econdition field-name="assetId"/>
                 <econdition field-name="workEffortId"/>
@@ -2249,23 +2249,23 @@ along with this software (see the LICENSE.md file). If not, see
                 <econdition field-name="invoiceItemSeqId" ignore-if-empty="true"/>
             </entity-find>
             <if condition="existingIssuanceList"><then>
-                <!-- add to existing issuance -->
+                &lt;!&ndash; add to existing issuance &ndash;&gt;
                 <set field="existingIssuance" from="existingIssuanceList[0]"/>
                 <service-call name="update#mantle.product.issuance.AssetIssuance" in-map="baseMap +
                         [assetIssuanceId:existingIssuance.assetIssuanceId, quantity:(existingIssuance.quantity + quantity)]"/>
                 <service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="baseMap +
                         [effectiveDate:issuedDate, quantityDiff:-quantity, assetIssuanceId:existingIssuance.assetIssuanceId]"/>
             </then><else>
-                <!-- create an issuance -->
+                &lt;!&ndash; create an issuance &ndash;&gt;
                 <service-call name="create#mantle.product.issuance.AssetIssuance" out-map="issueOut"
                         in-map="baseMap + [issuedDate:issuedDate, issuedByUserId:ec.user.userId, quantity:quantity]"/>
                 <service-call name="co.hotwax.product.AssetServices.change#AssetQuantity" in-map="baseMap +
                         [effectiveDate:issuedDate, quantityDiff:-quantity, assetIssuanceId:issueOut.assetIssuanceId]"/>
             </else></if>
         </actions>
-    </service>
+    </service>-->
 
-    <service verb="issue" noun="AnyAssetToWorkEffort" no-tx-cache="true">
+    <!--<service verb="issue" noun="AnyAssetToWorkEffort" no-tx-cache="true">
         <in-parameters>
             <parameter name="productId" required="true"/>
             <parameter name="facilityId" required="true"/>
@@ -2294,7 +2294,7 @@ along with this software (see the LICENSE.md file). If not, see
             </iterate>
             <if condition="remainingQuantity &gt; 0"><message>Could not find available inventory for ${remainingQuantity} out of ${quantity}</message></if>
         </actions>
-    </service>
+    </service>-->
     <service verb="issue" noun="AnyAssetForShipmentItemSource" no-tx-cache="true">
         <description>Issue from available inventory only, if not able to issue all returns quantityRemaining</description>
         <in-parameters>
@@ -2659,7 +2659,7 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find-one entity-name="mantle.order.OrderHeader" value-field="orderHeader"><field-map field-name="orderId"/></entity-find-one>
             <entity-find-one entity-name="mantle.order.OrderItem" value-field="orderItem">
                 <field-map field-name="orderId"/><field-map field-name="orderItemSeqId"/></entity-find-one>
-            <entity-find-one entity-name="mantle.work.effort.WorkEffort" value-field="workEffort"><field-map field-name="workEffortId"/></entity-find-one>
+<!--            <entity-find-one entity-name="mantle.work.effort.WorkEffort" value-field="workEffort"><field-map field-name="workEffortId"/></entity-find-one>-->
             <entity-find-one entity-name="mantle.facility.Facility" value-field="facility"><field-map field-name="facilityId"/></entity-find-one>
 
             <!-- set type and class from product if not passed in -->
@@ -2672,7 +2672,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="ownerPartyId" from="orderPart?.customerPartyId"/>
             </if>
             <!-- get ownerPartyId from WorkEffort if needed (who made it within the system on a production run WorkEffort) -->
-            <if condition="!ownerPartyId"><set field="ownerPartyId" from="workEffort?.ownerPartyId"/></if>
+<!--            <if condition="!ownerPartyId"><set field="ownerPartyId" from="workEffort?.ownerPartyId"/></if>-->
             <!-- get ownerPartyId from Facility if needed (final default, who owns the facility it's going into) -->
             <if condition="!ownerPartyId"><set field="ownerPartyId" from="facility?.ownerPartyId"/></if>
 
@@ -2745,7 +2745,7 @@ along with this software (see the LICENSE.md file). If not, see
                             acquiredDate:(orderHeader?.placedDate ?: ec.user.nowTimestamp),
                             acquireOrderId:orderId, acquireOrderItemSeqId:orderItemSeqId,
                             acquireShipmentId:shipmentId, acquireCost:(acquireCost ?: orderItem?.standardCost ?: orderItem?.unitAmount),
-                            acquireCostUomId:orderHeader?.currencyUomId, acquireWorkEffortId:workEffortId]"/>
+                            acquireCostUomId:orderHeader?.currencyUomId]"/>
             </then><else>
                 <entity-find-one entity-name="mantle.product.asset.Asset" value-field="asset"/>
                 <set field="asset.originalQuantity" from="(asset.originalQuantity ?: 0) + originalQuantity"/>
@@ -2792,7 +2792,7 @@ along with this software (see the LICENSE.md file). If not, see
                         workEffortId:workEffortId, assetReceiptId:assetReceiptId]"/>
 
             <!-- if this is for a WorkEffort (production run, etc)  -->
-            <if condition="workEffortId">
+            <!--<if condition="workEffortId">
                 <entity-find entity-name="mantle.work.effort.WorkEffortProduct" list="produceProductList">
                     <date-filter/>
                     <econdition field-name="workEffortId"/><econdition field-name="productId"/>
@@ -2806,7 +2806,7 @@ along with this software (see the LICENSE.md file). If not, see
                             productId:productId, typeEnumId:'WeptProduce', estimatedQuantity:quantity]"/>
                     </else-if></if>
                 </if>
-            </if>
+            </if>-->
 
             <!-- call through AssetDetail create? NO, would get called from the move#AssetReservation record recursively -->
             <!-- reserve the newly available Asset, if needed -->

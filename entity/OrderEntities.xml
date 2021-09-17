@@ -262,7 +262,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <detail relationship="contactMechs">
                     <detail relationship="contactMech" use-master="default"/>
                 </detail>
-                <detail relationship="terms"><detail relationship="term"/></detail>
+<!--                <detail relationship="terms"><detail relationship="term"/></detail>-->
                 <detail relationship="vendor" use-master="basic"/>
                 <detail relationship="customer" use-master="basic"/>
                 <detail relationship="carrier" use-master="basic"/>
@@ -392,7 +392,7 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="finAccountTransId" type="id"/>
         <field name="overrideGlAccountId" type="id">
             <description>Used to specify the override or actual glAccountId used for the item.</description></field>
-        <field name="salesOpportunityId" type="id"/>
+<!--        <field name="salesOpportunityId" type="id"/>-->
 
         <!-- these fields are for sales/VAT/etc tax items -->
         <field name="sourceReferenceId" type="text-short"/>
@@ -426,11 +426,11 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" related="mantle.product.store.ProductStorePromotion" short-alias="storePromotion"/>
         <relationship type="one" related="mantle.product.store.ProductStorePromoCode" short-alias="storePromoCode"/>
 
-        <relationship type="one" related="mantle.product.subscription.Subscription" short-alias="subscription"/>
-        <relationship type="one" title="Override" related="mantle.ledger.account.GlAccount" short-alias="overrideGlAccount">
-            <key-map field-name="overrideGlAccountId"/></relationship>
-        <relationship type="one" related="SalesOpportunity" short-alias="opportunity"/>
-        <relationship type="one" related="mantle.other.tax.TaxAuthority" short-alias="taxAuthority"/>
+<!--        <relationship type="one" related="mantle.product.subscription.Subscription" short-alias="subscription"/>-->
+        <!--<relationship type="one" title="Override" related="mantle.ledger.account.GlAccount" short-alias="overrideGlAccount">
+            <key-map field-name="overrideGlAccountId"/></relationship>-->
+<!--        <relationship type="one" related="SalesOpportunity" short-alias="opportunity"/>-->
+<!--        <relationship type="one" related="mantle.other.tax.TaxAuthority" short-alias="taxAuthority"/>-->
 
         <relationship type="many" related="mantle.product.issuance.AssetReservation" short-alias="reservations">
             <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>
@@ -523,8 +523,8 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="carrierPartyId" type="id" enable-audit-log="update"/>
         <field name="shipmentMethodEnumId" type="id" enable-audit-log="update"/>
         <field name="tradeTermEnumId" type="id"/>
-        <field name="settlementTermId" type="id">
-            <description>Settlement (payment) term for auto order payments and set on Invoice(s) based on this OrderPart</description></field>
+<!--        <field name="settlementTermId" type="id">
+            <description>Settlement (payment) term for auto order payments and set on Invoice(s) based on this OrderPart</description></field>-->
 
         <field name="postalContactMechId" type="id" enable-audit-log="update"/>
         <field name="telecomContactMechId" type="id"/>
@@ -585,7 +585,7 @@ along with this software (see the LICENSE.md file). If not, see
         <!-- For tradeTermEnumId terms are defined with enumTypeId="TermType" in AccountingAccountEntities.xml -->
         <relationship type="one" title="TermType" related="moqui.basic.Enumeration" short-alias="tradeTermEnum">
             <key-map field-name="tradeTermEnumId"/></relationship>
-        <relationship type="one" related="SettlementTerm" short-alias="settlementTerm"/>
+<!--        <relationship type="one" related="SettlementTerm" short-alias="settlementTerm"/>-->
 
         <relationship type="one" title="Postal" related="mantle.party.contact.ContactMech" short-alias="postal">
             <key-map field-name="postalContactMechId"/></relationship>
@@ -606,10 +606,10 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="orderId"/><key-map field-name="orderPartSeqId"/></relationship>
         <relationship type="many" related="mantle.order.OrderPartContactMech" short-alias="contactMechs">
             <key-map field-name="orderId"/><key-map field-name="orderPartSeqId"/></relationship>
-        <relationship type="many" related="mantle.order.OrderPartTerm" short-alias="terms">
-            <key-map field-name="orderId"/><key-map field-name="orderPartSeqId"/></relationship>
-        <!--<relationship type="many" related="mantle.account.payment.Payment" short-alias="payments">
+        <!--<relationship type="many" related="mantle.order.OrderPartTerm" short-alias="terms">
             <key-map field-name="orderId"/><key-map field-name="orderPartSeqId"/></relationship>-->
+        <relationship type="many" related="mantle.order.payment.Payment" short-alias="payments">
+            <key-map field-name="orderId"/><key-map field-name="orderPartSeqId"/></relationship>
 
         <index name="ORDPTOPTY_ID_IDX"><index-field name="otherPartyOrderId"/></index>
     </entity>
@@ -636,13 +636,13 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one-nofk" related="mantle.party.contact.TelecomNumber" short-alias="telecomNumber"/>
         <relationship type="one-nofk" related="mantle.party.contact.PostalAddress" short-alias="postalAddress"/>
     </entity>
-    <entity entity-name="OrderPartTerm" package="mantle.order" cache="never">
+    <!--<entity entity-name="OrderPartTerm" package="mantle.order" cache="never">
         <field name="orderId" type="id" is-pk="true"/>
         <field name="orderPartSeqId" type="id" is-pk="true"/>
         <field name="settlementTermId" type="id" is-pk="true"/>
         <relationship type="one" related="mantle.order.OrderPart" short-alias="orderPart"/>
         <relationship type="one" related="SettlementTerm" short-alias="term"/>
-    </entity>
+    </entity>-->
     <entity entity-name="OrderPromoCode" package="mantle.order" cache="never">
         <field name="orderId" type="id" is-pk="true"/>
         <field name="promoCodeId" type="id" is-pk="true"/>
@@ -767,7 +767,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <detail relationship="issuances"/>
                 <detail relationship="receipts"/>
                 <detail relationship="shipmentSources"/>
-                <detail relationship="billings"/>
+<!--                <detail relationship="billings"/>-->
             </detail>
         </master>
     </entity>
@@ -870,5 +870,174 @@ along with this software (see the LICENSE.md file). If not, see
             <moqui.basic.Enumeration enumId="RrspReplace" description="Replace" enumTypeId="ReturnResponse"/>
             <moqui.basic.Enumeration enumId="RrspManual" description="Manual" enumTypeId="ReturnResponse"/>
         </seed-data>
+    </entity>
+
+    <entity entity-name="Payment" package="mantle.order.payment" short-alias="payments" cache="never" optimistic-lock="true">
+        <field name="paymentId" type="id" is-pk="true"/>
+        <field name="paymentTypeEnumId" type="id"/>
+        <field name="fromPartyId" type="id" enable-audit-log="update"/>
+        <field name="toPartyId" type="id" enable-audit-log="update"/>
+
+        <!-- Deprecated, use paymentInstrumentEnumId: <field name="paymentMethodTypeEnumId" type="id"/> -->
+        <field name="paymentInstrumentEnumId" type="id"><description>The payment instrument used for the payment; for
+            non-cash and other instruments represented by an account specify details of it with paymentMethodId</description></field>
+
+        <field name="paymentMethodId" type="id"><description>The from PaymentMethod (owned by fromPartyId)</description></field>
+        <field name="toPaymentMethodId" type="id"><description>The to PaymentMethod (owned by toPartyId), if applicable,
+            the account the payment goes to</description></field>
+        <field name="orderId" type="id"><description>Set if the Payment represents the payment settings for an Order.</description></field>
+        <field name="orderPartSeqId" type="id"><description>Set if the Payment represents the payment settings for an OrderPart.</description></field>
+        <field name="orderItemSeqId" type="id"><description>Set if the Payment represents the payment settings for an OrderItem.</description></field>
+
+        <field name="statusId" type="id" enable-audit-log="true"/>
+        <field name="effectiveDate" type="date-time" enable-audit-log="update"><description>When the payment is issued (delivered)</description></field>
+        <field name="settlementDate" type="date-time"><description>When the payment is settled (confirmed)</description></field>
+        <field name="dueDate" type="date-time"><description>Due Date for this Payment, different concept than Invoice Due Date for planned split payments, etc</description></field>
+        <field name="paymentAuthCode" type="text-short"/>
+        <field name="paymentRefNum" type="text-short" enable-audit-log="update"/>
+        <field name="comments" type="text-medium"/>
+        <field name="memo" type="text-medium"/>
+        <field name="distGroupEnumId" type="id"/>
+
+        <field name="amount" type="currency-amount" enable-audit-log="update"/>
+        <field name="amountUomId" type="id"/>
+        <field name="appliedTotal" type="currency-amount"/>
+        <field name="unappliedTotal" type="currency-amount"/>
+
+        <field name="forInvoiceId" type="id" enable-audit-log="update"/>
+        <field name="refundForPaymentId" type="id"/>
+        <field name="partyRelationshipId" type="id"><description>For Payroll payments, points to Employment record</description></field>
+
+        <!-- The Original Currency amount and uomId are for the values coming from the bank (if known) and are to be used for reconciliation and such later, and not for PaymentApplication. -->
+        <field name="visitId" type="id"><description>Track the Visit so we know the session info, including client IP,
+            for audit and fraud purposes.</description></field>
+        <field name="originalCurrencyAmount" type="currency-amount"/>
+        <field name="originalCurrencyUomId" type="id"/>
+        
+        <relationship type="one" title="PaymentType" related="moqui.basic.Enumeration" short-alias="type">
+            <key-map field-name="paymentTypeEnumId"/></relationship>
+        <relationship type="one" title="PaymentInstrument" related="moqui.basic.Enumeration" short-alias="instrument">
+            <key-map field-name="paymentInstrumentEnumId"/></relationship>
+        <relationship type="one" related="mantle.order.OrderHeader" short-alias="orderHeader"/>
+        <relationship type="one-nofk" related="mantle.order.OrderPart" short-alias="orderPart"/>
+        <relationship type="one-nofk" related="mantle.order.OrderItem" short-alias="orderItem"/>
+        <relationship type="one" title="Amount" related="moqui.basic.Uom" short-alias="amountUom">
+            <key-map field-name="amountUomId"/></relationship>
+        <relationship type="one" title="From" related="mantle.party.Party" short-alias="fromParty">
+            <key-map field-name="fromPartyId"/></relationship>
+        <relationship type="one" title="To" related="mantle.party.Party" short-alias="toParty">
+            <key-map field-name="toPartyId"/></relationship>
+        <relationship type="one" title="Payment" related="moqui.basic.StatusItem" short-alias="status"/>
+        <relationship type="one" title="RefundFor" related="mantle.order.payment.Payment" short-alias="refundForPayment">
+            <key-map field-name="refundForPaymentId"/></relationship>
+        <!--<relationship type="one" title="OverrideOrg" related="mantle.party.Party" short-alias="overrideOrgParty">
+            <key-map field-name="overrideOrgPartyId"/></relationship>-->
+        
+        <relationship type="one" title="OriginalCurrency" related="moqui.basic.Uom" short-alias="originalCurrencyUom">
+            <key-map field-name="originalCurrencyUomId"/></relationship>
+        <relationship type="one" related="moqui.server.Visit"/>
+        <index name="PAYMENT_REFNUM"><index-field name="paymentRefNum"/></index>
+
+        <seed-data>
+            <!-- Payment Type -->
+            <moqui.basic.EnumerationType description="Payment Type" enumTypeId="PaymentType"/>
+            <moqui.basic.Enumeration description="Disbursement" enumId="PtDisbursement" enumTypeId="PaymentType"/>
+            <moqui.basic.Enumeration description="Refund" enumId="PtRefund" enumTypeId="PaymentType"/>
+            <!-- Payment meant to be applied to an invoice -->
+            <moqui.basic.Enumeration description="Invoice Payment" enumId="PtInvoicePayment" enumTypeId="PaymentType"/>
+            <moqui.basic.Enumeration description="Pre Payment - Expense" enumId="PtPrePayment" parentEnumId="PtInvoicePayment" enumTypeId="PaymentType"/>
+            <moqui.basic.Enumeration description="Pre Payment - Inventory" enumId="PtPrePaymentInventory" parentEnumId="PtInvoicePayment" enumTypeId="PaymentType"/>
+            <!-- Payment for deposit to or withdrawal from a FinancialAccount, never applied to an invoice -->
+            <moqui.basic.Enumeration description="Financial Account Transaction" enumId="PtFinancialAccount" enumTypeId="PaymentType"/>
+            <moqui.basic.Enumeration description="Order Payment Preference" enumId="PtOrderPref" enumTypeId="PaymentType"/>
+            <!-- Payment of payroll invoices -->
+            <moqui.basic.Enumeration description="Payroll Employee Payment" enumId="PtPayrollPayment" enumTypeId="PaymentType" parentEnumId="PtInvoicePayment"/>
+            <moqui.basic.Enumeration description="Payroll Other Payment" enumId="PtPayrollOtherPayment" enumTypeId="PaymentType" parentEnumId="PtInvoicePayment"/>
+
+            <!-- Payment Instrument -->
+            <moqui.basic.EnumerationType description="Payment Instrument" enumTypeId="PaymentInstrument"/>
+            <moqui.basic.Enumeration description="ACH Direct" enumId="PiAch" enumTypeId="PaymentInstrument" relatedEnumId="PmtBankAccount"/>
+            <moqui.basic.Enumeration description="Amazon Pay" enumId="PiAmazonPay" enumTypeId="PaymentInstrument" relatedEnumId="PmtAmazonPayAccount"/>
+            <moqui.basic.Enumeration description="Bitcoin" enumId="PiBitcoinWallet" enumTypeId="PaymentInstrument" relatedEnumId="PmtBitcoinWallet"/>
+            <moqui.basic.Enumeration description="Credit Card" enumId="PiCreditCard" enumTypeId="PaymentInstrument" relatedEnumId="PmtCreditCard"/>
+            <moqui.basic.Enumeration description="Debit Card" enumId="PiDebitCard" enumTypeId="PaymentInstrument" relatedEnumId="PmtCreditCard"/>
+            <moqui.basic.Enumeration description="PayPal Account" enumId="PiPayPalAccount" enumTypeId="PaymentInstrument" relatedEnumId="PmtPayPalAccount"/>
+            <moqui.basic.Enumeration description="Gift Card" enumId="PiGiftCard" enumTypeId="PaymentInstrument" relatedEnumId="PmtGiftCard"/>
+            <moqui.basic.Enumeration description="Gift Certificate" enumId="PiGiftCertificate" enumTypeId="PaymentInstrument"/>
+            <moqui.basic.Enumeration description="Cash" enumId="PiCash" enumTypeId="PaymentInstrument"/>
+            <moqui.basic.Enumeration description="Financial Account" enumId="PiFinancialAccount" enumTypeId="PaymentInstrument" relatedEnumId="PmtFinancialAccount"/>
+            <moqui.basic.Enumeration description="Personal Check" enumId="PiPersonalCheck" enumTypeId="PaymentInstrument" relatedEnumId="PmtBankAccount"/>
+            <moqui.basic.Enumeration description="Company Check" enumId="PiCompanyCheck" enumTypeId="PaymentInstrument" relatedEnumId="PmtBankAccount"/>
+            <moqui.basic.Enumeration description="Certified Check" enumId="PiCertifiedCheck" enumTypeId="PaymentInstrument" relatedEnumId="PmtBankAccount"/>
+            <moqui.basic.Enumeration description="Money Order" enumId="PiMoneyOrder" enumTypeId="PaymentInstrument"/>
+            <moqui.basic.Enumeration description="Company Account" enumId="PiCompanyAccount" enumTypeId="PaymentInstrument" relatedEnumId="PmtFinancialAccount"/>
+            <moqui.basic.Enumeration description="Billing Account" enumId="PiBillingAccount" enumTypeId="PaymentInstrument"/>
+            <moqui.basic.Enumeration description="Cash On Delivery" enumId="PiCod" enumTypeId="PaymentInstrument"/>
+            <moqui.basic.Enumeration description="Wire Transfer" enumId="PiWireTransfer" enumTypeId="PaymentInstrument"/>
+            <moqui.basic.Enumeration description="Other" enumId="PiOther" enumTypeId="PaymentInstrument"/>
+            <!-- Using Payment for these is messy, use adjust#Invoice with appropriate item type instead:
+            <moqui.basic.Enumeration description="Write-off" enumId="PiWriteOff" enumTypeId="PaymentInstrument"/>
+            <moqui.basic.Enumeration description="Discount" enumId="PiDiscount" enumTypeId="PaymentInstrument"/>
+            -->
+            <!-- really need this? implied by various more specific others... <moqui.basic.Enumeration description="Offline Payment" enumId="PiOffline" enumTypeId="PaymentInstrument"/> -->
+
+            <!-- Payment Status -->
+            <moqui.basic.StatusType description="Payment Status" statusTypeId="Payment"/>
+            <moqui.basic.StatusItem description="Proposed" sequenceNum="1" statusId="PmntProposed" statusTypeId="Payment"/>
+            <moqui.basic.StatusItem description="Promised" sequenceNum="2" statusId="PmntPromised" statusTypeId="Payment"/>
+            <moqui.basic.StatusItem description="Authorized" sequenceNum="3" statusId="PmntAuthorized" statusTypeId="Payment"/>
+            <moqui.basic.StatusItem description="Delivered" sequenceNum="4" statusId="PmntDelivered" statusTypeId="Payment"/>
+            <moqui.basic.StatusItem description="Confirmed Paid" sequenceNum="6" statusId="PmntConfirmed" statusTypeId="Payment"/>
+            <moqui.basic.StatusItem description="Cancelled" sequenceNum="91" statusId="PmntCancelled" statusTypeId="Payment"/>
+            <moqui.basic.StatusItem description="Void" sequenceNum="92" statusId="PmntVoid" statusTypeId="Payment"/>
+            <moqui.basic.StatusItem description="Declined" sequenceNum="93" statusId="PmntDeclined" statusTypeId="Payment"/>
+            <!-- deprecated, should always be separate payment applied to refunded payment: <moqui.basic.StatusItem description="Refunded" sequenceNum="94" statusId="PmntRefunded" statusTypeId="Payment"/> -->
+
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntProposed" toStatusId="PmntPromised" transitionName="Promise"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntProposed" toStatusId="PmntCancelled" transitionName="Cancel"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntPromised" toStatusId="PmntAuthorized" transitionName="Authorize"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntPromised" toStatusId="PmntDelivered" transitionName="Deliver"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntPromised" toStatusId="PmntCancelled" transitionName="Cancel"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntPromised" toStatusId="PmntDeclined" transitionName="Decline"/>
+
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDeclined" toStatusId="PmntPromised" transitionName="Promise"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDeclined" toStatusId="PmntAuthorized" transitionName="Authorize"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntAuthorized" toStatusId="PmntPromised" transitionName="Unauthorize"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntAuthorized" toStatusId="PmntDelivered" transitionName="Deliver"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntAuthorized" toStatusId="PmntCancelled" transitionName="Cancel"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntAuthorized" toStatusId="PmntVoid" transitionName="Void"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntAuthorized" toStatusId="PmntDeclined" transitionName="Decline"/>
+
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntAuthorized" transitionName="Undeliver"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntPromised" transitionName="Undeliver and Unauthorize"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntConfirmed" transitionName="Confirm"/>
+            <!-- deprecated: <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntRefunded" transitionName="Refund"/> -->
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntCancelled" transitionName="Cancel"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntVoid" transitionName="Void"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntDeclined" transitionName="Decline"/>
+
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntConfirmed" toStatusId="PmntDelivered" transitionName="Unconfirm"/>
+            <!-- deprecated: <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntConfirmed" toStatusId="PmntRefunded" transitionName="Refund"/> -->
+
+            <!--&lt;!&ndash; Payment Reconcile Status &ndash;&gt;
+            <moqui.basic.StatusType description="Payment Reconcile Status" statusTypeId="PaymentReconcile"/>
+            <moqui.basic.StatusItem description="Not Reconciled" sequenceNum="1" statusId="PmtrNot" statusTypeId="PaymentReconcile"/>
+            <moqui.basic.StatusItem description="Partly Reconciled" sequenceNum="2" statusId="PmtrPartly" statusTypeId="PaymentReconcile"/>
+            <moqui.basic.StatusItem description="Reconciled" sequenceNum="3" statusId="PmtrRec" statusTypeId="PaymentReconcile"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmtrNot" toStatusId="PmtrPartly" transitionName="Partly Reconcile"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmtrNot" toStatusId="PmtrRec" transitionName="Reconcile"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmtrPartly" toStatusId="PmtrRec" transitionName="Reconcile"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmtrPartly" toStatusId="PmtrNot" transitionName="Unreconcile"/>
+            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmtrRec" toStatusId="PmtrNot" transitionName="Unreconcile"/>-->
+        </seed-data>
+
+        <master>
+            <detail relationship="type"/>
+            <detail relationship="instrument"/>
+            <detail relationship="amountUom"/>
+            <detail relationship="fromParty" use-master="basic"/>
+            <detail relationship="toParty" use-master="basic"/>
+            <detail relationship="status"/>
+        </master>
     </entity>
 </entities>

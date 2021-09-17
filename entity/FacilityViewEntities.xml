@@ -45,17 +45,17 @@ along with this software (see the LICENSE.md file). If not, see
         <alias name="partyPseudoId" entity-alias="PTY" field="pseudoId"/>
         <alias name="roleTypeId" entity-alias="PTRL"/>
     </view-entity>
-    <view-entity entity-name="FacilityAndGlAppl" package="mantle.facility">
+    <!--<view-entity entity-name="FacilityAndGlAppl" package="mantle.facility">
         <member-entity entity-alias="FAC" entity-name="mantle.facility.Facility"/>
-        <member-entity entity-alias="FGLA" entity-name="mantle.facility.FacilityGlAppl" join-from-alias="FAC">
-            <key-map field-name="facilityId"/></member-entity>
+        &lt;!&ndash;<member-entity entity-alias="FGLA" entity-name="mantle.facility.FacilityGlAppl" join-from-alias="FAC">
+            <key-map field-name="facilityId"/></member-entity>&ndash;&gt;
         <member-entity entity-alias="FPTY" entity-name="mantle.facility.FacilityParty" join-from-alias="FAC" join-optional="true">
             <key-map field-name="facilityId"/></member-entity>
         <alias-all entity-alias="FAC"/>
         <alias-all entity-alias="FGLA"/>
         <alias-all entity-alias="FPTY"/>
-    </view-entity>
-    <view-entity entity-name="FacilityGlApplAccountOrg" package="mantle.facility">
+    </view-entity>-->
+    <!--<view-entity entity-name="FacilityGlApplAccountOrg" package="mantle.facility">
         <member-entity entity-alias="GLACT" entity-name="mantle.ledger.account.GlAccount"/>
         <member-entity entity-alias="GLAO" entity-name="mantle.ledger.account.GlAccountOrganization" join-from-alias="GLACT">
             <key-map field-name="glAccountId"/></member-entity>
@@ -78,7 +78,7 @@ along with this software (see the LICENSE.md file). If not, see
         <alias name="joinEnumId" entity-alias="GLEA" field="enumId"/>
         <alias name="facilityPartyId" entity-alias="FPTY" field="partyId"/>
         <alias name="facilityRoleTypeId" entity-alias="FPTY" field="roleTypeId"/>
-    </view-entity>
+    </view-entity>-->
     <view-entity entity-name="FacilityAndParty" package="mantle.facility">
         <member-entity entity-alias="FAC" entity-name="mantle.facility.Facility"/>
         <member-entity entity-alias="FPTY" entity-name="mantle.facility.FacilityParty" join-from-alias="FAC" join-optional="true">

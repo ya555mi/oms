@@ -44,10 +44,10 @@ along with this software (see the LICENSE.md file). If not, see
     </seca>
 
     <!-- Check Order Part Completed after WorkEffort statusId update -->
-    <seca id="OrderItemWorkEffortCheckComplete" service="update#mantle.work.effort.WorkEffort" when="post-service">
+    <!--<seca id="OrderItemWorkEffortCheckComplete" service="update#mantle.work.effort.WorkEffort" when="post-service">
         <condition><expression>statusChanged &amp;&amp; statusId in ['WeComplete', 'WeClosed', 'WeCancelled']</expression></condition>
         <actions>
-            <!-- will rarely be more than one record, but allow it -->
+            &lt;!&ndash; will rarely be more than one record, but allow it &ndash;&gt;
             <entity-find entity-name="mantle.order.OrderItemWorkEffort" list="itemWorkEffortList">
                 <econdition field-name="workEffortId"/>
                 <econdition field-name="requiredWork" value="Y"/>
@@ -64,7 +64,7 @@ along with this software (see the LICENSE.md file). If not, see
             </iterate>
         </actions>
     </seca>
-
+-->
     <!-- Return processing on approval -->
     <seca id="ReturnApprovedProcess" service="update#mantle.order.return.ReturnHeader" when="post-service">
         <condition><expression>statusChanged &amp;&amp; statusId == 'ReturnApproved'</expression></condition>

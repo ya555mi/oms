@@ -4,6 +4,9 @@
 <resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/rest-api-2.1.xsd"
           name="oms" displayName="Headless OMS APIs" version="1.0.0" description="Services for OMS">
 
+    <resource name="lookup" description="Lookup from various entities by ID"><method type="get">
+        <service name="mantle.GeneralServices.lookup#ById"/></method></resource>
+
     <resource name="v1">
         <resource name="orders">
             <method type="get"><service name="co.hotwax.v1.OrderServices.find#Orders"/></method>

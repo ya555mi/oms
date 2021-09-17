@@ -69,30 +69,30 @@ along with this software (see the LICENSE.md file). If not, see
 
     <!-- ========== Registered Services ========== -->
 
-    <!-- Registered Services: Product Price Modify -->
+    <!--&lt;!&ndash; Registered Services: Product Price Modify &ndash;&gt;
     <moqui.service.ServiceRegister serviceRegisterId="ProductPriceKS" serviceTypeEnumId="ProductPriceModify"
-            description="Mantle Price Drools Knowledge Set" serviceName="mantle.product.PriceServices.run#ProductPriceKS"/>
-    <!-- add the ProductPriceKS drools rules -->
+            description="Mantle Price Drools Knowledge Set" serviceName="co.hotwax.product.PriceServices.run#ProductPriceKS"/>
+    &lt;!&ndash; add the ProductPriceKS drools rules &ndash;&gt;
     <mantle.product.ProductPriceModify priceModifyId="ProductPriceKS" serviceRegisterId="ProductPriceKS"/>
 
-    <!-- Registered Services: Store Promotion -->
+    &lt;!&ndash; Registered Services: Store Promotion &ndash;&gt;
     <moqui.service.ServiceRegister serviceRegisterId="NewCustomerDiscount" serviceTypeEnumId="ProductStorePromotion"
-            description="New Customer Discount" serviceName="mantle.product.PromotionServices.apply#NewCustomerDiscount"/>
+            description="New Customer Discount" serviceName="co.hotwax.product.PromotionServices.apply#NewCustomerDiscount"/>
     <moqui.service.ServiceRegister serviceRegisterId="BuyGetDiscount" serviceTypeEnumId="ProductStorePromotion"
-            description="Buy X Get Y at Z% Discount" serviceName="mantle.product.PromotionServices.apply#BuyGetDiscount"/>
+            description="Buy X Get Y at Z% Discount" serviceName="co.hotwax.product.PromotionServices.apply#BuyGetDiscount"/>
     <moqui.service.ServiceRegister serviceRegisterId="FlatDiscount" serviceTypeEnumId="ProductStorePromotion"
-            description="Flat Discount per Quantity" serviceName="mantle.product.PromotionServices.apply#FlatDiscount"/>
-
+            description="Flat Discount per Quantity" serviceName="co.hotwax.product.PromotionServices.apply#FlatDiscount"/>
+-->
     <!-- Registered Services: Store Order Pre-Approve Validation -->
     <moqui.service.ServiceRegister serviceRegisterId="OrderManualApprove" serviceTypeEnumId="OrderValidate"
-            description="Require Manual Approval" serviceName="mantle.order.OrderInfoServices.validate#OrderRequireManual"/>
+            description="Require Manual Approval" serviceName="co.hotwax.order.OrderInfoServices.validate#OrderRequireManual"/>
 
     <!-- ========== Service Jobs ========== -->
 
     <!-- Service Job: Auto-approve Orders Delayed - every 15 minutes by default -->
     <!-- Service Job: Auto-approve Orders Delayed - every 15 minutes by default -->
     <moqui.service.job.ServiceJob jobName="autoApprove_OrdersDelayed" description="Auto-approve Orders Delayed"
-            serviceName="mantle.order.OrderServices.autoApprove#OrdersDelayed" cronExpression="0 0/15 * * * ?" paused="N"
+            serviceName="co.hotwax.order.OrderServices.autoApprove#OrdersDelayed" cronExpression="0 0/15 * * * ?" paused="N"
             transactionTimeout="1800"/>
 
 </entity-facade-xml>

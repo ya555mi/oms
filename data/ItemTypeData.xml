@@ -48,7 +48,9 @@ along with this software (see the LICENSE.md file). If not, see
 
     <moqui.basic.Enumeration description="Asset - Inventory" enumId="ItemInventory" enumTypeId="ItemType"/>
     <moqui.basic.Enumeration description="Asset - Fixed Asset" enumId="ItemAsset" enumTypeId="ItemType"/>
-
+    
+    <!-- Outgoing/Receivable/Sales Item Types -->
+    <moqui.basic.Enumeration description="Outgoing/Receivable/Sales Items" enumId="EngItemsSales" enumTypeId="EnumGroup"/>
     <moqui.basic.EnumGroupMember enumId="ItemSalesTax" enumGroupEnumId="EngItemsSales"/>
     <moqui.basic.EnumGroupMember enumId="ItemVatTax" enumGroupEnumId="EngItemsSales"/>
     <moqui.basic.EnumGroupMember enumId="ItemShipping" enumGroupEnumId="EngItemsSales"/>
@@ -71,17 +73,6 @@ along with this software (see the LICENSE.md file). If not, see
     <moqui.basic.EnumGroupMember enumId="ItemMkgtPkgAdj" enumGroupEnumId="EngItemsSales"/>
     <moqui.basic.EnumGroupMember enumId="ItemSalesThirdParty" enumGroupEnumId="EngItemsSales"/>
 
-    <moqui.basic.EnumGroupMember enumId="ItemPromptDiscount" enumGroupEnumId="EngItemsSales"/>
-    <moqui.basic.EnumGroupMember enumId="ItemLateCharge" enumGroupEnumId="EngItemsSales"/>
-    <moqui.basic.EnumGroupMember enumId="ItemCouponCredit" enumGroupEnumId="EngItemsSales"/>
-    <moqui.basic.EnumGroupMember enumId="ItemPromoDiscount" enumGroupEnumId="EngItemsSales"/>
-
-    <moqui.basic.EnumGroupMember enumId="ItemWriteOff" enumGroupEnumId="EngItemsSales"/>
-    <moqui.basic.EnumGroupMember enumId="ItemReturnAdjust" enumGroupEnumId="EngItemsSales"/>
-    <moqui.basic.EnumGroupMember enumId="ItemChargebackAdjust" enumGroupEnumId="EngItemsSales"/>
-    <moqui.basic.EnumGroupMember enumId="ItemComplianceFee" enumGroupEnumId="EngItemsSales"/>
-    <moqui.basic.EnumGroupMember enumId="ItemShrinkage" enumGroupEnumId="EngItemsSales"/>
-
     <!-- Incoming/Payable/Purchase Item Types -->
     <moqui.basic.Enumeration description="Incoming/Payable/Purchase Items" enumId="EngItemsPurchase" enumTypeId="EnumGroup"/>
 
@@ -100,18 +91,6 @@ along with this software (see the LICENSE.md file). If not, see
     <!-- Invoice Adjust Item Types -->
     <moqui.basic.Enumeration description="Invoice Adjust Items" enumId="EngItemsAdjust" enumTypeId="EnumGroup"/>
 
-    <moqui.basic.EnumGroupMember enumId="ItemWriteOff" enumGroupEnumId="EngItemsAdjust"/>
-    <moqui.basic.EnumGroupMember enumId="ItemPromptDiscount" enumGroupEnumId="EngItemsAdjust"/>
-    <moqui.basic.EnumGroupMember enumId="ItemLateCharge" enumGroupEnumId="EngItemsAdjust"/>
-    <moqui.basic.EnumGroupMember enumId="ItemReturnAdjust" enumGroupEnumId="EngItemsAdjust"/>
-    <moqui.basic.EnumGroupMember enumId="ItemChargebackAdjust" enumGroupEnumId="EngItemsAdjust"/>
-    <moqui.basic.EnumGroupMember enumId="ItemComplianceFee" enumGroupEnumId="EngItemsAdjust"/>
-    <moqui.basic.EnumGroupMember enumId="ItemShrinkage" enumGroupEnumId="EngItemsAdjust"/>
-
-    <moqui.basic.EnumGroupMember enumId="ItemCouponCredit" enumGroupEnumId="EngItemsAdjust"/>
-    <moqui.basic.EnumGroupMember enumId="ItemPromoDiscount" enumGroupEnumId="EngItemsAdjust"/>
-    <moqui.basic.EnumGroupMember enumId="ItemFreeFills" enumGroupEnumId="EngItemsAdjust"/>
-
     <moqui.basic.EnumGroupMember enumId="ItemDiscount" enumGroupEnumId="EngItemsAdjust"/>
     <moqui.basic.EnumGroupMember enumId="ItemDiscountAppease" enumGroupEnumId="EngItemsAdjust"/>
     <moqui.basic.EnumGroupMember enumId="ItemSupplierDiscount" enumGroupEnumId="EngItemsAdjust"/>
@@ -127,5 +106,4 @@ along with this software (see the LICENSE.md file). If not, see
     <moqui.basic.EnumGroupMember enumId="ItemReplacement" enumGroupEnumId="EngItemsProduct"/>
     <moqui.basic.EnumGroupMember enumId="ItemInventory" enumGroupEnumId="EngItemsProduct"/>
     <moqui.basic.EnumGroupMember enumId="ItemAsset" enumGroupEnumId="EngItemsProduct"/>
-    <moqui.basic.EnumGroupMember enumId="ItemExpSupplies" enumGroupEnumId="EngItemsProduct"/>
 </entity-facade-xml>
