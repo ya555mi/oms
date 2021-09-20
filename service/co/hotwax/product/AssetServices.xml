@@ -2771,7 +2771,7 @@ along with this software (see the LICENSE.md file). If not, see
                         rejectionReasonEnumId:rejectionReasonEnumId]"/>
 
             <!-- if there are OrderItemBilling records matching orderId, orderItemSeqId, and shipmentId set assetReceiptId -->
-            <if condition="orderId &amp;&amp; orderItemSeqId &amp;&amp; shipmentId">
+           <!-- <if condition="orderId &amp;&amp; orderItemSeqId &amp;&amp; shipmentId">
                 <entity-find entity-name="mantle.order.OrderItemBilling" list="orderItemBillingList">
                     <econdition field-name="orderId"/><econdition field-name="orderItemSeqId"/>
                     <econdition field-name="shipmentId"/><econdition field-name="assetReceiptId" from="null"/>
@@ -2780,7 +2780,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <set field="orderItemBilling.assetReceiptId" from="assetReceiptId"/>
                     <entity-update value-field="orderItemBilling"/>
                 </iterate>
-            </if>
+            </if>-->
 
             <!-- create AssetDetail -->
             <!-- don't do this, better to make always available given how ATP is used for issuance/etc: <set field="availableToPromiseDiff" from="statusId == 'AstAvailable' ? quantity : 0"/> -->

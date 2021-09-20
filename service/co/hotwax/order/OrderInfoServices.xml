@@ -50,8 +50,8 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="quantityNotShippedByPart" type="Map">
                 <description>Key is orderPartSeqId, value is quantity not shipped for all items in part.</description></parameter>
 
-            <parameter name="orderItemBillingList" type="List"><parameter name="oib" type="Map">
-                <auto-parameters entity-name="mantle.order.OrderItemBilling"/></parameter></parameter>
+            <!--<parameter name="orderItemBillingList" type="List"><parameter name="oib" type="Map">
+                <auto-parameters entity-name="mantle.order.OrderItemBilling"/></parameter></parameter>-->
             <parameter name="invoiceIdSet" type="Set"><parameter name="invoiceId"/></parameter>
             <parameter name="quantityNotBilledByItem" type="Map">
                 <description>Key is orderItemSeqId, value is quantity not billed for item.</description></parameter>
@@ -272,8 +272,8 @@ along with this software (see the LICENSE.md file). If not, see
 
             <!-- get OrderItemBilling list and derived data -->
             <!-- TODO: exclude OrderItemBilling records for cancelled invoices -->
-            <entity-find entity-name="mantle.order.OrderItemBilling" list="orderItemBillingList">
-                <econdition field-name="orderId"/><order-by field-name="orderItemSeqId"/></entity-find>
+            <!--<entity-find entity-name="mantle.order.OrderItemBilling" list="orderItemBillingList">
+                <econdition field-name="orderId"/><order-by field-name="orderItemSeqId"/></entity-find>-->
             <set field="invoiceIdSet" from="new TreeSet()"/>
             <set field="quantityNotBilledByItem" from="[:]"/>
             <set field="totalNotBilledByItem" from="[:]"/>
@@ -285,7 +285,7 @@ along with this software (see the LICENSE.md file). If not, see
                 addToBigDecimalInMap(orderItem.orderItemSeqId, orderItemTotal, totalNotBilledByItem)
                 addToBigDecimalInMap(orderItem.orderPartSeqId, orderItemQuantity, quantityNotBilledByPart)
             ]]></script></iterate>
-            <iterate list="orderItemBillingList" entry="orderItemBilling"><script><![CDATA[
+            <!--<iterate list="orderItemBillingList" entry="orderItemBilling"><script><![CDATA[
                 def curOrderItem = orderItemList.find({ it.orderItemSeqId == orderItemBilling.orderItemSeqId })
                 invoiceIdSet.add(orderItemBilling.invoiceId)
                 if (curOrderItem != null) {
@@ -297,7 +297,7 @@ along with this software (see the LICENSE.md file). If not, see
                     def billedTotal = (billedQuantity * (curInvoiceItem?.amount ?: 0.0)).setScale(2, BigDecimal.ROUND_HALF_UP)
                     addToBigDecimalInMap(curOrderItem.orderItemSeqId, -billedTotal, totalNotBilledByItem)
                 }
-            ]]></script></iterate>
+            ]]></script></iterate>-->
 
             <!-- get ReturnItem list -->
             <entity-find entity-name="mantle.order.return.ReturnItem" list="returnItemList">
@@ -627,12 +627,12 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="itemQuantityShipped" from="shipmentItemSourceList ? shipmentItemSourceList*.quantity.sum() : 0.0"/>
             <set field="itemQuantityNotShipped" from="orderItemQuantity - itemQuantityShipped"/>
 
-            <entity-find entity-name="mantle.order.OrderItemBilling" list="orderItemBillingList">
+            <!--<entity-find entity-name="mantle.order.OrderItemBilling" list="orderItemBillingList">
                 <econdition field-name="orderId"/>
                 <econdition field-name="orderItemSeqId"/>
-            </entity-find>
+            </entity-find>-->
 
-            <set field="itemQuantityBilled" from="0.0"/>
+            <!--<set field="itemQuantityBilled" from="0.0"/>
             <set field="itemAmountBilled" from="0.0"/>
             <iterate list="orderItemBillingList" entry="orderItemBilling">
                 <set field="billedQuantity" from="orderItemBilling.quantity != null ? orderItemBilling.quantity : 1.0"/>
@@ -640,7 +640,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                 <set field="curInvoiceItem" from="orderItemBilling.invoiceItem"/>
                 <set field="itemAmountBilled" from="itemAmountBilled + ((billedQuantity * (curInvoiceItem?.amount ?: 0.0)).setScale(2, BigDecimal.ROUND_HALF_UP))"/>
-            </iterate>
+            </iterate>-->
 
             <set field="itemQuantityNotBilled" from="orderItemQuantity - itemQuantityBilled"/>
             <set field="itemAmountNotBilled" from="orderItemTotal - itemAmountBilled"/>
@@ -690,8 +690,8 @@ along with this software (see the LICENSE.md file). If not, see
                 <econdition field-name="statusId" operator="not-equals" value="ReturnCancelled"/>
                 <order-by field-name="orderItemSeqId"/>
             </entity-find>
-            <service-call name="co.hotwax.order.ReturnServices.calculate#OrderItemReturnable" out-map="returnableOut"
-                    in-map="[orderId:orderItem.orderId, orderItemSeqId:orderItem.orderItemSeqId, orderItemBillingList:orderItemBillingList, returnItemList:returnItemList]"/>
+            <!--<service-call name="co.hotwax.order.ReturnServices.calculate#OrderItemReturnable" out-map="returnableOut"
+                    in-map="[orderId:orderItem.orderId, orderItemSeqId:orderItem.orderItemSeqId, orderItemBillingList:orderItemBillingList, returnItemList:returnItemList]"/>-->
             <set field="returnIdSet" from="new TreeSet()"/>
             <iterate list="returnItemList" entry="returnItem">
                 <if condition="returnItem.orderItemSeqId != orderItemSeqId"><continue/></if>

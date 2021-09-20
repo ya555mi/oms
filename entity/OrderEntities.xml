@@ -440,8 +440,8 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>
         <relationship type="many" related="mantle.shipment.ShipmentItemSource" short-alias="shipmentSources">
             <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>
-        <relationship type="many" related="mantle.order.OrderItemBilling" short-alias="billings">
-            <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>
+        <!--<relationship type="many" related="mantle.order.OrderItemBilling" short-alias="billings">
+            <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>-->
 
         <index name="ORDITMEXT_ID_IDX"><index-field name="externalItemSeqId"/></index>
         <seed-data>
@@ -451,7 +451,7 @@ along with this software (see the LICENSE.md file). If not, see
             <moqui.basic.Enumeration enumId="OiqrCustomer" description="Customer Request" enumTypeId="OrderItemQuantityReason"/>
         </seed-data>
     </entity>
-    <entity entity-name="OrderItemBilling" package="mantle.order" cache="never">
+    <!--<entity entity-name="OrderItemBilling" package="mantle.order" cache="never">
         <field name="orderItemBillingId" type="id" is-pk="true"/>
         <field name="orderId" type="id"/>
         <field name="orderItemSeqId" type="id"/>
@@ -466,12 +466,12 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="amount" type="currency-precise"/>
         <relationship type="one" related="mantle.order.OrderItem" short-alias="orderItem">
             <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>
-        <!--<relationship type="one" related="mantle.account.invoice.InvoiceItem" short-alias="invoiceItem">
-            <key-map field-name="invoiceId"/><key-map field-name="invoiceItemSeqId"/></relationship>-->
+        &lt;!&ndash;<relationship type="one" related="mantle.account.invoice.InvoiceItem" short-alias="invoiceItem">
+            <key-map field-name="invoiceId"/><key-map field-name="invoiceItemSeqId"/></relationship>&ndash;&gt;
         <relationship type="one" related="mantle.product.receipt.AssetReceipt" short-alias="receipt"/>
         <relationship type="one" related="mantle.product.issuance.AssetIssuance" short-alias="issuance"/>
         <relationship type="one" related="mantle.shipment.Shipment" short-alias="shipment"/>
-    </entity>
+    </entity>-->
     <entity entity-name="OrderItemFormResponse" package="mantle.order" cache="never">
         <field name="orderId" type="id" is-pk="true"/>
         <field name="orderItemSeqId" type="id" is-pk="true"/>

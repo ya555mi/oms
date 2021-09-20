@@ -1,3 +1,2 @@
-# products
+# Headless Omnichannel Order Management System
 
-Digital Commerce OMS

@@ -723,26 +723,26 @@ along with this software (see the LICENSE.md file). If not, see
                             in-map="[shipmentId:shipmentId, productId:orderItem.productId, quantity:quantityNotShipped]"/>
                 </else></if>
 
-                <entity-find entity-name="mantle.order.OrderItemBilling" list="orderItemBillingList">
+                <!--<entity-find entity-name="mantle.order.OrderItemBilling" list="orderItemBillingList">
                     <econdition field-name="orderId"/><econdition field-name="orderItemSeqId" from="orderItem.orderItemSeqId"/>
-                </entity-find>
+                </entity-find>-->
                 <!-- set shipmentId on existing OrderItemBilling records with no shipmentId (for billed before shipped, ie Invoice before Shipment) -->
-                <set field="quantityNotBilled" from="(orderItem.quantity != null ? orderItem.quantity : 1.0) * (orderItem.selectedAmount ?: 1.0)"/>
+                <!--<set field="quantityNotBilled" from="(orderItem.quantity != null ? orderItem.quantity : 1.0) * (orderItem.selectedAmount ?: 1.0)"/>
                 <iterate list="orderItemBillingList" entry="orderItemBilling">
                     <if condition="!orderItemBilling.shipmentId &amp;&amp; quantityNotBilled >= orderItemBilling.quantity">
                         <set field="orderItemBilling.shipmentId" from="shipmentId"/>
                         <entity-update value-field="orderItemBilling"/>
                     </if>
                     <set field="quantityNotBilled" from="quantityNotBilled - orderItemBilling.quantity"/>
-                    <!-- NOTE if orderItemBilling.shipmentId set split OrderItemBilling by Shipment quantities? -->
-                </iterate>
+                    &lt;!&ndash; NOTE if orderItemBilling.shipmentId set split OrderItemBilling by Shipment quantities? &ndash;&gt;
+                </iterate>-->
 
                 <!-- if quantityNotBilled > 0 do anything here? it should be handled when shipped (see InvoiceServices.create#SalesShipmentInvoices -->
                 <!-- set invoiceId, invoiceItemSeqId from existing OrderItemBilling records -->
                 <!-- simple case: full item already billed, just set the invoiceId so it is skipped when Shipment is Packed -->
                 <set field="singleFullOib" from="null"/>
-                <if condition="orderItemBillingList.size() == 1 &amp;&amp; quantityNotBilled == 0.0">
-                    <set field="singleFullOib" from="orderItemBillingList[0]"/></if>
+                <!--<if condition="orderItemBillingList.size() == 1 &amp;&amp; quantityNotBilled == 0.0">
+                    <set field="singleFullOib" from="orderItemBillingList[0]"/></if>-->
                 <!-- NOTE: handle case where order item was invoiced, then quantity increased? just handle on Shipment Packed (in InvoiceServices.create#SalesShipmentInvoices) -->
 
                 <!-- create the ShipmentItemSource to associate the OrderItem with the Shipment -->

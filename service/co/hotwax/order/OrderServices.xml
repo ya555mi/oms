@@ -1941,11 +1941,11 @@ General Order Placement and eCommerce Usage
         </in-parameters>
         <actions>
             <!-- make sure order has no associated shipments or invoices -->
-            <entity-find-count entity-name="mantle.order.OrderItemBilling" count-field="itemBillingCount">
+            <!--<entity-find-count entity-name="mantle.order.OrderItemBilling" count-field="itemBillingCount">
                 <econdition field-name="orderId"/></entity-find-count>
             <if condition="itemBillingCount">
                 <return error="true" message="Order ${orderId} has been invoiced (billed), cannot make recurring"/></if>
-
+-->
             <entity-find-count entity-name="mantle.shipment.ShipmentItemSource" count-field="shipmentSourceCount">
                 <econdition field-name="orderId"/></entity-find-count>
             <if condition="shipmentSourceCount">
@@ -2138,11 +2138,11 @@ General Order Placement and eCommerce Usage
                     <return type="warning" message="Not updating promotions, shipping, or tax for order part ${orderId}:${orderPartSeqId} in status ${orderPart.status?.description}"/></if>
 
                 <!-- make sure no billing done, don't auto update if so -->
-                <entity-find-count entity-name="mantle.order.OrderItemBillingDetail" count-field="partBillingCount">
+                <!--<entity-find-count entity-name="mantle.order.OrderItemBillingDetail" count-field="partBillingCount">
                     <econdition field-name="orderId"/><econdition field-name="orderPartSeqId"/></entity-find-count>
                 <if condition="partBillingCount">
                     <return type="warning" message="Not updating promotions, shipping, or tax for order part ${orderId}:${orderPartSeqId} with ${partBillingCount} OrderItemBilling records"/></if>
-
+-->
                 <!-- set flag in context root to avoid recursive triggers -->
                 <script>ec.context.getSharedMap().put(sharedFlagKey, true)</script>
 
@@ -2156,8 +2156,8 @@ General Order Placement and eCommerce Usage
                         <service-call name="co.hotwax.order.OrderServices.delete#OrderItem"
                                 in-map="[orderId:promoItem.orderId, orderItemSeqId:promoItem.orderItemSeqId]"/>
                     </iterate>
-                    <service-call name="co.hotwax.product.PromotionServices.apply#OrderPromotions"
-                            in-map="[orderId:orderId, orderPartSeqId:orderPartSeqId, orderHeader:orderHeader]"/>
+                    <!--<service-call name="co.hotwax.product.PromotionServices.apply#OrderPromotions"
+                            in-map="[orderId:orderId, orderPartSeqId:orderPartSeqId, orderHeader:orderHeader]"/>-->
                 </if>
 
                 <!-- Check for promotions with free ground shipping (if shipmentMethodEnumId == ShMthGround) -->
