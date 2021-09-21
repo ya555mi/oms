@@ -4,54 +4,53 @@
 <resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/rest-api-2.1.xsd"
           name="oms" displayName="Headless OMS APIs" version="1.0.0" description="Services for OMS">
 
-    <resource name="lookup" description="Lookup from various entities by ID"><method type="get">
-        <service name="co.hotwax.GeneralServices.lookup#ById"/></method></resource>
-
-    <resource name="v1">
-        <resource name="orders">
+    <resource name="lookup" description="Lookup from various entities by ID">
+        <method type="get"><service name="co.hotwax.GeneralServices.lookup#ById"/></method>
+    </resource>
+    
+    <resource name="orders">
+        <method type="get"><service name="co.hotwax.oms.OrderServices.find#Orders"/></method>
+        <method type="post"><service name="co.hotwax.oms.OrderServices.create#Order"/></method>
+        <id name="orderId">
             <method type="get"><service name="co.hotwax.oms.OrderServices.find#Orders"/></method>
-            <method type="post"><service name="co.hotwax.oms.OrderServices.create#Order"/></method>
-            <id name="orderId">
-                <method type="get"><service name="co.hotwax.oms.OrderServices.find#Orders"/></method>
-                <resource name="orderItem">
-                    <method type="post"><service name="co.hotwax.oms.OrderServices.add#OrderItem"/></method>
-                    <method type="put"><service name="co.hotwax.oms.OrderServices.update#OrderItem"/></method>
-                    <resource name="cancel">
-                        <method type="post"><service name="co.hotwax.oms.OrderServices.cancel#OrderItem"/></method>
-                    </resource>
+            <resource name="orderItem">
+                <method type="post"><service name="co.hotwax.oms.OrderServices.add#OrderItem"/></method>
+                <method type="put"><service name="co.hotwax.oms.OrderServices.update#OrderItem"/></method>
+                <resource name="cancel">
+                    <method type="post"><service name="co.hotwax.oms.OrderServices.cancel#OrderItem"/></method>
                 </resource>
-            </id>
-        </resource>
+            </resource>
+        </id>
+    </resource>
 
-        <resource name="customers">
-            <method type="post"><service name="co.hotwax.oms.CustomerServices.create#Customer"/></method>
+    <resource name="customers">
+        <method type="post"><service name="co.hotwax.oms.CustomerServices.create#Customer"/></method>
+        <method type="get"><service name="co.hotwax.oms.CustomerServices.find#Customers"/></method>
+
+        <id name="partyId">
             <method type="get"><service name="co.hotwax.oms.CustomerServices.find#Customers"/></method>
+        </id>
+    </resource>
 
-            <id name="partyId">
-                <method type="get"><service name="co.hotwax.oms.CustomerServices.find#Customers"/></method>
-            </id>
-        </resource>
-
-        <resource name="products">
-            <method type="put"><service name="co.hotwax.oms.ProductServices.store#ProductRestImpl"/></method>
+    <resource name="products">
+        <method type="put"><service name="co.hotwax.oms.ProductServices.store#ProductRestImpl"/></method>
+        <method type="get"><service name="co.hotwax.oms.ProductServices.find#Products"/></method>
+        <id name="productId">
             <method type="get"><service name="co.hotwax.oms.ProductServices.find#Products"/></method>
-            <id name="productId">
-                <method type="get"><service name="co.hotwax.oms.ProductServices.find#Products"/></method>
-            </id>
-        </resource>
+        </id>
+    </resource>
 
-        <resource name="facilities">
-            <method type="post"><service name="co.hotwax.oms.FacilityServices.create#Facility"/></method>
+    <resource name="facilities">
+        <method type="post"><service name="co.hotwax.oms.FacilityServices.create#Facility"/></method>
+        <method type="get"><service name="co.hotwax.oms.FacilityServices.find#Facilities"/></method>
+
+        <id name="locationId">
             <method type="get"><service name="co.hotwax.oms.FacilityServices.find#Facilities"/></method>
+        </id>
+    </resource>
 
-            <id name="locationId">
-                <method type="get"><service name="co.hotwax.oms.FacilityServices.find#Facilities"/></method>
-            </id>
-        </resource>
-
-        <resource name="inventory">
-            <method type="post"><service name="co.hotwax.oms.AssetServices.record#Inventory"/></method>
-            <method type="get"><service name="co.hotwax.oms.AssetServices.get#AvailableInventory"/></method>
-        </resource>
+    <resource name="inventory">
+        <method type="post"><service name="co.hotwax.oms.AssetServices.record#Inventory"/></method>
+        <method type="get"><service name="co.hotwax.oms.AssetServices.get#AvailableInventory"/></method>
     </resource>
 </resource>
