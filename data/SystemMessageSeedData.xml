@@ -6,19 +6,19 @@
 	<!-- SystemMessageType record for importing product data -->
 	<moqui.service.message.SystemMessageType systemMessageTypeId="ImportProduct"
 			description="Create/Update Product System Message"
-			consumeServiceName="co.hotwax.v1.SystemMessageServices.consume#DataImportSystemMessage"
+			consumeServiceName="co.hotwax.oms.SystemMessageServices.consume#DataImportSystemMessage"
 			receivePath="/sftp_user/sftpdir" receiveFilePattern=".*\.json"/>
 
 	<!-- SystemMessageType record for importing facility data -->
 	<moqui.service.message.SystemMessageType systemMessageTypeId="ImportFacility"
 			description="Create Facility System Message"
-			consumeServiceName="co.hotwax.v1.SystemMessageServices.consume#DataImportSystemMessage"
+			consumeServiceName="co.hotwax.oms.SystemMessageServices.consume#DataImportSystemMessage"
 			receivePath="/sftp_user/sftpdir" receiveFilePattern=".*\.json"/>
 
 	<!-- SystemMessageType record for importing inventory data  -->
 	<moqui.service.message.SystemMessageType systemMessageTypeId="ImportInventory"
 			description="Update Inventory System Message"
-			consumeServiceName="co.hotwax.v1.SystemMessageServices.consume#DataImportSystemMessage"
+			consumeServiceName="co.hotwax.oms.SystemMessageServices.consume#DataImportSystemMessage"
 			receivePath="/sftp_user/sftpdir" receiveFilePattern=".*\.json"/>
 
 </entity-facade-xml>

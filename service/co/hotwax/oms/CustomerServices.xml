@@ -39,7 +39,7 @@
         </actions>
     </service>
 
-	<!-- GET customers service -->
+    <!-- GET customers service -->
     <service verb="find" noun="Customers">
         <description>
             Find customers by party ID or email address.

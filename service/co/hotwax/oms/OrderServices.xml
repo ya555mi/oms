@@ -168,7 +168,7 @@
         </out-parameters>
         <actions>
             <!-- get ProductStore ID from ProductStoreSetting of hostname-->
-            <service-call name="co.hotwax.v1.StoreServices.get#ProductStoreIdFromHostName" in-map="[requestHostName:ec.web.getHostName(false)]" out-map="productStoreIdContext"/>
+            <service-call name="co.hotwax.oms.StoreServices.get#ProductStoreIdFromHostName" in-map="[requestHostName:ec.web.getHostName(false)]" out-map="productStoreIdContext"/>
 
             <set field="defaultProductStoreId" from="productStoreIdContext?.productStoreId"/>
             <if condition="defaultProductStoreId">
@@ -179,7 +179,7 @@
             </if>
 
             <!-- Validate API request -->
-            <service-call name="co.hotwax.v1.OrderServices.validate#OrderRequest" in-map="context" out-map="context"/>
+            <service-call name="co.hotwax.oms.OrderServices.validate#OrderRequest" in-map="context" out-map="context"/>
 
             <!-- Get some unspecified values from the default Product Store -->
             <set field="productStoreId" from="defaultProductStore?.productStoreId"/>
@@ -691,7 +691,7 @@
                          externalOrderId:orderHeaderAndPart.externalId, grandTotal:orderHeaderAndPart.grandTotal]"/>
 
                     <!-- Preparing customer details -->
-                    <service-call name="co.hotwax.v1.CustomerServices.find#Customers" out-map="customers"
+                    <service-call name="co.hotwax.oms.CustomerServices.find#Customers" out-map="customers"
                             in-map="[partyId:orderHeaderAndPart.customerPartyId]"/>
 
                     <set field="customer_details" from="customers?.customers[0]"/>
@@ -933,7 +933,7 @@
                 </if>
 
                 <!-- Create OrderItem and ItemTax records  -->
-                <service-call name="co.hotwax.v1.OrderServices.create#OrderItemAndTax"
+                <service-call name="co.hotwax.oms.OrderServices.create#OrderItemAndTax"
                               out-map="context" in-map="context + [orderPartId:order_part.id,
                         orderItem:order_part.item_details]"/>
             </then>
@@ -977,7 +977,7 @@
                         telecomContactMechId:shippingPhoneOut?.contactMechId]"/>
 
                     <!-- Create OrderItem and ItemTax records  -->
-                    <service-call name="co.hotwax.v1.OrderServices.create#OrderItemAndTax"
+                    <service-call name="co.hotwax.oms.OrderServices.create#OrderItemAndTax"
                                   out-map="context" in-map="context + [orderPartId:orderPartOut.orderPartSeqId,
                         orderItem:order_part.item_details]"/>
                 </else>
