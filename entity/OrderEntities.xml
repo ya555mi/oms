@@ -262,7 +262,6 @@ along with this software (see the LICENSE.md file). If not, see
                 <detail relationship="contactMechs">
                     <detail relationship="contactMech" use-master="default"/>
                 </detail>
-<!--                <detail relationship="terms"><detail relationship="term"/></detail>-->
                 <detail relationship="vendor" use-master="basic"/>
                 <detail relationship="customer" use-master="basic"/>
                 <detail relationship="carrier" use-master="basic"/>
@@ -425,13 +424,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" related="mantle.product.category.ProductCategory" short-alias="category"/>
         <relationship type="one" related="mantle.product.store.ProductStorePromotion" short-alias="storePromotion"/>
         <relationship type="one" related="mantle.product.store.ProductStorePromoCode" short-alias="storePromoCode"/>
-
-<!--        <relationship type="one" related="mantle.product.subscription.Subscription" short-alias="subscription"/>-->
-        <!--<relationship type="one" title="Override" related="mantle.ledger.account.GlAccount" short-alias="overrideGlAccount">
-            <key-map field-name="overrideGlAccountId"/></relationship>-->
-<!--        <relationship type="one" related="SalesOpportunity" short-alias="opportunity"/>-->
-<!--        <relationship type="one" related="mantle.other.tax.TaxAuthority" short-alias="taxAuthority"/>-->
-
         <relationship type="many" related="mantle.product.issuance.AssetReservation" short-alias="reservations">
             <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>
         <relationship type="many" related="mantle.product.issuance.AssetIssuance" short-alias="issuances">
@@ -440,8 +432,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>
         <relationship type="many" related="mantle.shipment.ShipmentItemSource" short-alias="shipmentSources">
             <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>
-        <!--<relationship type="many" related="mantle.order.OrderItemBilling" short-alias="billings">
-            <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>-->
 
         <index name="ORDITMEXT_ID_IDX"><index-field name="externalItemSeqId"/></index>
         <seed-data>
@@ -451,27 +441,6 @@ along with this software (see the LICENSE.md file). If not, see
             <moqui.basic.Enumeration enumId="OiqrCustomer" description="Customer Request" enumTypeId="OrderItemQuantityReason"/>
         </seed-data>
     </entity>
-    <!--<entity entity-name="OrderItemBilling" package="mantle.order" cache="never">
-        <field name="orderItemBillingId" type="id" is-pk="true"/>
-        <field name="orderId" type="id"/>
-        <field name="orderItemSeqId" type="id"/>
-        <field name="invoiceId" type="id"/>
-        <field name="invoiceItemSeqId" type="id"/>
-        <field name="assetIssuanceId" type="id"/>
-        <field name="assetReceiptId" type="id"/>
-        <field name="shipmentId" type="id"><description>For physical items the assetIssuanceId can be used
-            to find the Shipment but for adjustments and such, possibly prorated for a particular Shipment, this is
-            the way to find it.</description></field>
-        <field name="quantity" type="number-decimal"/>
-        <field name="amount" type="currency-precise"/>
-        <relationship type="one" related="mantle.order.OrderItem" short-alias="orderItem">
-            <key-map field-name="orderId"/><key-map field-name="orderItemSeqId"/></relationship>
-        &lt;!&ndash;<relationship type="one" related="mantle.account.invoice.InvoiceItem" short-alias="invoiceItem">
-            <key-map field-name="invoiceId"/><key-map field-name="invoiceItemSeqId"/></relationship>&ndash;&gt;
-        <relationship type="one" related="mantle.product.receipt.AssetReceipt" short-alias="receipt"/>
-        <relationship type="one" related="mantle.product.issuance.AssetIssuance" short-alias="issuance"/>
-        <relationship type="one" related="mantle.shipment.Shipment" short-alias="shipment"/>
-    </entity>-->
     <entity entity-name="OrderItemFormResponse" package="mantle.order" cache="never">
         <field name="orderId" type="id" is-pk="true"/>
         <field name="orderItemSeqId" type="id" is-pk="true"/>
@@ -523,9 +492,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="carrierPartyId" type="id" enable-audit-log="update"/>
         <field name="shipmentMethodEnumId" type="id" enable-audit-log="update"/>
         <field name="tradeTermEnumId" type="id"/>
-<!--        <field name="settlementTermId" type="id">
-            <description>Settlement (payment) term for auto order payments and set on Invoice(s) based on this OrderPart</description></field>-->
-
         <field name="postalContactMechId" type="id" enable-audit-log="update"/>
         <field name="telecomContactMechId" type="id"/>
         <field name="trackingNumber" type="text-short"/>
@@ -585,7 +551,6 @@ along with this software (see the LICENSE.md file). If not, see
         <!-- For tradeTermEnumId terms are defined with enumTypeId="TermType" in AccountingAccountEntities.xml -->
         <relationship type="one" title="TermType" related="moqui.basic.Enumeration" short-alias="tradeTermEnum">
             <key-map field-name="tradeTermEnumId"/></relationship>
-<!--        <relationship type="one" related="SettlementTerm" short-alias="settlementTerm"/>-->
 
         <relationship type="one" title="Postal" related="mantle.party.contact.ContactMech" short-alias="postal">
             <key-map field-name="postalContactMechId"/></relationship>
@@ -606,8 +571,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="orderId"/><key-map field-name="orderPartSeqId"/></relationship>
         <relationship type="many" related="mantle.order.OrderPartContactMech" short-alias="contactMechs">
             <key-map field-name="orderId"/><key-map field-name="orderPartSeqId"/></relationship>
-        <!--<relationship type="many" related="mantle.order.OrderPartTerm" short-alias="terms">
-            <key-map field-name="orderId"/><key-map field-name="orderPartSeqId"/></relationship>-->
         <relationship type="many" related="mantle.order.payment.Payment" short-alias="payments">
             <key-map field-name="orderId"/><key-map field-name="orderPartSeqId"/></relationship>
 
@@ -636,13 +599,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one-nofk" related="mantle.party.contact.TelecomNumber" short-alias="telecomNumber"/>
         <relationship type="one-nofk" related="mantle.party.contact.PostalAddress" short-alias="postalAddress"/>
     </entity>
-    <!--<entity entity-name="OrderPartTerm" package="mantle.order" cache="never">
-        <field name="orderId" type="id" is-pk="true"/>
-        <field name="orderPartSeqId" type="id" is-pk="true"/>
-        <field name="settlementTermId" type="id" is-pk="true"/>
-        <relationship type="one" related="mantle.order.OrderPart" short-alias="orderPart"/>
-        <relationship type="one" related="SettlementTerm" short-alias="term"/>
-    </entity>-->
     <entity entity-name="OrderPromoCode" package="mantle.order" cache="never">
         <field name="orderId" type="id" is-pk="true"/>
         <field name="promoCodeId" type="id" is-pk="true"/>
@@ -767,7 +723,6 @@ along with this software (see the LICENSE.md file). If not, see
                 <detail relationship="issuances"/>
                 <detail relationship="receipts"/>
                 <detail relationship="shipmentSources"/>
-<!--                <detail relationship="billings"/>-->
             </detail>
         </master>
     </entity>
@@ -929,10 +884,7 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="toPartyId"/></relationship>
         <relationship type="one" title="Payment" related="moqui.basic.StatusItem" short-alias="status"/>
         <relationship type="one" title="RefundFor" related="mantle.order.payment.Payment" short-alias="refundForPayment">
-            <key-map field-name="refundForPaymentId"/></relationship>
-        <!--<relationship type="one" title="OverrideOrg" related="mantle.party.Party" short-alias="overrideOrgParty">
-            <key-map field-name="overrideOrgPartyId"/></relationship>-->
-        
+            <key-map field-name="refundForPaymentId"/></relationship>        
         <relationship type="one" title="OriginalCurrency" related="moqui.basic.Uom" short-alias="originalCurrencyUom">
             <key-map field-name="originalCurrencyUomId"/></relationship>
         <relationship type="one" related="moqui.server.Visit"/>
@@ -975,10 +927,6 @@ along with this software (see the LICENSE.md file). If not, see
             <moqui.basic.Enumeration description="Cash On Delivery" enumId="PiCod" enumTypeId="PaymentInstrument"/>
             <moqui.basic.Enumeration description="Wire Transfer" enumId="PiWireTransfer" enumTypeId="PaymentInstrument"/>
             <moqui.basic.Enumeration description="Other" enumId="PiOther" enumTypeId="PaymentInstrument"/>
-            <!-- Using Payment for these is messy, use adjust#Invoice with appropriate item type instead:
-            <moqui.basic.Enumeration description="Write-off" enumId="PiWriteOff" enumTypeId="PaymentInstrument"/>
-            <moqui.basic.Enumeration description="Discount" enumId="PiDiscount" enumTypeId="PaymentInstrument"/>
-            -->
             <!-- really need this? implied by various more specific others... <moqui.basic.Enumeration description="Offline Payment" enumId="PiOffline" enumTypeId="PaymentInstrument"/> -->
 
             <!-- Payment Status -->
@@ -1011,24 +959,11 @@ along with this software (see the LICENSE.md file). If not, see
             <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntAuthorized" transitionName="Undeliver"/>
             <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntPromised" transitionName="Undeliver and Unauthorize"/>
             <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntConfirmed" transitionName="Confirm"/>
-            <!-- deprecated: <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntRefunded" transitionName="Refund"/> -->
             <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntCancelled" transitionName="Cancel"/>
             <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntVoid" transitionName="Void"/>
             <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntDelivered" toStatusId="PmntDeclined" transitionName="Decline"/>
 
             <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntConfirmed" toStatusId="PmntDelivered" transitionName="Unconfirm"/>
-            <!-- deprecated: <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmntConfirmed" toStatusId="PmntRefunded" transitionName="Refund"/> -->
-
-            <!--&lt;!&ndash; Payment Reconcile Status &ndash;&gt;
-            <moqui.basic.StatusType description="Payment Reconcile Status" statusTypeId="PaymentReconcile"/>
-            <moqui.basic.StatusItem description="Not Reconciled" sequenceNum="1" statusId="PmtrNot" statusTypeId="PaymentReconcile"/>
-            <moqui.basic.StatusItem description="Partly Reconciled" sequenceNum="2" statusId="PmtrPartly" statusTypeId="PaymentReconcile"/>
-            <moqui.basic.StatusItem description="Reconciled" sequenceNum="3" statusId="PmtrRec" statusTypeId="PaymentReconcile"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmtrNot" toStatusId="PmtrPartly" transitionName="Partly Reconcile"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmtrNot" toStatusId="PmtrRec" transitionName="Reconcile"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmtrPartly" toStatusId="PmtrRec" transitionName="Reconcile"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmtrPartly" toStatusId="PmtrNot" transitionName="Unreconcile"/>
-            <moqui.basic.StatusFlowTransition statusFlowId="Default" statusId="PmtrRec" toStatusId="PmtrNot" transitionName="Unreconcile"/>-->
         </seed-data>
 
         <master>

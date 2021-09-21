@@ -246,7 +246,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" title="PartyBadgeScanResult" related="moqui.basic.Enumeration">
             <key-map field-name="scanResultEnumId"/></relationship>
         <relationship type="one" related="mantle.facility.Facility"/>
-<!--        <relationship type="one" related="mantle.work.time.TimeEntry"/>-->
         <seed-data>
             <moqui.basic.EnumerationType description="Party Badge Scan Purpose" enumTypeId="PartyBadgeScanPurpose"/>
             <moqui.basic.Enumeration description="Access" enumId="PbspAccess" enumTypeId="PartyBadgeScanPurpose"/>
@@ -401,8 +400,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="fromDate" type="date-time"/>
         <field name="thruDate" type="date-time"/>
         <field name="statusId" type="id" enable-audit-log="true"/>
-        <!-- not used: <field name="priorityTypeEnumId" type="id"/> -->
-        <!-- not used: <field name="permissionsEnumId" type="id"/> -->
         <field name="comments" type="text-medium"/>
         <field name="relationshipName" type="text-medium">
             <description>Official name of relationship, such as title in an organization.</description>
@@ -418,8 +415,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" title="To" related="mantle.party.RoleType" short-alias="toRole">
             <key-map field-name="toRoleTypeId"/></relationship>
         <relationship type="one" title="PartyRelationship" related="moqui.basic.StatusItem" short-alias="status"/>
-        <!-- not used: <relationship type="one" title="PriorityType" related="moqui.basic.Enumeration" short-alias="priorityType">
-            <key-map field-name="priorityTypeEnumId"/></relationship> -->
         <seed-data>
             <!-- NOTE: The partyRelationshipTypeEnumId describes the FROM Party, ie Joe is a customer of ACME, so Joe
                 is the fromPartyId (fromRoleTypeId=Customer) and ACME is the toPartyId (toRoleTypeId=OrgInternal); for
@@ -756,8 +751,6 @@ along with this software (see the LICENSE.md file). If not, see
                 <roles roleTypeId="OrgInternal"/></mantle.party.PartySettingType>
             <mantle.party.PartySettingType partySettingTypeId="DefaultShipmentGatewayConfigId" description="Default Shipment Gateway Config ID">
                 <roles roleTypeId="OrgInternal"/></mantle.party.PartySettingType>
-            <!-- PaymentMethod vault gateway - setting type per org for payment gateway config to use by default for CC vault -->
-            <!-- Support required for each payment gateway integration, org partyId is: PaymentMethod.ownerPartyId => Payment.ownerPartyId -->
             <mantle.party.PartySettingType partySettingTypeId="VaultPaymentGatewayConfigId" description="Vault Payment Gateway Config ID">
                 <roles roleTypeId="OrgInternal"/></mantle.party.PartySettingType>
 
@@ -834,7 +827,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="note" type="text-long"/>
 
         <field name="reasonEnumId" type="id"/>
-<!--        <field name="contactListId" type="id"/>-->
         <field name="emailMessageId" type="id"/>
 
         <relationship type="one" related="mantle.party.communication.CommunicationEventType" short-alias="type"/>
@@ -864,7 +856,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="toPartyId" related="partyId"/></relationship>
         <relationship type="one" title="To" related="mantle.party.RoleType" short-alias="toRole">
             <key-map field-name="toRoleTypeId"/></relationship>
-<!--        <relationship type="one" related="ContactList" short-alias="contactList"/>-->
         <relationship type="one" title="CommunicationEventReason" related="moqui.basic.Enumeration" short-alias="reason">
             <key-map field-name="reasonEnumId"/></relationship>
 
@@ -937,8 +928,6 @@ along with this software (see the LICENSE.md file). If not, see
             <detail relationship="fromContactMech"/><detail relationship="toContactMech"/>
             <detail relationship="fromParty"/><detail relationship="fromRole"/>
             <detail relationship="toParty"/><detail relationship="toRole"/>
-<!--            <detail relationship="contactList"/><detail relationship="reason"/>-->
-
             <detail relationship="contents"/>
             <detail relationship="parties">
                 <detail relationship="party" use-master="basic"/>

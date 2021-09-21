@@ -17,13 +17,12 @@ along with this software (see the LICENSE.md file). If not, see
 
         curl http://localhost:9200/_cat/indices?v
 
-        curl -X DELETE http://localhost:9200/mantle_sales_order_part?pretty
-        curl -X DELETE http://localhost:9200/mantle_sales_order_item?pretty
-        curl -X DELETE http://localhost:9200/mantle_sales_invoice?pretty
-        curl -X DELETE http://localhost:9200/mantle_sales_invoice_item?pretty
+        curl -X DELETE http://localhost:9200/commerce?pretty
+        curl -X DELETE http://localhost:9200/commerce_sales?pretty
+        curl -X DELETE http://localhost:9200/commerce_sales?pretty
     -->
     <!-- ========== Product ========== -->
-    <dataDocuments dataDocumentId="MantleProduct" indexName="mantle" documentName="Product"
+    <dataDocuments dataDocumentId="CommerceProduct" indexName="commerce" documentName="Product"
                    primaryEntityName="mantle.product.Product" documentTitle="ProductNameTemplate"
                    manualDataServiceName="co.hotwax.product.ProductServices.get#ProductManualDocumentData">
         <fields fieldSeqId="01" fieldPath="productId"/>
@@ -89,7 +88,7 @@ along with this software (see the LICENSE.md file). If not, see
     </dataDocuments>
 
     <!-- Sales OrderPart -->
-    <dataDocuments dataDocumentId="MantleSalesOrderPart" indexName="mantle_sales" documentName="Sales Order Part"
+    <dataDocuments dataDocumentId="CommerceSalesOrderPart" indexName="commerce_sales" documentName="Sales Order Part"
                    primaryEntityName="mantle.order.OrderPart" documentTitle="${orderId}:${orderPartSeqId}">
         <fields fieldSeqId="01" fieldPath="orderId"/>
         <fields fieldSeqId="02" fieldPath="orderPartSeqId"/>
@@ -137,7 +136,7 @@ along with this software (see the LICENSE.md file). If not, see
     </dataDocuments>
 
     <!-- Sales OrderItem -->
-    <dataDocuments dataDocumentId="MantleSalesOrderItem" indexName="mantle_sales" documentName="Sales Order Item"
+    <dataDocuments dataDocumentId="CommerceSalesOrderItem" indexName="commerce_sales" documentName="Sales Order Item"
                    primaryEntityName="mantle.order.OrderItem" documentTitle="${orderId}:${orderItemSeqId}">
         <fields fieldSeqId="01" fieldPath="orderId"/>
         <fields fieldSeqId="02" fieldPath="orderItemSeqId"/>

@@ -98,8 +98,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="productId"/></relationship>
         <relationship type="many" related="mantle.product.ProductGeo" short-alias="geos">
             <key-map field-name="productId"/></relationship>
-        <!--<relationship type="many" related="mantle.product.ProductGlAppl" short-alias="glAppls">
-            <key-map field-name="productId"/></relationship>-->
         <relationship type="many" related="mantle.product.ProductIdentification" short-alias="identifications">
             <key-map field-name="productId"/></relationship>
         <relationship type="many" related="mantle.product.ProductParty" short-alias="parties">
@@ -111,8 +109,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="productId"/></relationship>
         <relationship type="many" related="mantle.product.feature.ProductFeatureAppl" short-alias="features">
             <key-map field-name="productId"/></relationship>
-        <!--<relationship type="many" related="mantle.product.subscription.ProductSubscriptionResource" short-alias="subscriptionResources">
-            <key-map field-name="productId"/></relationship>-->
 
         <relationship type="many" related="mantle.product.asset.Asset" short-alias="assets">
             <key-map field-name="productId"/></relationship>
@@ -358,7 +354,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" title="ProductFormType" related="moqui.basic.Enumeration" short-alias="productFormTypeEnum">
             <key-map field-name="productFormTypeEnumId" related="enumId"/></relationship>
         <relationship type="one" related="mantle.party.RoleType" short-alias="role"/>
-<!--        <relationship type="one" related="mantle.marketing.segment.MarketSegment" short-alias="marketSegment"/>-->
         <seed-data>
             <moqui.basic.EnumerationType description="Product Form Type" enumTypeId="ProductFormType"/>
             <moqui.basic.Enumeration description="Sales Required Info" enumId="PfmtSalesRequired" enumTypeId="ProductFormType"/>
@@ -414,7 +409,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="uomId" type="id"/>
         <relationship type="one" related="mantle.product.Product" short-alias="product"/>
         <relationship type="one" related="moqui.basic.UomDimensionType" short-alias="type"/>
-<!--        <relationship type="one" related="mantle.marketing.segment.MarketSegment" short-alias="marketSegment"/>-->
         <relationship type="one" related="moqui.basic.Uom" short-alias="uom"/>
     </entity>
 
@@ -436,13 +430,6 @@ along with this software (see the LICENSE.md file). If not, see
             <moqui.basic.Enumeration description="Shipment Exclude" enumId="PgpShipmentExclude" enumTypeId="ProductGeoPurpose"/>
         </seed-data>
     </entity>
-    <!--<entity entity-name="ProductGlAppl" package="mantle.product">
-        <description>Used to specify relevant GL Accounts for a Product (expense, revenue, etc); not related to posting conf</description>
-        <field name="productId" type="id" is-pk="true"/>
-        <field name="glAccountId" type="id" is-pk="true"/>
-        <relationship type="one" related="mantle.product.Product" short-alias="product"/>
-        <relationship type="one" related="mantle.ledger.account.GlAccount" short-alias="glAccount"/>
-    </entity>-->
     <entity entity-name="ProductIdentification" package="mantle.product">
         <field name="productId" type="id" is-pk="true"/>
         <field name="productIdTypeEnumId" type="id" is-pk="true"/>
@@ -480,7 +467,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="productIdTypeEnumId"/></relationship>
         <relationship type="one" related="mantle.product.Product" short-alias="product"/>
         <relationship type="one" related="mantle.product.store.ProductStore" short-alias="productStore"/>
-<!--        <relationship type="one" related="mantle.marketing.segment.MarketSegment" short-alias="marketSegment"/>-->
         <relationship type="one" title="Parent" related="mantle.product.Product" short-alias="parentProduct">
             <key-map field-name="parentProductId" related="productId"/></relationship>
         <index name="PRODUCT_STR_ID_VAL" unique="false"><index-field name="idValue"/></index>
@@ -515,7 +501,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="sequenceNum" type="number-integer"/>
         <relationship type="one" related="mantle.product.ProductParameter" short-alias="productParameter"/>
         <relationship type="one" related="mantle.product.Product" short-alias="product"/>
-<!--        <relationship type="one" related="mantle.marketing.segment.MarketSegment" short-alias="marketSegment"/>-->
         <relationship type="one" related="mantle.product.store.ProductStore" short-alias="productStore"/>
         <relationship type="one" related="mantle.product.ProductUomDimension" short-alias="productUomDimension"/>
         <relationship type="one" related="mantle.product.ProductOtherIdentification" short-alias="productOtherIdent"/>
@@ -541,7 +526,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="parameterValue" type="text-medium"/>
         <field name="uomId" type="id"/>
         <relationship type="one" related="mantle.product.ProductParameterSet" short-alias="productParameterSet"/>
-<!--        <relationship type="one" related="mantle.marketing.segment.MarketSegment" short-alias="marketSegment"/>-->
         <relationship type="one" related="mantle.product.ProductParameter" short-alias="productParameter"/>
         <relationship type="one" related="mantle.product.ProductParameterOption" short-alias="productParameterOption"/>
         <relationship type="one" related="moqui.basic.Uom" short-alias="uom"/>
@@ -617,7 +601,6 @@ along with this software (see the LICENSE.md file). If not, see
         <relationship type="one" title="Term" related="moqui.basic.Uom" short-alias="termUom">
             <key-map field-name="termUomId"/></relationship>
         <relationship type="one" related="ProductStore" short-alias="store"/>
-<!--        <relationship type="one" related="mantle.other.tax.TaxAuthority" short-alias="taxAuthority"/>-->
 
         <relationship type="one" title="SupplierPreferredOrder" related="moqui.basic.Enumeration" short-alias="supplierOrder">
             <key-map field-name="preferredOrderEnumId"/></relationship>
