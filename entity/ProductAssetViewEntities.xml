@@ -97,10 +97,6 @@ along with this software (see the LICENSE.md file). If not, see
             <case><when expression="ASD.ASSET_RECEIPT_ID IS NOT NULL AND ASD.SHIPMENT_ID IS NOT NULL AND ASD.RETURN_ID IS NULL AND ASD.EFFECTIVE_DATE BETWEEN '${ec.l10n.format(fromDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}' AND '${ec.l10n.format(thruDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}'">
                 <complex-alias expression="ASD.QUANTITY_ON_HAND_DIFF"/></when><else><complex-alias expression="0"/></else></case>
         </alias>
-        <!--<alias name="receiptsWorkEffort" function="sum">
-            <case><when expression="ASD.ASSET_RECEIPT_ID IS NOT NULL AND ASD.WORK_EFFORT_ID IS NOT NULL AND ASD.SHIPMENT_ID IS NULL AND ASD.EFFECTIVE_DATE BETWEEN '${ec.l10n.format(fromDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}' AND '${ec.l10n.format(thruDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}'">
-                <complex-alias expression="ASD.QUANTITY_ON_HAND_DIFF"/></when><else><complex-alias expression="0"/></else></case>
-        </alias>-->
         <alias name="receiptsOther" function="sum">
             <case><when expression="ASD.ASSET_RECEIPT_ID IS NOT NULL AND ASD.RETURN_ID IS NULL AND ASD.SHIPMENT_ID IS NULL AND ASD.WORK_EFFORT_ID IS NULL AND ASD.EFFECTIVE_DATE BETWEEN '${ec.l10n.format(fromDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}' AND '${ec.l10n.format(thruDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}'">
                 <complex-alias expression="ASD.QUANTITY_ON_HAND_DIFF"/></when><else><complex-alias expression="0"/></else></case>
@@ -113,10 +109,6 @@ along with this software (see the LICENSE.md file). If not, see
             <case><when expression="ASD.ASSET_ISSUANCE_ID IS NOT NULL AND ASD.SHIPMENT_ID IS NOT NULL AND ASD.EFFECTIVE_DATE BETWEEN '${ec.l10n.format(fromDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}' AND '${ec.l10n.format(thruDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}'">
                 <complex-alias expression="ASD.QUANTITY_ON_HAND_DIFF"/></when><else><complex-alias expression="0"/></else></case>
         </alias>
-        <!--<alias name="issuancesWorkEffort" function="sum">
-            <case><when expression="ASD.ASSET_ISSUANCE_ID IS NOT NULL AND ASD.WORK_EFFORT_ID IS NOT NULL AND ASD.SHIPMENT_ID IS NULL AND ASD.EFFECTIVE_DATE BETWEEN '${ec.l10n.format(fromDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}' AND '${ec.l10n.format(thruDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}'">
-                <complex-alias expression="ASD.QUANTITY_ON_HAND_DIFF"/></when><else><complex-alias expression="0"/></else></case>
-        </alias>-->
         <alias name="issuancesOther" function="sum">
             <case><when expression="ASD.ASSET_ISSUANCE_ID IS NOT NULL AND ASD.SHIPMENT_ID IS NULL AND ASD.WORK_EFFORT_ID IS NULL AND ASD.EFFECTIVE_DATE BETWEEN '${ec.l10n.format(fromDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}' AND '${ec.l10n.format(thruDate, 'yyyy-MM-dd HH:mm:ss', null, ec.entity.databaseTimeZone)}'">
                 <complex-alias expression="ASD.QUANTITY_ON_HAND_DIFF"/></when><else><complex-alias expression="0"/></else></case>
@@ -395,38 +387,6 @@ along with this software (see the LICENSE.md file). If not, see
         <alias name="pseudoId" entity-alias="MFGP"/>
         <alias name="mfgOwnerPartyId" entity-alias="MFGP" field="ownerPartyId"/>
     </view-entity>
-    <!--<view-entity entity-name="AssetAndGlAppl" package="mantle.product.asset">
-        <member-entity entity-alias="AST" entity-name="mantle.product.asset.Asset"/>
-        &lt;!&ndash;<member-entity entity-alias="AGLA" entity-name="mantle.product.asset.AssetGlAppl" join-from-alias="AST">
-            <key-map field-name="assetId"/></member-entity>
-        <alias-all entity-alias="AST"/>&ndash;&gt;
-        <alias-all entity-alias="AGLA"/>
-    </view-entity>-->
-    <!--<view-entity entity-name="AssetGlApplAccountOrg" package="mantle.product.asset">
-        <member-entity entity-alias="GLACT" entity-name="mantle.ledger.account.GlAccount"/>
-        <member-entity entity-alias="GLAO" entity-name="mantle.ledger.account.GlAccountOrganization" join-from-alias="GLACT">
-            <key-map field-name="glAccountId"/></member-entity>
-        <member-entity entity-alias="AGLA" entity-name="mantle.product.asset.AssetGlAppl" join-from-alias="GLACT" join-optional="true">
-            <key-map field-name="glAccountId"/></member-entity>
-        <member-entity entity-alias="PGLA" entity-name="mantle.product.ProductGlAppl" join-from-alias="GLACT" join-optional="true">
-            <key-map field-name="glAccountId"/></member-entity>
-        <member-entity entity-alias="AST" entity-name="mantle.product.asset.Asset" join-from-alias="AGLA">
-            <entity-condition><econditions combine="or">
-                <econdition entity-alias="AGLA" field-name="assetId" to-entity-alias="AST" to-field-name="assetId"/>
-                <econdition entity-alias="PGLA" field-name="productId" to-entity-alias="AST" to-field-name="productId"/>
-            </econditions></entity-condition>
-        </member-entity>
-        <member-entity entity-alias="PROD" entity-name="mantle.product.Product" join-from-alias="AST" join-optional="true">
-            <key-map field-name="productId"/></member-entity>
-        <alias-all entity-alias="GLACT"><exclude field="productId"/></alias-all>
-        <alias-all entity-alias="GLAO"/>
-        <alias-all entity-alias="AST"/>
-        <alias entity-alias="AGLA" name="joinAssetId" field="assetId"/>
-        <alias entity-alias="PGLA" name="joinProductId" field="productId"/>
-        <alias entity-alias="PROD" name="pseudoId"/>
-        <alias entity-alias="PROD" name="productName"/>
-    </view-entity>-->
-
     <view-entity entity-name="AssetAndPool" package="mantle.product.asset">
         <member-entity entity-alias="AST" entity-name="mantle.product.asset.Asset"/>
         <member-relationship entity-alias="ASP" join-from-alias="AST" relationship="pool"/>
@@ -692,33 +652,6 @@ along with this software (see the LICENSE.md file). If not, see
         <alias entity-alias="PROD" name="amountFixed"/>
         <alias entity-alias="PROD" name="productTypeEnumId"/>
     </view-entity>
-
-    <!-- ========================================================= -->
-    <!-- mantle.product.maintenance -->
-    <!-- ========================================================= -->
-
-    <!--<view-entity entity-name="ProductMaintenanceDetail" package="mantle.product.maintenance">
-        <member-entity entity-alias="PDM" entity-name="mantle.product.maintenance.ProductMaintenance"/>
-        <member-entity entity-alias="UOM" entity-name="moqui.basic.Uom" join-from-alias="PDM">
-            <key-map field-name="intervalUomId"/></member-entity>
-        <member-entity entity-alias="PMTR" entity-name="mantle.product.maintenance.ProductMeter" join-from-alias="PDM">
-            <key-map field-name="intervalProductMeterId"/></member-entity>
-        <member-entity entity-alias="PMUOM" entity-name="moqui.basic.Uom" join-from-alias="PMTR">
-            <key-map field-name="meterUomId"/></member-entity>
-        <member-entity entity-alias="MTENM" entity-name="moqui.basic.Enumeration" join-from-alias="PDM">
-            <key-map field-name="maintenanceTypeEnumId"/></member-entity>
-        <alias-all entity-alias="PDM"/>
-        <alias name="uomDescription" entity-alias="UOM" field="description"/>
-        <alias name="meterUomDescription" entity-alias="PMUOM" field="description"/>
-        <alias name="maintTypeDescription" entity-alias="MTENM" field="description"/>
-    </view-entity>
-    <view-entity entity-name="ProductMeterAndUom" package="mantle.product.maintenance">
-        <member-entity entity-alias="PDM" entity-name="mantle.product.maintenance.ProductMeter"/>
-        <member-entity entity-alias="UOM" entity-name="moqui.basic.Uom" join-from-alias="PDM">
-            <key-map field-name="meterUomId"/></member-entity>
-        <alias-all entity-alias="PDM"/>
-        <alias-all entity-alias="UOM"/>
-    </view-entity>-->
 
     <view-entity entity-name="AssetAndPartyDetail" package="mantle.product.maintenance">
         <member-entity entity-alias="AST" entity-name="mantle.product.asset.Asset"/>

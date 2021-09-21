@@ -230,20 +230,6 @@ along with this software (see the LICENSE.md file). If not, see
         <alias-all entity-alias="WUOM" prefix="weight"><exclude field="uomId"/></alias-all>
         <alias-all entity-alias="BUOM" prefix="capacity"><exclude field="uomId"/></alias-all>
     </view-entity>
-
-    <!--<view-entity entity-name="ShipmentInvoicePayment" package="mantle.shipment">
-        <member-entity entity-alias="SIS" entity-name="mantle.shipment.ShipmentItemSource"/>
-        <member-entity entity-alias="PAPP" entity-name="mantle.account.payment.PaymentApplication" join-from-alias="SIS">
-            <key-map field-name="invoiceId"/></member-entity>
-        <member-entity entity-alias="PMT" entity-name="mantle.account.payment.Payment" join-from-alias="PAPP">
-            <key-map field-name="paymentId"/></member-entity>
-        <alias-all entity-alias="PMT"/>
-        <alias name="shipmentId" entity-alias="SIS"/>
-        <alias name="invoiceId" entity-alias="SIS"/>
-        <alias name="paymentId" entity-alias="PAPP"/>
-        <alias name="amountApplied" entity-alias="PAPP"/>
-        <alias name="appliedDate" entity-alias="PAPP"/>
-    </view-entity>-->
     <view-entity entity-name="ShipmentOrderPayment" package="mantle.shipment">
         <member-entity entity-alias="SIS" entity-name="mantle.shipment.ShipmentItemSource"/>
         <member-entity entity-alias="PMT" entity-name="mantle.order.payment.Payment" join-from-alias="SIS">
@@ -272,21 +258,6 @@ along with this software (see the LICENSE.md file). If not, see
         <alias name="customerClassFromDate" entity-alias="TPCLS" field="fromDate"/>
         <alias name="customerClassThruDate" entity-alias="TPCLS" field="thruDate"/>
     </view-entity>
-    <!-- aborted effort, for future reference (report on insured packages where associated order was refunded as a list of potential insurance claims)
-    <view-entity entity-name="ShipmentInsuredRefunded" package="mantle.shipment">
-        <member-entity entity-alias="SPRS" entity-name="mantle.shipment.ShipmentPackageRouteSeg"/>
-        <member-relationship entity-alias="SRS" join-from-alias="SPRS" relationship="routeSegment"/>
-        <member-relationship entity-alias="SPCNT" join-from-alias="SPRS" relationship="contents"/>
-        <member-relationship entity-alias="SIS" join-from-alias="SPCNT" relationship="itemSources"/>
-        <member-relationship entity-alias="OITM" join-from-alias="SIS" relationship="orderItem"/>
-        <member-entity entity-alias="PMNT" entity-name="mantle.payment.Payment" join-from-alias="OITM">
-            <key-map field-name="orderId"/>
-            <entity-condition><econdition entity-alias="PMNT" field-name="paymentTypeEnumId" value="PtRefund"/></entity-condition>
-        </member-entity>
-        <alias-all entity-alias="SPRS"/>
-        <alias-all entity-alias="SRS"><exclude field="statusId"/><exclude field="costUomId"/><exclude field="estimatedArrivalDate"/></alias-all>
-    </view-entity>
-    -->
 
     <view-entity entity-name="ShipmentPackageSummary" package="mantle.shipment">
         <member-entity entity-alias="SRS" entity-name="mantle.shipment.ShipmentRouteSegment"/>

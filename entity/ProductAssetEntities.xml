@@ -135,8 +135,6 @@ along with this software (see the LICENSE.md file). If not, see
             <key-map field-name="assetId"/></relationship>
         <relationship type="many" related="mantle.product.asset.AssetDepreciation" short-alias="depreciations">
             <key-map field-name="assetId"/></relationship>
-        <!--<relationship type="many" related="mantle.product.asset.AssetGlAppl" short-alias="glAppls">
-            <key-map field-name="assetId"/></relationship>-->
         <relationship type="many" related="mantle.product.asset.AssetIdentification" short-alias="identifications">
             <key-map field-name="assetId"/></relationship>
         <relationship type="many" related="mantle.product.asset.AssetPartyAssignment" short-alias="partyAssignments">
@@ -394,8 +392,6 @@ along with this software (see the LICENSE.md file). If not, see
         <field name="yearsRemaining" type="number-integer"/>
         <field name="acctgTransId" type="id"/>
         <relationship type="one" related="mantle.product.asset.Asset"/>
-<!--        <relationship type="one" related="mantle.party.time.TimePeriod"/>-->
-<!--        <relationship type="one" related="mantle.ledger.transaction.AcctgTrans"/>-->
     </entity>
     <entity entity-name="AssetIdentification" package="mantle.product.asset" cache="never">
         <field name="assetId" type="id" is-pk="true"/>
@@ -416,13 +412,6 @@ along with this software (see the LICENSE.md file). If not, see
             <moqui.basic.Enumeration description="License Plate Number" enumId="AitLicensePlate" enumTypeId="AssetIdentificationType"/>
         </seed-data>
     </entity>
-    <!--<entity entity-name="AssetGlAppl" package="mantle.product.asset">
-        <description>Used to specify relevant GL Accounts for an Asset (expense, revenue, etc); not related to posting conf</description>
-        <field name="assetId" type="id" is-pk="true"/>
-        <field name="glAccountId" type="id" is-pk="true"/>
-        <relationship type="one" related="mantle.product.asset.Asset" short-alias="asset"/>
-        <relationship type="one" related="mantle.ledger.account.GlAccount" short-alias="glAccount"/>
-    </entity>-->
     <entity entity-name="AssetPartyAssignment" package="mantle.product.asset" cache="never">
         <field name="assetId" type="id" is-pk="true"/>
         <field name="partyId" type="id" is-pk="true"/>
