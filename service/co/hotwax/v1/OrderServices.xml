@@ -933,7 +933,7 @@
                 </if>
 
                 <!-- Create OrderItem and ItemTax records  -->
-                <service-call name="co.hotwax.oms.v1.OrderServices.create#OrderItemAndTax"
+                <service-call name="co.hotwax.v1.OrderServices.create#OrderItemAndTax"
                               out-map="context" in-map="context + [orderPartId:order_part.id,
                         orderItem:order_part.item_details]"/>
             </then>
@@ -977,7 +977,7 @@
                         telecomContactMechId:shippingPhoneOut?.contactMechId]"/>
 
                     <!-- Create OrderItem and ItemTax records  -->
-                    <service-call name="co.hotwax.oms.v1.OrderServices.create#OrderItemAndTax"
+                    <service-call name="co.hotwax.v1.OrderServices.create#OrderItemAndTax"
                                   out-map="context" in-map="context + [orderPartId:orderPartOut.orderPartSeqId,
                         orderItem:order_part.item_details]"/>
                 </else>

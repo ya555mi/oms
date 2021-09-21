@@ -14,10 +14,10 @@
             <id name="orderId">
                 <method type="get"><service name="co.hotwax.v1.OrderServices.find#Orders"/></method>
                 <resource name="orderItem">
-                    <method type="post"><service name="co.hotwax.oms.v1.OrderServices.add#OrderItem"/></method>
-                    <method type="put"><service name="co.hotwax.oms.v1.OrderServices.update#OrderItem"/></method>
+                    <method type="post"><service name="co.hotwax.v1.OrderServices.add#OrderItem"/></method>
+                    <method type="put"><service name="co.hotwax.v1.OrderServices.update#OrderItem"/></method>
                     <resource name="cancel">
-                        <method type="post"><service name="co.hotwax.oms.v1.OrderServices.cancel#OrderItem"/></method>
+                        <method type="post"><service name="co.hotwax.v1.OrderServices.cancel#OrderItem"/></method>
                     </resource>
                 </resource>
             </id>
@@ -34,9 +34,9 @@
 
         <resource name="products">
             <method type="put"><service name="co.hotwax.v1.ProductServices.store#ProductRestImpl"/></method>
-            <method type="get"><service name="co.hotwax.oms.v1.ProductServices.find#Products"/></method>
+            <method type="get"><service name="co.hotwax.v1.ProductServices.find#Products"/></method>
             <id name="productId">
-                <method type="get"><service name="co.hotwax.oms.v1.ProductServices.find#Products"/></method>
+                <method type="get"><service name="co.hotwax.v1.ProductServices.find#Products"/></method>
             </id>
         </resource>
 
