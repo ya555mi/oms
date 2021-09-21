@@ -72,6 +72,9 @@
                     <parameter name="item_details" type="List" required="true">
                         <description>The list of items in the order part.</description>
                         <parameter name="items" type="Map">
+                            <parameter name="externalItemId">
+                                <description>The ID for the item in the external system.</description>
+                            </parameter>
                             <parameter name="sku" required="true">
                                 <description>The unique sku of the product.</description>
                             </parameter>
@@ -278,7 +281,7 @@
                             in-map="context + [orderId:orderHeaderOut.orderId,
                             orderPartSeqId:orderPartOut.orderPartSeqId, productId:productList[0].productId,
                             quantity:order_item.quantity, itemDescription:order_item.productName,
-                            unitAmount:order_item.unitAmount]"/>
+                            unitAmount:order_item.unitAmount,externalItemSeqId:order_item.externalItemId]"/>
                     <!-- Item Tax Details -->
                     <if condition="order_item.tax_details">
                         <!-- Create Order Item for item's tax details -->
@@ -558,6 +561,9 @@
                                     <parameter name="id">
                                         <description>The ID of the Order Item in the system.</description>
                                     </parameter>
+                                    <parameter name="externalItemId">
+                                        <description>The ID for the item in the external system.</description>
+                                    </parameter>
                                     <parameter name="productId">
                                         <description>The ID of the product in the system.</description>
                                     </parameter>
@@ -733,7 +739,7 @@
                             <econdition field-name="orderId" from="orderPart.orderId"/>
                             <econdition field-name="orderPartSeqId" from="orderPart.orderPartSeqId"/>
                             <select-field field-name="orderItemSeqId,productId,itemDescription,quantity,
-                                    unitAmount,itemTypeEnumId,parentItemSeqId,sourcePercentage"/>
+                                    unitAmount,itemTypeEnumId,parentItemSeqId,sourcePercentage,externalItemSeqId"/>
                         </entity-find>
 
                         <set field="orderItems" from="[]"/>
@@ -748,7 +754,7 @@
                                 <set field="orderItemMap" from="[id:orderItem.orderItemSeqId,
                                     productId:orderItem.productId, sku:product.pseudoId,
                                     product_name:orderItem.itemDescription ?: '',
-                                    quantity:orderItem.quantity, unitAmount:orderItem.unitAmount]"/>
+                                    quantity:orderItem.quantity, unitAmount:orderItem.unitAmount,externalItemId:orderItem.externalItemSeqId]"/>
 
                                 <!-- Preparing Order Item Tax details -->
                                 <!-- Check added for parentItemSeqId to get tax details for the Order Item being prepared -->
@@ -815,4 +821,461 @@
             </iterate>
         </actions>
     </service>
+    <!-- Update Order - Add Order Item -->
+    <service verb="add" noun="OrderItem">
+        <description>Adds a product item to an existing order.</description>
+        <in-parameters>
+            <parameter name="orderId" required="true">
+                <description>The unique ID of the order in the system.</description>
+            </parameter>
+            <parameter name="order_part" type="Map" required="true">
+                <parameter name="id">
+                    <description>The ID of the Order Part in the order.</description>
+                </parameter>
+                <parameter name="item_details" type="Map" required="true">
+                    <parameter name="productId" required="true">
+                        <description>The ID of the product in the system.</description>
+                    </parameter>
+                    <parameter name="productName">
+                        <description>The name of the product.</description>
+                    </parameter>
+                    <parameter name="quantity" type="Integer" required="true">
+                        <description>The quantity of product to be added.</description>
+                    </parameter>
+                    <parameter name="unitAmount" type="BigDecimal" required="true">
+                        <description>The unit amount of the product.</description>
+                    </parameter>
+                    <parameter name="tax_details" type="Map">
+                        <parameter name="amount" type="BigDecimal" required="true">
+                            <description>The tax amount applicable to the product.</description>
+                        </parameter>
+                        <parameter name="percentage" type="BigDecimal" required="true">
+                            <description>The tax percentage applicable to the product.</description>
+                        </parameter>
+                    </parameter>
+                </parameter>
+                <parameter name="facilityId">
+                    <description>The ID of the facility in the system for order fulfillment.</description>
+                </parameter>
+                <parameter name="carrierPartyId">
+                    <description>The carrier service party ID for order delivery.</description>
+                </parameter>
+                <parameter name="shipmentMethodEnumId">
+                    <description>The method by which to ship the order for delivery.</description>
+                </parameter>
+                <parameter name="shipping_details" type="Map">
+                    <parameter name="address" type="Map">
+                        <parameter name="toName">
+                            <description>The customer's name for the shipping address.</description>
+                        </parameter>
+                        <parameter name="address1" required="true">
+                            <description>The first line for the address.</description>
+                        </parameter>
+                        <parameter name="address2">
+                            <description>The additional field for address details.</description>
+                        </parameter>
+                        <parameter name="city" required="true">
+                            <description>The city where the address is located in.</description>
+                        </parameter>
+                        <parameter name="stateProvinceGeoId">
+                            <description>The state code where the address is located in.</description>
+                        </parameter>
+                        <parameter name="countryGeoId" required="true">
+                            <description>The country code where the address is located in.</description>
+                        </parameter>
+                        <parameter name="postalCode" required="true">
+                            <description>The postal code for the address.</description>
+                        </parameter>
+                    </parameter>
+                    <parameter name="phone" type="Map">
+                        <parameter name="countryCode" required="true">
+                            <description>The country code for the contact number.</description>
+                            <text-digits/></parameter>
+                        <parameter name="areaCode" required="true">
+                            <description>The area code for the contact number.</description>
+                            <text-digits/></parameter>
+                        <parameter name="contactNumber" required="true">
+                            <description>The contact number for the customer.</description>
+                            <matches regexp="^\d\d[-\. \d]*\d\d$" message="Please enter a valid phone number"/>
+                        </parameter>
+                    </parameter>
+                </parameter>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId">
+                <description>The unique ID of the order in the system.</description>
+            </parameter>
+            <parameter name="orderPartId">
+                <description>The ID of the Order Part in the order.</description>
+            </parameter>
+            <parameter name="orderItemId">
+                <description>The ID assigned to the Order Item in the Order Part of the order.</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="order"/>
+            <if condition="order.statusId in ['OrderCancelled','OrderCompleted']">
+                <return error="true" message="Found order [${orderId}] in status ${order.statusId}, cannot be updated"/>
+            </if>
+            <!-- Check for existing Order Part in request-->
+            <if condition="order_part.id"><then>
+                <!-- Case 1: Add Order Item to an existing Order Part -->
+
+                <!-- Validating Order Part Id -->
+                <entity-find-count entity-name="mantle.order.OrderPart" count-field="orderPartCount">
+                    <econdition field-name="orderId"/>
+                    <econdition field-name="orderPartSeqId" from="order_part.id"/>
+                    <econdition field-name="statusId" operator="not-in" value="OrderCompleted,OrderCancelled"/>
+                </entity-find-count>
+                <if condition="orderPartCount == 0">
+                    <return error="true" message="Invalid Order Part Id ${order_part.id}, cannot be updated."/>
+                </if>
+
+                <!-- Create OrderItem and ItemTax records  -->
+                <service-call name="co.hotwax.oms.v1.OrderServices.create#OrderItemAndTax"
+                              out-map="context" in-map="context + [orderPartId:order_part.id,
+                        orderItem:order_part.item_details]"/>
+            </then>
+                <!-- Case 2: Add Order Item to a new Order Part -->
+                <else>
+                    <!-- Handling Shipping Contact Details -->
+                    <if condition="order_part.shipping_details">
+                        <if condition="order_part.shipping_details.address">
+                            <set field="shippingAddress" from="order_part.shipping_details.address"/>
+                            <!-- Shipping Address -->
+                            <service-call name="co.hotwax.party.ContactServices.create#PostalAddress"
+                                          out-map="shippingAddressOut" in-map="[toName:shippingAddress.toName ?: '',
+                                address1:shippingAddress.address1, address2:shippingAddress.address2 ?: '',
+                                city:shippingAddress.city, countryGeoId:shippingAddress.countryGeoId,
+                                stateProvinceGeoId:shippingAddress.stateProvinceGeoId ?: '',
+                                postalCode:shippingAddress.postalCode]"/>
+                        </if>
+                        <if condition="order_part.shipping_details.phone">
+                            <set field="shippingPhone" from="order_part.shipping_details.phone"/>
+                            <!-- Shipping Phone -->
+                            <service-call name="co.hotwax.party.ContactServices.create#TelecomNumber"
+                                          out-map="shippingPhoneOut" in-map="[countryCode:shippingPhone.countryCode,
+                                areaCode:shippingPhone.areaCode,
+                                contactNumber:shippingPhone.contactNumber]"/>
+                        </if>
+                    </if>
+
+                    <!-- Find existing OrderPart to use customer and vendor party Id in new Order Part  -->
+                    <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+
+                    <!-- Create Order Part -->
+                    <!-- NOTE: Setting disableTaxCalc='Y' and disableShippingCalc='Y' for Order Part as we need to store the tax amount and shipping charge as is coming in the item details.
+                    Else, due to OOTB EECA rule on OrderItem, handle#OrderMajorChange gets called which deletes the tax and shipping items after calculations. -->
+                    <service-call name="create#mantle.order.OrderPart" out-map="orderPartOut"
+                                  in-map="context + [customerPartyId:orderPart.customerPartyId,
+                        statusId:order.statusId, disableTaxCalc:'Y', disableShippingCalc:'Y',
+                        vendorPartyId:orderPart.vendorPartyId, facilityId:order_part.facilityId ?: '',
+                        carrierPartyId:order_part.carrierPartyId,
+                        shipmentMethodEnumId:order_part.shipmentMethodEnumId,
+                        postalContactMechId:shippingAddressOut?.contactMechId,
+                        telecomContactMechId:shippingPhoneOut?.contactMechId]"/>
+
+                    <!-- Create OrderItem and ItemTax records  -->
+                    <service-call name="co.hotwax.oms.v1.OrderServices.create#OrderItemAndTax"
+                                  out-map="context" in-map="context + [orderPartId:orderPartOut.orderPartSeqId,
+                        orderItem:order_part.item_details]"/>
+                </else>
+            </if>
+
+            <!-- Set Order Part Id for response; orderId and orderItemId comes from context variables -->
+            <set field="orderPartId" from="order_part.id ?: orderPartOut.orderPartSeqId"/>
+        </actions>
+    </service>
+
+    <!-- Internal service to create OrderItem and its tax details used in add#OrderItem service -->
+    <service verb="create" noun="OrderItemAndTax">
+        <in-parameters>
+            <parameter name="orderId"/>
+            <parameter name="orderPartId"/>
+            <parameter name="orderItem" type="Map"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderItemId"/>
+        </out-parameters>
+        <actions>
+            <!-- Create Order Item -->
+            <service-call name="co.hotwax.order.OrderServices.create#OrderItem" out-map="orderItemOut"
+                          in-map="context + [orderPartSeqId:orderPartId, productId:orderItem.productId,
+                    itemDescription:orderItem.productName, quantity:orderItem.quantity,
+                    unitAmount:orderItem.unitAmount]"/>
+
+            <!-- Item Tax Details -->
+            <if condition="orderItem.tax_details">
+                <!-- Create Order Item for item tax information -->
+                <service-call name="create#mantle.order.OrderItem" out-map="context"
+                              in-map="context + [orderPartSeqId:orderPartId, itemTypeEnumId:'ItemSalesTax',
+                        parentItemSeqId:orderItemOut.orderItemSeqId, quantity:orderItem.quantity,
+                        unitAmount:orderItem.tax_details.amount, itemDescription:'Sales Tax',
+                        sourcePercentage:orderItem.tax_details.percentage, ]"/>
+            </if>
+            <set field="orderItemId" from="orderItemOut.orderItemSeqId"/>
+        </actions>
+    </service>
+
+    <!-- Update Order - Update Order Item -->
+    <service verb="update" noun="OrderItem">
+        <description>Updates an Order Item of an existing order.</description>
+        <in-parameters>
+            <parameter name="orderId" required="true">
+                <description>The unique ID of the order in the system.</description>
+            </parameter>
+            <parameter name="order_part" type="Map" required="true">
+                <parameter name="id">
+                    <description>The ID of the Order Part in the order.</description>
+                </parameter>
+                <parameter name="item_details" type="Map" required="true">
+                    <parameter name="id" required="true">
+                        <description>The ID of the Order Item in the Order Part.</description>
+                    </parameter>
+                    <parameter name="quantity" type="Integer">
+                        <description>The quantity of the product. The minimum value is 1.</description>
+                    </parameter>
+                </parameter>
+                <parameter name="facilityId">
+                    <description>The ID of the facility in the system for order fulfillment.</description>
+                </parameter>
+                <parameter name="carrierPartyId">
+                    <description>The carrier service party ID for order delivery.</description>
+                </parameter>
+                <parameter name="shipmentMethodEnumId">
+                    <description>The method by which to ship the order for delivery.</description>
+                </parameter>
+                <parameter name="shipping_details" type="Map">
+                    <parameter name="address" type="Map">
+                        <parameter name="toName">
+                            <description>The customer's name for the shipping address.</description>
+                        </parameter>
+                        <parameter name="address1" required="true">
+                            <description>The first line for the address.</description>
+                        </parameter>
+                        <parameter name="address2">
+                            <description>The additional field for address details.</description>
+                        </parameter>
+                        <parameter name="city" required="true">
+                            <description>The city where the address is located in.</description>
+                        </parameter>
+                        <parameter name="stateProvinceGeoId">
+                            <description>The state code where the address is located in.</description>
+                        </parameter>
+                        <parameter name="countryGeoId" required="true">
+                            <description>The country code where the address is located in.</description>
+                        </parameter>
+                        <parameter name="postalCode" required="true">
+                            <description>The postal code for the address.</description>
+                        </parameter>
+                    </parameter>
+                    <parameter name="phone" type="Map">
+                        <parameter name="countryCode" required="true">
+                            <description>The country code for the contact number.</description>
+                            <text-digits/></parameter>
+                        <parameter name="areaCode" required="true">
+                            <description>The area code for the contact number.</description>
+                            <text-digits/></parameter>
+                        <parameter name="contactNumber" required="true">
+                            <description>The contact number for the customer.</description>
+                            <matches regexp="^\d\d[-\. \d]*\d\d$" message="Please enter a valid phone number"/>
+                        </parameter>
+                    </parameter>
+                </parameter>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId">
+                <description>The unique ID of the order in the system.</description>
+            </parameter>
+            <parameter name="orderPartId">
+                <description>The ID of the Order Part in the order.</description>
+            </parameter>
+            <parameter name="orderItemId">
+                <description>The ID of the Order Item in the Order Part.</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <entity-find-one entity-name="mantle.order.OrderHeader" value-field="order"/>
+            <if condition="order.statusId in ['OrderCancelled','OrderCompleted']">
+                <return error="true" message="Found order [${orderId}] in status ${order.statusId}, cannot be updated"/>
+            </if>
+
+            <!-- isCheckCancelPart to be used when OrderPart association updated for the item -->
+            <set field="isCheckCancelPart" value="false"/>
+            <entity-find entity-name="mantle.order.OrderItem" list="orderItems" for-update="true">
+                <econdition field-name="orderId"/>
+                <econdition field-name="orderItemSeqId" from="order_part.item_details.id"/>
+                <!-- To allow updates for ItemProduct Order Items-->
+                <econdition field-name="itemTypeEnumId" value="ItemProduct"/>
+            </entity-find>
+            <if condition="orderItems.isEmpty()">
+                <return message="Invalid item ${order_part.item_details.id} for update."/>
+            </if>
+
+            <set field="orderItem" from="orderItems.first"/>
+            <set field="currentPartId" from="orderItem.orderPartSeqId"/>
+
+            <!-- Get Tax OrderItem for the item to perform updates -->
+            <entity-find entity-name="mantle.order.OrderItem" list="taxItems" for-update="true">
+                <econdition field-name="orderId"/>
+                <econdition field-name="parentItemSeqId" from="orderItem.orderItemSeqId"/>
+                <econdition field-name="itemTypeEnumId" value="ItemSalesTax"/>
+            </entity-find>
+
+            <if condition="order_part.id"><then>
+                <!-- Validating Order Part Id -->
+                <entity-find-count entity-name="mantle.order.OrderPart" count-field="orderPartCount">
+                    <econdition field-name="orderId"/>
+                    <econdition field-name="orderPartSeqId" from="order_part.id"/>
+                    <econdition field-name="statusId" operator="not-in" value="OrderCompleted,OrderCancelled"/>
+                </entity-find-count>
+                <if condition="orderPartCount == 0">
+                    <return error="true" message="Invalid Order Part Id ${order_part.id}, cannot be updated."/>
+                </if>
+
+                <!-- Case 1: Update quantity for the Order Item -->
+                <if condition="order_part.item_details.quantity != null"><then>
+                    <if condition="order_part.item_details.quantity &lt;= 0">
+                        <return error="true" message="Item quantity cannot be less than or equal to zero."/>
+                    </if>
+                    <!-- Warning message if incorrect Order Part Id in the quantity update request -->
+                    <if condition="!order_part.id.equals(orderItem.orderPartSeqId)">
+                        <message type="warning">The Order Item ${order_part.item_details.id} belongs to Order Part ${orderItem.orderPartSeqId}, only quantity is updated for the item.</message>
+                    </if>
+
+                    <set field="itemQuantity" from="order_part.item_details.quantity"/>
+                </then>
+                <!-- Case 2: Update Order Part for the Order Item -->
+                <else>
+                        <set field="newOrderPartId" from="order_part.id"/>
+                        <set field="isCheckCancelPart" value="true"/>
+                    </else>
+                </if>
+            </then>
+            <!-- Case 3: Create and Update new Order Part for the Order Item -->
+            <else>
+                    <!-- Handling Shipping Contact Details -->
+                    <if condition="order_part.shipping_details">
+                        <if condition="order_part.shipping_details.address">
+                            <set field="shippingAddress" from="order_part.shipping_details.address"/>
+                            <!-- Shipping Address -->
+                            <service-call name="co.hotwax.party.ContactServices.create#PostalAddress"
+                                    out-map="shippingAddressOut" in-map="[toName:shippingAddress.toName ?: '',
+                                    address1:shippingAddress.address1, address2:shippingAddress.address2 ?: '',
+                                    city:shippingAddress.city, countryGeoId:shippingAddress.countryGeoId,
+                                    stateProvinceGeoId:shippingAddress.stateProvinceGeoId ?: '',
+                                    postalCode:shippingAddress.postalCode,]"/>
+                        </if>
+                        <if condition="order_part.shipping_details.phone">
+                            <set field="shippingPhone" from="order_part.shipping_details.phone"/>
+                            <!-- Shipping Phone -->
+                            <service-call name="co.hotwax.party.ContactServices.create#TelecomNumber"
+                                    out-map="shippingPhoneOut" in-map="[countryCode:shippingPhone.countryCode,
+                                    areaCode:shippingPhone.areaCode,
+                                    contactNumber:shippingPhone.contactNumber]"/>
+                        </if>
+                    </if>
+    
+                    <!-- Find existing OrderPart to use customer and vendor party Id in new Order Part  -->
+                    <entity-find-one entity-name="mantle.order.OrderPart" value-field="orderPart"/>
+    
+                    <!-- Create Order Part -->
+                    <!-- NOTE: Setting disableTaxCalc='Y' and disableShippingCalc='Y' for Order Part as we need to store the tax amount and shipping charge as is coming in the item details.
++                Else, due to OOTB EECA rule on OrderItem, handle#OrderMajorChange gets called which deletes the tax and shipping items after calculations. -->
+                    <service-call name="create#mantle.order.OrderPart" out-map="orderPartOut"
+                            in-map="[orderId:orderId, customerPartyId:orderPart.customerPartyId,
+                            statusId:order.statusId, disableTaxCalc:'Y', disableShippingCalc:'Y',
+                            vendorPartyId:orderPart.vendorPartyId, facilityId:order_part.facilityId ?: '',
+                            carrierPartyId:order_part.carrierPartyId,
+                            shipmentMethodEnumId:order_part.shipmentMethodEnumId,
+                            postalContactMechId:shippingAddressOut?.contactMechId,
+                            telecomContactMechId:shippingPhoneOut?.contactMechId]"/>
+    
+                    <!-- Set new Order Part Id -->
+                    <set field="newOrderPartId" from="orderPartOut.orderPartSeqId"/>
+                    <set field="isCheckCancelPart" value="true"/>
+                </else>
+            </if>
+
+            <!-- Update Order Item's tax record -->
+            <if condition="!taxItems.isEmpty()">
+                <service-call name="co.hotwax.order.OrderServices.update#OrderItem" out-map="context"
+                        in-map="[orderId:orderId, orderItemSeqId:taxItems.first.orderItemSeqId,
+                        unitAmount:taxItems.first.unitAmount, quantity:itemQuantity,
+                        orderPartSeqId:newOrderPartId]"/>
+            </if>
+
+            <!-- Update Order Item record -->
+            <service-call name="co.hotwax.order.OrderServices.update#OrderItem" out-map="context"
+                    in-map="[orderId:orderId, orderItemSeqId:order_part.item_details.id,
+                    unitAmount:orderItem.unitAmount, quantity:itemQuantity,
+                    orderPartSeqId:newOrderPartId]"/>
+
+            <if condition="isCheckCancelPart">
+                <!-- Check if item's old Order Part has OrderItems, if not, cancel Order Part -->
+                <entity-find-count entity-name="mantle.order.OrderItem" count-field="partItemsCount">
+                    <econdition field-name="orderId"/>
+                    <econdition field-name="orderPartSeqId" from="currentPartId"/>
+                    <econdition field-name="itemTypeEnumId" value="ItemProduct"/>
+                </entity-find-count>
+                <if condition="partItemsCount == 0">
+                    <!-- Check if ItemShipping record available -->
+                    <entity-find entity-name="mantle.order.OrderItem" list="shippingItems" for-update="true">
+                        <econdition field-name="orderId"/>
+                        <econdition field-name="orderPartSeqId" from="currentPartId"/>
+                        <econdition field-name="itemTypeEnumId" value="ItemShipping"/>
+                    </entity-find>
+                    <!-- Set quantity to 0 so that cancelled Part's shipping cost does not contribute to order total -->
+                    <if condition="shippingItems">
+                        <set field="shippingItems.first.quantity" from="0"/>
+                        <entity-update value-field="shippingItems.first"/>
+                    </if>
+                    <service-call name="update#mantle.order.OrderPart" out-map="context"
+                            in-map="[orderId:orderId, orderPartSeqId:currentPartId,
+                            statusId:'OrderCancelled']"/>
+                </if>
+            </if>
+
+            <!-- Set out parameters -->
+            <set field="orderPartId" from="order_part.id ? order_part.id : orderPartOut.orderPartSeqId"/>
+            <set field="orderItemId" from="orderItem.orderItemSeqId"/>
+        </actions>
+    </service>
+    <!-- Cancel Order Item -->
+    <service verb="cancel" noun="OrderItem">
+        <description>
+            Cancels an Order Item. If cancelQuantity not provided, defaults to quantity not yet issued.
+            If cancelQuantity greater than quantity not issued, it will be reduced to quantity not issued.
+        </description>
+        <in-parameters>
+            <parameter name="orderId" required="true">
+                <description>The unique ID of the order in the system.</description>
+            </parameter>
+            <parameter name="orderItemId" required="true">
+                <description>The unique ID of the Order Item in the order.</description>
+            </parameter>
+            <parameter name="cancelQuantity" type="Integer">
+                <description>The quantity for the item to be cancelled.</description>
+            </parameter>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="orderId">
+                <description>The unique ID of the order in the system.</description>
+            </parameter>
+            <parameter name="orderItemId">
+                <description>The unique ID of the Order Item in the order.</description>
+            </parameter>
+            <parameter name="quantityCancelled" type="Integer">
+                <description>The quantity cancelled for the item.</description>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <!-- Using OOTB service for handling the cancel of order item -->
+            <service-call name="co.hotwax.order.OrderServices.cancel#OrderItem" out-map="context"
+                          in-map="context + [orderItemSeqId:orderItemId]"/>
+        </actions>
+    </service>
+
 </services>
