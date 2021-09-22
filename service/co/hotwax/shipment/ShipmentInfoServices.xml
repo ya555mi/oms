@@ -79,10 +79,6 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="orderCarrierDetail" type="Map"/>
             <parameter name="orderShipmentMethodEnum" type="Map"/>
             <parameter name="orderCarrierShipmentMethod" type="Map"/>
-
-            <!--<parameter name="assemblyWorkEffort" type="Map"/>
-            <parameter name="assemblyAssetInfo" type="Map">
-                <description>If Shipment.assemblyWorkEffortId, a Map with the results of a call to ManufacturingServices.get#ConsumedAssetRemaining</description></parameter>-->
         </out-parameters>
         <actions>
             <service-call name="co.hotwax.shipment.ShipmentServices.get#ShipmentContactInfo" out-map="context" in-map="[shipmentId:shipmentId]"/>
@@ -129,16 +125,8 @@ along with this software (see the LICENSE.md file). If not, see
                 if (shipmentItemSource.returnId) returnIdSet.add(shipmentItemSource.returnId)
                 if (shipmentItemSource.invoiceId) invoiceIdSet.add(shipmentItemSource.invoiceId)
             </script></iterate>
-            <!--<if condition="invoiceIdSet"><entity-find entity-name="mantle.account.invoice.Invoice" list="invoiceList">
-                <econdition field-name="invoiceId" operator="in" from="invoiceIdSet"/></entity-find></if>-->
-
             <entity-find entity-name="mantle.shipment.ShipmentContent" list="contentList">
                 <econdition field-name="shipmentId"/><order-by field-name="-contentDate"/></entity-find>
-
-            <!-- get associated accounting transactions -->
-            <!--<entity-find entity-name="mantle.ledger.transaction.AcctgTrans" list="acctgTransList">
-                <econdition field-name="shipmentId"/></entity-find>
-            <set field="acctgTransIdSet" from="new TreeSet(acctgTransList*.acctgTransId)"/>-->
 
             <if condition="isIncoming || isTransfer">
                 <set field="allReceived" from="true"/>
@@ -240,14 +228,6 @@ along with this software (see the LICENSE.md file). If not, see
                     </entity-find-one>
                 </if>
             </if>
-
-            <!-- get Assembly WorkEffort Info -->
-           <!-- <if condition="shipment.assemblyWorkEffortId">
-                <entity-find-one entity-name="mantle.work.effort.WorkEffort" value-field="assemblyWorkEffort">
-                    <field-map field-name="workEffortId" from="shipment.assemblyWorkEffortId"/></entity-find-one>
-                <service-call name="co.hotwax.work.ManufacturingServices.get#ConsumedAssetRemaining"
-                        in-map="[workEffortId:shipment.assemblyWorkEffortId]" out-map="assemblyAssetInfo"/>
-            </if>-->
         </actions>
     </service>
     <service verb="get" noun="ShipmentContactInfo">
@@ -555,189 +535,7 @@ along with this software (see the LICENSE.md file). If not, see
     <!-- =============================================== -->
     <!-- ========== Shipping/Packing Services ========== -->
     <!-- =============================================== -->
-
-    <!--<service verb="get" noun="ShipmentLoadPickInfo">
-        <description>Get information for a picklist document for all shipments in a shipment ship/load work effort.</description>
-        <in-parameters>
-            <parameter name="workEffortId" required="true"/>
-            <parameter name="locationOrderBy" default-value="facilityId,sequenceNum,areaId,aisleId,sectionId,levelId,positionId"/>
-            <parameter name="productOrderBy" default-value="pseudoId,productName"/>
-        </in-parameters>
-        <out-parameters>
-            <parameter name="workEffort" type="Map"/>
-            <parameter name="dockFacility" type="Map"/>
-            <parameter name="warehouseFacility" type="Map"><description>The warehouse the shipments come
-                from. Based on WorkEffort.facilityId unless it is a dock type facility and has a warehouse parent
-                facility.</description></parameter>
-            <parameter name="assignedAssetList" type="List"/>
-
-            <parameter name="shipmentList" type="List"/>
-            <parameter name="shipmentPickPackInfoList" type="List"><description>List of Maps withs result from calls to
-                the get#ShipmentPickPackInfo service.</description></parameter>
-
-            &lt;!&ndash; The following are consolidated lists for picking &ndash;&gt;
-            <parameter name="reservedLocationInfoList" type="List"/>
-            <parameter name="otherLocationInfoList" type="List"/>
-            &lt;!&ndash; reservedLocationInfoList and otherLocationInfoList are List of Maps with:
-              - FacilityLocation fields [facilityId, locationTypeEnumId, areaId, aisleId, sectionId, levelId, positionId]
-              - locationTypeEnum
-              - GeoPoint fields [latitude, longitude, elevation, elevationUomId]
-              - productInfoList - List of Maps with:
-                - Product fields (all fields from entity)
-                - quantity
-                - quantityByBin - Map with key binLocationNumber (from ShipmentItemSource or Shipment, may be null) and value quantity
-            &ndash;&gt;
-            <parameter name="productInfoList" type="List"/>
-            &lt;!&ndash; productInfoList is a List of Maps with:
-              - Product fields (all fields from entity)
-              - quantity
-              - reservedLocationInfoList
-                - FacilityLocation fields [facilityId, locationTypeEnumId, areaId, aisleId, sectionId, levelId, positionId]
-                - locationTypeEnum
-                - GeoPoint fields [latitude, longitude, elevation, elevationUomId]
-                - quantity
-                - quantityByBin - Map with key binLocationNumber (from ShipmentItemSource or Shipment, may be null) and value quantity
-              - otherLocationInfoList (same fields as reservedLocationInfoList)
-            &ndash;&gt;
-        </out-parameters>
-        <actions>
-            <entity-find-one entity-name="mantle.work.effort.WorkEffort" value-field="workEffort"/>
-
-            <entity-find-one entity-name="mantle.facility.Facility" value-field="dockFacility">
-                <field-map field-name="facilityId" from="workEffort.facilityId"/></entity-find-one>
-            &lt;!&ndash; for any of these alternatives originFacilityId may still be null &ndash;&gt;
-            <if condition="dockFacility &amp;&amp; dockFacility.facilityTypeEnumId != 'FcTpWarehouse'"><then>
-                <entity-find-one entity-name="mantle.facility.Facility" value-field="warehouseFacility">
-                    <field-map field-name="facilityId" from="dockFacility.parentFacilityId"/></entity-find-one>
-            </then><else-if condition="dockFacility?.facilityTypeEnumId == 'FcTpWarehouse'">
-                <set field="warehouseFacility" from="dockFacility"/>
-                <set field="dockFacility" from="null"/>
-            </else-if></if>
-
-            &lt;!&ndash;<entity-find entity-name="mantle.work.effort.WorkEffortAssetAndAssign" list="assignedAssetList">
-                <date-filter/><econdition field-name="workEffortId"/><order-by field-name="assetName"/></entity-find>&ndash;&gt;
-
-            &lt;!&ndash;<entity-find entity-name="mantle.shipment.Shipment" list="shipmentList">
-                <econdition field-name="shipWorkEffortId" from="workEffortId"/>
-                <order-by field-name="binLocationNumber,shipmentId"/></entity-find>
-&ndash;&gt;
-            <set field="shipmentPickPackInfoList" from="[]"/>
-
-            <set field="productInfoMap" from="[:]"/>
-            <set field="reservedLocationInfoMap" from="[:]"/>
-            <set field="otherLocationInfoMap" from="[:]"/>
-
-            &lt;!&ndash; get ShipmentPickPackInfo and combine for picklist (by location, by product) &ndash;&gt;
-            <iterate list="shipmentList" entry="shipment">
-                <set field="pickInfoOut" from="null"/>
-                <service-call name="co.hotwax.shipment.ShipmentServices.get#ShipmentPickPackInfo" out-map="pickInfoOut" out-map-add-to-existing="false"
-                        in-map="[shipmentId:shipment.shipmentId, locationOrderBy:locationOrderBy, productOrderBy:productOrderBy]"/>
-                <script>shipmentPickPackInfoList.add(pickInfoOut)</script>
-                &lt;!&ndash; <log message="======== pickInfoOut:\n${groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(pickInfoOut))}"/> &ndash;&gt;
-                &lt;!&ndash; <log message="======== pickInfoOut.packageInfoList:\n${groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(pickInfoOut.packageInfoList))}"/> &ndash;&gt;
-                &lt;!&ndash; <log message="======== pickInfoOut.productInfoList:\n${groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(pickInfoOut.productInfoList))}"/> &ndash;&gt;
-
-                <iterate list="pickInfoOut.productInfoList" entry="curProductInfo">
-                    <set field="productInfo" from="productInfoMap.get(curProductInfo.productId)"/>
-                    <if condition="productInfo != null"><then>
-                        &lt;!&ndash; merge curProductInfo into productInfo &ndash;&gt;
-                        <set field="productInfo.quantity" from="productInfo.quantity + curProductInfo.quantity"/>
-
-                        <iterate list="curProductInfo.productReservedLocationInfoMap" entry="curLocationInfo" key="assetLocKey">
-                            <set field="locationInfo" from="productInfo.productReservedLocationInfoMap.get(assetLocKey)"/>
-                            <if condition="locationInfo"><then>
-                                <set field="locationInfo.quantity" from="locationInfo.quantity + curLocationInfo.quantity"/>
-                                <iterate list="curLocationInfo.quantityByBin" entry="quantity" key="binLocationNumber">
-                                    <script>addToBigDecimalInMap(binLocationNumber, quantity, locationInfo.quantityByBin)</script>
-                                </iterate>
-                            </then><else>
-                                <script>productInfo.productReservedLocationInfoMap.put(assetLocKey, curLocationInfo)</script>
-                            </else></if>
-                        </iterate>
-                        <iterate list="curProductInfo.productOtherLocationInfoMap" entry="curLocationInfo" key="assetLocKey">
-                            <set field="locationInfo" from="productInfo.productOtherLocationInfoMap.get(assetLocKey)"/>
-                            <if condition="locationInfo"><then>
-                                <set field="locationInfo.quantity" from="locationInfo.quantity + curLocationInfo.quantity"/>
-                                <iterate list="curLocationInfo.quantityByBin" entry="quantity" key="binLocationNumber">
-                                    <script>addToBigDecimalInMap(binLocationNumber, quantity, locationInfo.quantityByBin)</script>
-                                </iterate>
-                            </then><else>
-                                <script>productInfo.productOtherLocationInfoMap.put(assetLocKey, curLocationInfo)</script>
-                            </else></if>
-                        </iterate>
-                    </then><else>
-                        <script>productInfoMap.put(curProductInfo.productId, new LinkedHashMap(curProductInfo))</script>
-                    </else></if>
-                </iterate>
-
-                <iterate list="pickInfoOut.reservedLocationInfoMap" entry="curLocationInfo" key="assetLocKey">
-                    <set field="locationInfo" from="reservedLocationInfoMap.get(assetLocKey)"/>
-                    <if condition="locationInfo"><then>
-                        &lt;!&ndash; merge curLocationInfo into locationInfo &ndash;&gt;
-                        <iterate list="curLocationInfo.productInfoMap" entry="curProductInfo" key="productId">
-                            <set field="productInfo" from="locationInfo.productInfoMap.get(productId)"/>
-                            <if condition="productInfo"><then>
-                                <set field="productInfo.quantity" from="productInfo.quantity + curProductInfo.quantity"/>
-                                <iterate list="curProductInfo.quantityByBin" entry="quantity" key="binLocationNumber">
-                                    <script>addToBigDecimalInMap(binLocationNumber, quantity, productInfo.quantityByBin)</script>
-                                </iterate>
-                            </then><else>
-                                <script>locationInfo.productInfoMap.put(productId, curProductInfo)</script>
-                            </else></if>
-                        </iterate>
-                    </then><else>
-                        <script>reservedLocationInfoMap.put(assetLocKey, curLocationInfo)</script>
-                    </else></if>
-                </iterate>
-                <iterate list="pickInfoOut.otherLocationInfoMap" entry="curLocationInfo" key="assetLocKey">
-                    <set field="locationInfo" from="otherLocationInfoMap.get(assetLocKey)"/>
-                    <if condition="locationInfo"><then>
-                        &lt;!&ndash; merge curLocationInfo into locationInfo &ndash;&gt;
-                        <iterate list="curLocationInfo.productInfoMap" entry="curProductInfo" key="productId">
-                            <set field="productInfo" from="locationInfo.productInfoMap.get(productId)"/>
-                            <if condition="productInfo"><then>
-                                <set field="productInfo.quantity" from="productInfo.quantity + curProductInfo.quantity"/>
-                                <iterate list="curProductInfo.quantityByBin" entry="quantity" key="binLocationNumber">
-                                    <script>addToBigDecimalInMap(binLocationNumber, quantity, productInfo.quantityByBin)</script>
-                                </iterate>
-                            </then><else>
-                                <script>locationInfo.productInfoMap.put(productId, curProductInfo)</script>
-                            </else></if>
-                        </iterate>
-                    </then><else>
-                        <script>otherLocationInfoMap.put(assetLocKey, curLocationInfo)</script>
-                    </else></if>
-                </iterate>
-            </iterate>
-
-            &lt;!&ndash; create and order Lists from Maps for productInfoList &ndash;&gt;
-            <set field="productInfoList" from="new ArrayList(productInfoMap.values())"/>
-            <order-map-list list="productInfoList"><order-by field-name="${productOrderBy}"/></order-map-list>
-            <iterate list="productInfoList" entry="productInfo">
-                <set field="productInfo.reservedLocationInfoList" from="new ArrayList(productInfo.productReservedLocationInfoMap.values())"/>
-                <order-map-list list="productInfo.reservedLocationInfoList"><order-by field-name="${locationOrderBy}"/></order-map-list>
-                <set field="productInfo.otherLocationInfoList" from="new ArrayList(productInfo.productOtherLocationInfoMap.values())"/>
-                <order-map-list list="productInfo.otherLocationInfoList"><order-by field-name="${locationOrderBy}"/></order-map-list>
-            </iterate>
-            &lt;!&ndash; <log message="======== productInfoList:\n${groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(productInfoList))}"/> &ndash;&gt;
-
-            &lt;!&ndash; create and order Lists from Maps for reservedLocationInfoList and otherLocationInfoList &ndash;&gt;
-            <set field="reservedLocationInfoList" from="new ArrayList(reservedLocationInfoMap.values())"/>
-            <order-map-list list="reservedLocationInfoList"><order-by field-name="${locationOrderBy}"/></order-map-list>
-            &lt;!&ndash; <log message="======== reservedLocationInfoList:\n${groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(reservedLocationInfoList))}"/> &ndash;&gt;
-            <iterate list="reservedLocationInfoList" entry="locationInfo">
-                <set field="locationInfo.productInfoList" from="new ArrayList(locationInfo.productInfoMap.values())"/>
-                <order-map-list list="locationInfo.productInfoList"><order-by field-name="${productOrderBy}"/></order-map-list>
-            </iterate>
-            <set field="otherLocationInfoList" from="new ArrayList(otherLocationInfoMap.values())"/>
-            <order-map-list list="otherLocationInfoList"><order-by field-name="${locationOrderBy}"/></order-map-list>
-            <iterate list="otherLocationInfoList" entry="locationInfo">
-                <set field="locationInfo.productInfoList" from="new ArrayList(locationInfo.productInfoMap.values())"/>
-                <order-map-list list="locationInfo.productInfoList"><order-by field-name="${productOrderBy}"/></order-map-list>
-            </iterate>
-        </actions>
-    </service>
--->
+    
     <service verb="get" noun="ShipmentPickPackInfo">
         <description>Get information for single shipment pick sheet or pack insert documents.</description>
         <in-parameters>
@@ -816,8 +614,6 @@ along with this software (see the LICENSE.md file). If not, see
                     </if>
                 </if>
             </iterate>
-            <!--<if condition="invoiceIdSet"><entity-find entity-name="mantle.account.invoice.Invoice" list="invoiceList">
-                    <econdition field-name="invoiceId" operator="in" from="invoiceIdSet"/></entity-find></if>-->
             <set field="orderPartList" from="new ArrayList(orderPartsById.values())"/>
             <order-map-list list="orderPartList"><order-by field-name="orderId"/><order-by field-name="orderPartSeqId"/></order-map-list>
 
