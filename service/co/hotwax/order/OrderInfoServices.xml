@@ -627,20 +627,6 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="itemQuantityShipped" from="shipmentItemSourceList ? shipmentItemSourceList*.quantity.sum() : 0.0"/>
             <set field="itemQuantityNotShipped" from="orderItemQuantity - itemQuantityShipped"/>
 
-            <!--<entity-find entity-name="mantle.order.OrderItemBilling" list="orderItemBillingList">
-                <econdition field-name="orderId"/>
-                <econdition field-name="orderItemSeqId"/>
-            </entity-find>-->
-
-            <!--<set field="itemQuantityBilled" from="0.0"/>
-            <set field="itemAmountBilled" from="0.0"/>
-            <iterate list="orderItemBillingList" entry="orderItemBilling">
-                <set field="billedQuantity" from="orderItemBilling.quantity != null ? orderItemBilling.quantity : 1.0"/>
-                <set field="itemQuantityBilled" from="itemQuantityBilled + billedQuantity"/>
-
-                <set field="curInvoiceItem" from="orderItemBilling.invoiceItem"/>
-                <set field="itemAmountBilled" from="itemAmountBilled + ((billedQuantity * (curInvoiceItem?.amount ?: 0.0)).setScale(2, BigDecimal.ROUND_HALF_UP))"/>
-            </iterate>-->
 
             <set field="itemQuantityNotBilled" from="orderItemQuantity - itemQuantityBilled"/>
             <set field="itemAmountNotBilled" from="orderItemTotal - itemAmountBilled"/>
@@ -690,8 +676,6 @@ along with this software (see the LICENSE.md file). If not, see
                 <econdition field-name="statusId" operator="not-equals" value="ReturnCancelled"/>
                 <order-by field-name="orderItemSeqId"/>
             </entity-find>
-            <!--<service-call name="co.hotwax.order.ReturnServices.calculate#OrderItemReturnable" out-map="returnableOut"
-                    in-map="[orderId:orderItem.orderId, orderItemSeqId:orderItem.orderItemSeqId, orderItemBillingList:orderItemBillingList, returnItemList:returnItemList]"/>-->
             <set field="returnIdSet" from="new TreeSet()"/>
             <iterate list="returnItemList" entry="returnItem">
                 <if condition="returnItem.orderItemSeqId != orderItemSeqId"><continue/></if>
