@@ -50,7 +50,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
             <if condition="!destPostalContactMechId &amp;&amp; destinationFacilityId">
                 <!-- NOTE: used to always use address for destination facility, now allow override (generally from a toPartyId address) -->
-                <service-call name="co.hotwax.facility.ContactServices.get#FacilityDefaultShipDest"
+                <service-call name="mantle.facility.ContactServices.get#FacilityDefaultShipDest"
                         in-map="[facilityId:destinationFacilityId]" out-map="facDestOut"/>
                 <set field="destPostalContactMechId" from="facDestOut.postalContactMechId"/>
             </if>
@@ -90,7 +90,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="shipmentRouteSegmentSeqId">
                 <if condition="!destPostalContactMechId &amp;&amp; destinationFacilityId">
                     <!-- NOTE: used to always use address for destination facility, now allow override (generally from a toPartyId address) -->
-                    <service-call name="co.hotwax.facility.ContactServices.get#FacilityDefaultShipDest"
+                    <service-call name="mantle.facility.ContactServices.get#FacilityDefaultShipDest"
                             in-map="[facilityId:destinationFacilityId]" out-map="facDestOut"/>
                     <set field="destPostalContactMechId" from="facDestOut.postalContactMechId"/>
                 </if>
@@ -286,13 +286,13 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="quantityRemaining" from="shipmentItem.quantity - (shipmentItemDetail.quantityAcceptedTotal ?: 0) - (shipmentItemDetail.quantityRejectedTotal ?: 0)"/>
                 <if condition="quantityRemaining &lt; newQuantityRemaining">
                     <set field="incrementQuantity" from="newQuantityRemaining - quantityRemaining"/>
-                    <service-call name="co.hotwax.shipment.ShipmentServices.update#ShipmentItem"
+                    <service-call name="mantle.shipment.ShipmentServices.update#ShipmentItem"
                             in-map="[shipmentId:shipmentId, productId:productId,
                                 quantity:(shipmentItem.quantity + incrementQuantity)]"/>
                 </if>
             </then><else>
                 <!-- no ShipmentItem at all, create one -->
-                <service-call name="co.hotwax.shipment.ShipmentServices.create#ShipmentItem"
+                <service-call name="mantle.shipment.ShipmentServices.create#ShipmentItem"
                         in-map="[shipmentId:shipmentId, productId:productId, quantity:newQuantityRemaining]"/>
             </else></if>
         </actions>
@@ -374,7 +374,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="!quantity"><return message="No quantity to add to package, not adding"/></if><!-- nothing to add -->
 
             <set field="existingPackage" from="shipmentPackageSeqId != null &amp;&amp; !shipmentPackageSeqId.isEmpty()"/>
-            <if condition="!existingPackage"><service-call name="co.hotwax.shipment.ShipmentServices.create#ShipmentPackage"
+            <if condition="!existingPackage"><service-call name="mantle.shipment.ShipmentServices.create#ShipmentPackage"
                     in-map="[shipmentId:shipmentId]" out-map="context"/></if>
 
             <entity-find-one entity-name="mantle.shipment.ShipmentPackageContent" value-field="packageContent">
@@ -469,7 +469,7 @@ along with this software (see the LICENSE.md file). If not, see
         </out-parameters>
         <actions>
             <!-- create#OrderPartShipment has transaction=cache so make it not init the tx cache with transaction=use-or-begin -->
-            <service-call name="co.hotwax.shipment.ShipmentServices.create#OrderPartShipment" out-map="context"
+            <service-call name="mantle.shipment.ShipmentServices.create#OrderPartShipment" out-map="context"
                     in-map="[orderId:orderId, orderPartSeqId:orderPartSeqId, entryDate:shipDate, tryAutoPackage:tryAutoPackage]"/>
 
             <entity-find entity-name="moqui.basic.EnumGroupMember" list="productItemTypeEgms" cache="true">
@@ -487,19 +487,19 @@ along with this software (see the LICENSE.md file). If not, see
             </entity-find>
             <iterate list="orderItemList" entry="orderItem">
                 <if condition="orderItem.productId &amp;&amp; productItemTypes.contains(orderItem.itemTypeEnumId)">
-                    <service-call name="co.hotwax.shipment.ShipmentServices.pack#ShipmentProduct"
+                    <service-call name="mantle.shipment.ShipmentServices.pack#ShipmentProduct"
                             in-map="[productId:orderItem.productId, quantity:orderItem.quantity, shipmentId:shipmentId,
                                 shipmentPackageSeqId:shipmentPackageSeqId]"/>
                 </if>
             </iterate>
 
             <!-- set Shipment Packed -->
-            <service-call name="co.hotwax.shipment.ShipmentServices.pack#Shipment" in-map="[shipmentId:shipmentId, packedDate:shipDate]"/>
+            <service-call name="mantle.shipment.ShipmentServices.pack#Shipment" in-map="[shipmentId:shipmentId, packedDate:shipDate]"/>
 
             <!-- NOTE: check order completed is done as items are packed, so by this point will be completed -->
 
             <!-- set Shipment Shipped -->
-            <service-call name="co.hotwax.shipment.ShipmentServices.ship#Shipment" in-map="[shipmentId:shipmentId]"/>
+            <service-call name="mantle.shipment.ShipmentServices.ship#Shipment" in-map="[shipmentId:shipmentId]"/>
         </actions>
     </service>
 
@@ -592,7 +592,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
             <if condition="!shippingGatewayConfigId &amp;&amp; orderPart.vendorPartyId">
                 <!-- if Shipment.fromPartyId lookup setting there -->
-                <service-call name="co.hotwax.party.PartyServices.get#PartySettingValue" out-map="ptySettingOut"
+                <service-call name="mantle.party.PartyServices.get#PartySettingValue" out-map="ptySettingOut"
                         in-map="[partyId:orderPart.vendorPartyId, partySettingTypeId:'DefaultShipmentGatewayConfigId']"/>
                 <set field="shippingGatewayConfigId" from="ptySettingOut?.settingValue"/>
             </if>
@@ -651,11 +651,11 @@ along with this software (see the LICENSE.md file). If not, see
                                 shipmentRouteSegmentSeqId:shipmentRouteSegmentSeqId]"/>
             </if>
 
-            <service-call name="co.hotwax.shipment.ShipmentServices.add#OrderPartToShipment"
+            <service-call name="mantle.shipment.ShipmentServices.add#OrderPartToShipment"
                     in-map="[shipmentId:shipmentId, orderId:orderId, orderPartSeqId:orderPartSeqId]"/>
 
             <if condition="shippingGatewayConfigId &amp;&amp; tryAutoPackage &amp;&amp; !customerOrgInternal">
-                <service-call name="co.hotwax.shipment.ShipmentServices.create#ShipmentAutoPackages"
+                <service-call name="mantle.shipment.ShipmentServices.create#ShipmentAutoPackages"
                     in-map="[shipmentId:shipmentId, shipmentRouteSegmentSeqId:shipmentRouteSegmentSeqId]"/></if>
         </actions>
     </service>
@@ -766,7 +766,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
 
             <if condition="shipmentId"><then>
-                <service-call name="co.hotwax.shipment.ShipmentServices.pickMove#ShipmentProduct" in-map="context" out-map="context"/>
+                <service-call name="mantle.shipment.ShipmentServices.pickMove#ShipmentProduct" in-map="context" out-map="context"/>
             </then><else>
                 <entity-find entity-name="mantle.shipment.Shipment" list="containerShipmentList">
                     <econdition field-name="pickContainerId" from="toContainerId"/>
@@ -777,14 +777,14 @@ along with this software (see the LICENSE.md file). If not, see
                     <return error="true" message="No unpicked Shipment (Input or Scheduled) found assigned to Container ${toContainerId}"/>
                 </then><else-if condition="containerShipmentList.size() == 1">
                     <set field="shipmentId" from="containerShipmentList[0].shipmentId"/>
-                    <service-call name="co.hotwax.shipment.ShipmentServices.pickMove#ShipmentProduct" in-map="context" out-map="context"/>
+                    <service-call name="mantle.shipment.ShipmentServices.pickMove#ShipmentProduct" in-map="context" out-map="context"/>
                 </else-if><else>
                     <!-- loop through Shipments in Container and pick/move for each Shipment until quantity parameter fully picked (and warn if any remaining) -->
                     <set field="quantityToPick" from="quantity"/>
                     <iterate list="containerShipmentList" entry="containerShipment">
                         <!-- <log level="warn" message="pickmove shipment ${containerShipment.shipmentId} quantityToPick ${quantityToPick}"/> -->
                         <if condition="quantityToPick == 0.0"><break/></if>
-                        <service-call name="co.hotwax.shipment.ShipmentServices.pickMove#ShipmentProduct"
+                        <service-call name="mantle.shipment.ShipmentServices.pickMove#ShipmentProduct"
                                 in-map="context + [shipmentId:containerShipment.shipmentId, quantity:quantityToPick, insufficientQtyWarn:false]"
                                 out-map="pickMoveOut" out-map-add-to-existing="false"/>
                         <set field="quantityToPick" from="quantityToPick - (pickMoveOut.quantityPicked ?: 0.0)"/>
@@ -837,7 +837,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
 
             <!-- get productId from scanProduct -->
-            <service-call name="co.hotwax.shipment.ShipmentServices.get#ShipmentProductByScan" out-map="context"
+            <service-call name="mantle.shipment.ShipmentServices.get#ShipmentProductByScan" out-map="context"
                     in-map="[shipmentId:shipmentId, scanInput:scanProduct]"/>
             <if condition="!productId"><return error="true" message="Could not find Product with ID ${scanProduct}"/></if>
 
@@ -851,7 +851,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <!-- checks and normalizes facilityId, locationSeqId, containerId, scanLocation -->
             <!-- <log level="warn" message="before scanLocation ${scanLocation} locationSeqId ${locationSeqId} containerId ${containerId}"/> -->
-            <service-call name="co.hotwax.product.AssetServices.check#ScanLocation" in-map="context" out-map="context"/>
+            <service-call name="mantle.product.AssetServices.check#ScanLocation" in-map="context" out-map="context"/>
             <!-- <log level="warn" message="after scanLocation ${scanLocation} locationSeqId ${locationSeqId} containerId ${containerId}"/> -->
 
             <!-- handle by ShipmentItemSource records -->
@@ -916,7 +916,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                         <!-- move Asset to pick container (and reservation with it) -->
                         <if condition="toContainer != null">
-                            <service-call name="co.hotwax.product.AssetServices.move#Asset"
+                            <service-call name="mantle.product.AssetServices.move#Asset"
                                     in-map="[assetId:curAsset.assetId, quantity:quantityToPick, facilityId:toContainer.facilityId,
                                         locationSeqId:toContainer.locationSeqId, containerId:toContainer.containerId,
                                         moveAssetReservationId:assetReservation.assetReservationId]"/>
@@ -991,11 +991,11 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="packDate" type="Timestamp" default="ec.user.nowTimestamp"/>
         </in-parameters>
         <actions>
-            <service-call name="co.hotwax.shipment.ShipmentServices.get#ShipmentProductByScan" in-map="context" out-map="context"/>
+            <service-call name="mantle.shipment.ShipmentServices.get#ShipmentProductByScan" in-map="context" out-map="context"/>
 
             <if condition="productId">
                 <!-- pack it -->
-                <service-call name="co.hotwax.shipment.ShipmentServices.pack#ShipmentProduct" in-map="context" out-map="packOut"/>
+                <service-call name="mantle.shipment.ShipmentServices.pack#ShipmentProduct" in-map="context" out-map="packOut"/>
                 <!-- if a Shipment has an item product that is also a component of another item PA product
                     then see if direct shipment item product has been fully packed and instead pack#ShipmentAssemblyComponent -->
                 <if condition="packOut.quantityRemaining"><then>
@@ -1059,7 +1059,7 @@ along with this software (see the LICENSE.md file). If not, see
                     </if>
 
                     <if condition="productId">
-                        <service-call name="co.hotwax.shipment.ShipmentServices.pack#ShipmentAssemblyComponent" in-map="context"/>
+                        <service-call name="mantle.shipment.ShipmentServices.pack#ShipmentAssemblyComponent" in-map="context"/>
                         <return/>
                     </if>
                 </if>
@@ -1097,7 +1097,7 @@ along with this software (see the LICENSE.md file). If not, see
                         quantityRemaining : shipmentItemSource.quantityNotHandled"/>
                 <set field="quantityRemaining" from="quantityRemaining &gt; shipmentItemSource.quantityNotHandled ?
                         quantityRemaining - shipmentItemSource.quantityNotHandled : 0"/>
-                <service-call name="co.hotwax.shipment.ShipmentServices.pack#ShipmentItemSource"
+                <service-call name="mantle.shipment.ShipmentServices.pack#ShipmentItemSource"
                         in-map="[shipmentItemSourceId:shipmentItemSource.shipmentItemSourceId, assetId:assetId,
                             shipmentPackageSeqId:shipmentPackageSeqId, packDate:packDate, quantity:quantityToPack]"/>
             </iterate>
@@ -1155,7 +1155,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <return error="true" message="Quantity specified (${quantity}) is greater than asset [${assetId}] quantity on hand (${asset.quantityOnHandTotal}), not packing"/></if>
 
                 <!-- handle reservations, moving other reservations as needed to handle current quantity assumed to be physically present -->
-                <service-call name="co.hotwax.product.AssetServices.displace#AssetReservations"
+                <service-call name="mantle.product.AssetServices.displace#AssetReservations"
                         in-map="[assetId:assetId, orderId:shipmentItemSource.orderId,
                                 orderItemSeqId:shipmentItemSource.orderItemSeqId, quantity:quantity]"/>
             </if>
@@ -1209,7 +1209,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <set field="quantityRemaining" from="quantityRemaining > assetReservation.quantityNotIssued ?
                         (quantityRemaining - assetReservation.quantityNotIssued) : 0.0"/>
 
-                    <service-call name="co.hotwax.product.AssetServices.issue#AssetReservation"
+                    <service-call name="mantle.product.AssetServices.issue#AssetReservation"
                             in-map="[assetReservation:assetReservation, shipmentId:shipmentItemSource.shipmentId,
                                 shipmentItemSourceId:shipmentItemSourceId, issuedDate:packDate, quantity:quantityToIssue]"/>
 
@@ -1230,7 +1230,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="quantityRemaining" from="quantityRemaining &gt; quantityToIssue ? (quantityRemaining - quantityToIssue) : 0.0"/>
 
                 <!-- do a non-reservation asset issuance -->
-                <service-call name="co.hotwax.product.AssetServices.issue#Asset"
+                <service-call name="mantle.product.AssetServices.issue#Asset"
                         in-map="[shipmentId:shipmentItemSource.shipmentId, shipmentItemSourceId:shipmentItemSourceId,
                             quantity:quantityToIssue, issuedDate:packDate, assetId:assetId,
                             orderId:shipmentItemSource.orderId, orderItemSeqId:shipmentItemSource.orderItemSeqId,
@@ -1239,7 +1239,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <!-- if quantityRemaining (no reservations or specified assetId) use logic similar to reserve to find Assets to pack/issue -->
             <if condition="quantityRemaining">
-                <service-call name="co.hotwax.product.AssetServices.issue#AnyAssetForShipmentItemSource" out-map="issueAnyOut"
+                <service-call name="mantle.product.AssetServices.issue#AnyAssetForShipmentItemSource" out-map="issueAnyOut"
                         in-map="[shipmentItemSourceId:shipmentItemSourceId, quantity:quantityRemaining, issuedDate:packDate, forceIssueOther:forceIssueOther]"/>
                 <set field="quantityRemaining" from="issueAnyOut.quantityRemaining"/>
             </if>
@@ -1251,7 +1251,7 @@ along with this software (see the LICENSE.md file). If not, see
 
             <!-- add to specified package, or in new package if none specified -->
             <if condition="forceAddToPackage || shipmentPackageSeqId">
-                <service-call name="co.hotwax.shipment.ShipmentServices.add#ItemToPackage"
+                <service-call name="mantle.shipment.ShipmentServices.add#ItemToPackage"
                         in-map="[shipmentId:shipmentItemSource.shipmentId, productId:shipmentItemSource.productId,
                             shipmentPackageSeqId:shipmentPackageSeqId, quantity:quantity]"/>
             </if>
@@ -1269,7 +1269,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <field-map field-name="orderId" from="shipmentItemSource.orderId"/>
                     <field-map field-name="orderItemSeqId" from="shipmentItemSource.orderItemSeqId"/>
                 </entity-find-one>
-                <service-call name="co.hotwax.order.OrderServices.checkComplete#OrderPart"
+                <service-call name="mantle.order.OrderServices.checkComplete#OrderPart"
                         in-map="[orderId:orderItem.orderId, orderPartSeqId:orderItem.orderPartSeqId]"/>
             </if>
             -->
@@ -1303,26 +1303,26 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="shipmentItemSource.statusId" value="SisPending"/></if>
             <entity-update value-field="shipmentItemSource"/>
 
-            <service-call name="co.hotwax.product.AssetServices.cancel#AssetIssuance" out-map="context"
+            <service-call name="mantle.product.AssetServices.cancel#AssetIssuance" out-map="context"
                     in-map="[assetIssuanceId:assetIssuanceId, cancelDate:unpackDate]"/>
 
             <!-- if product unpacked is a PtPickAssembly and was produced by the Shipment's Assembly Task then
                 also un-produce so component quantities are not used, and if unpackAssemblyComponents unpack/unissue the components as well -->
             <entity-find-one entity-name="mantle.product.Product" value-field="product" cache="true">
                 <field-map field-name="productId" from="assetIssuance.productId"/></entity-find-one>
-            <if condition="product.productTypeEnumId == 'PtPickAssembly'">
+            <!--<if condition="product.productTypeEnumId == 'PtPickAssembly'">
                 <entity-find-one entity-name="mantle.product.asset.Asset" value-field="asset">
                     <field-map field-name="assetId" from="assetIssuance.assetId"/></entity-find-one>
                 <entity-find-one entity-name="mantle.shipment.Shipment" value-field="shipment">
                     <field-map field-name="shipmentId"/></entity-find-one>
-                <!-- make sure asset came from Shipment's assemblyWorkEffortId before making changes to the WorkEffort -->
+                &lt;!&ndash; make sure asset came from Shipment's assemblyWorkEffortId before making changes to the WorkEffort &ndash;&gt;
                 <if condition="shipment.assemblyWorkEffortId == asset.acquireWorkEffortId">
                     <service-call name="co.hotwax.work.ManufacturingServices.breakDown#Assembly"
                             in-map="[assetId:asset.assetId, asset:asset, workEffortId:shipment.assemblyWorkEffortId,
                                 quantityToBreakDown:originalQuantity, unissueAssemblyComponents:unpackAssemblyComponents,
                                 breakDownDate:unpackDate]"/>
                 </if>
-            </if>
+            </if>-->
         </actions>
     </service>
 
@@ -1334,7 +1334,7 @@ along with this software (see the LICENSE.md file). If not, see
                 existing packages with content</description></parameter>
         </in-parameters>
         <actions>
-            <service-call name="co.hotwax.shipment.CarrierServices.get#ShipmentGatewayDetails" in-map="context" out-map="context"/>
+            <service-call name="mantle.shipment.CarrierServices.get#ShipmentGatewayDetails" in-map="context" out-map="context"/>
             <set field="getAutoPackageInfoName" from="shippingGatewayConfig?.getAutoPackageInfoName"/>
             <if condition="!getAutoPackageInfoName"><return/></if>
 
@@ -1397,13 +1397,13 @@ along with this software (see the LICENSE.md file). If not, see
             <iterate list="shipmentItemDetailList" entry="sid">
                 <set field="quantityRemaining" from="sid.quantity - (sid.quantityAcceptedTotal ?: 0) - (sid.quantityRejectedTotal ?: 0)"/>
 
-                <service-call name="co.hotwax.shipment.ShipmentServices.receive#ShipmentProduct"
+                <service-call name="mantle.shipment.ShipmentServices.receive#ShipmentProduct"
                         in-map="[shipmentId:shipmentId, productId:sid.productId, statusId:statusId,
                             quantityAccepted:quantityRemaining, facilityId:facilityId]"/>
             </iterate>
 
             <!-- consider doing this automatically when all quantities of all items are received -->
-            <service-call name="co.hotwax.shipment.ShipmentServices.deliver#Shipment" out-map="context" in-map="[shipmentId:shipmentId]"/>
+            <service-call name="mantle.shipment.ShipmentServices.deliver#Shipment" out-map="context" in-map="[shipmentId:shipmentId]"/>
         </actions>
     </service>
     <service verb="receive" noun="ShipmentProduct">
@@ -1460,7 +1460,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <set field="quantityRejectedRemaining" from="quantityRejectedRemaining > quantityNotHandled ? quantityRejectedRemaining - quantityNotHandled : 0.0"/>
                 <set field="quantityNotHandled" from="quantityNotHandled - quantityToReject"/>
 
-                <service-call name="co.hotwax.product.AssetServices.receive#Asset" out-map="receiveAssetOut"
+                <service-call name="mantle.product.AssetServices.receive#Asset" out-map="receiveAssetOut"
                         in-map="context + [shipmentItemSourceId:shipmentItemSource.shipmentItemSourceId, shipmentPackageSeqId:null,
                             orderId:shipmentItemSource.orderId, orderItemSeqId:shipmentItemSource.orderItemSeqId,
                             returnId:shipmentItemSource.returnId, returnItemSeqId:shipmentItemSource.returnItemSeqId,
@@ -1478,7 +1478,7 @@ along with this software (see the LICENSE.md file). If not, see
                         <field-map field-name="orderId" from="shipmentItemSource.orderId"/>
                         <field-map field-name="orderItemSeqId" from="shipmentItemSource.orderItemSeqId"/>
                     </entity-find-one>
-                    <service-call name="co.hotwax.order.OrderServices.checkComplete#OrderPart"
+                    <service-call name="mantle.order.OrderServices.checkComplete#OrderPart"
                             in-map="[orderId:orderItem.orderId, orderPartSeqId:orderItem.orderPartSeqId]"/>
                 </if>
             </iterate>
@@ -1486,7 +1486,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="quantityAcceptedRemaining > 0 || quantityRejectedRemaining > 0">
                 <!-- <message>Not sufficient quantity in item source(s) to receive ${quantityAcceptedRemaining} of ${quantityAccepted} accepted or ${quantityRejectedRemaining} of ${quantityRejected} rejected.</message> -->
                 <!-- ShipmentItemSource(s) all used up, just receive outside context of an order/etc -->
-                <service-call name="co.hotwax.product.AssetServices.receive#Asset" out-map="receiveAssetOut"
+                <service-call name="mantle.product.AssetServices.receive#Asset" out-map="receiveAssetOut"
                         in-map="context + [productId:productId, quantity:quantityAcceptedRemaining, shipmentId:shipmentId,
                             facilityId:facilityId, quantityRejected:quantityRejectedRemaining, rejectionReasonEnumId:rejectionReasonEnumId]"/>
                 <script>assetIdList.add(receiveAssetOut.assetId)</script>
@@ -1671,17 +1671,17 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="!shipmentRouteSegmentSeqId"><return error="true" message="No route segment found for shipment ${shipmentId}"/></if>
 
             <!-- always run this, even if no carrierAndShipmentMethod, does some normalization -->
-            <service-call name="co.hotwax.shipment.ShipmentServices.update#ShipmentAndRouteSegment" in-map="context" transaction="force-new"/>
+            <service-call name="mantle.shipment.ShipmentServices.update#ShipmentAndRouteSegment" in-map="context" transaction="force-new"/>
 
             <!-- set shipment Packed in separate TX (force-new) so that any later errors don't undo this -->
             <entity-find-one entity-name="mantle.shipment.Shipment" value-field="shipment"/>
             <if condition="shipment == null"><return error="true" message="Shipment ${shipmentId} not found"/></if>
             <if condition="shipment.statusId in ['ShipInput', 'ShipScheduled', 'ShipPicked']">
-                <service-call name="co.hotwax.shipment.ShipmentServices.pack#Shipment" in-map="[shipmentId:shipmentId]" transaction="force-new"/></if>
+                <service-call name="mantle.shipment.ShipmentServices.pack#Shipment" in-map="[shipmentId:shipmentId]" transaction="force-new"/></if>
 
             <!-- get and print labels -->
             <if condition="getLabels">
-                <service-call name="co.hotwax.shipment.CarrierServices.request#ShipmentLabels"
+                <service-call name="mantle.shipment.CarrierServices.request#ShipmentLabels"
                         in-map="[shipmentId:shipmentId, getReturnLabels:false]"/>
 
                 <!-- make sure label is successful before printing or getting return label -->
@@ -1695,13 +1695,13 @@ along with this software (see the LICENSE.md file). If not, see
 
                 <if condition="hasAllLabels"><then>
                     <!-- if printer specified, print now -->
-                    <if condition="networkPrinterId"><service-call name="co.hotwax.shipment.ShipmentServices.print#ShipmentLabels"
+                    <if condition="networkPrinterId"><service-call name="mantle.shipment.ShipmentServices.print#ShipmentLabels"
                             in-map="[returnLabels:false] + context"/></if>
                     <!-- get and print return labels -->
                     <if condition="getReturnLabels">
-                        <service-call name="co.hotwax.shipment.CarrierServices.request#ShipmentLabels"
+                        <service-call name="mantle.shipment.CarrierServices.request#ShipmentLabels"
                                 in-map="[shipmentId:shipmentId, getReturnLabels:true]"/>
-                        <if condition="networkPrinterId"><service-call name="co.hotwax.shipment.ShipmentServices.print#ShipmentLabels"
+                        <if condition="networkPrinterId"><service-call name="mantle.shipment.ShipmentServices.print#ShipmentLabels"
                                 in-map="[returnLabels:true] + context"/></if>
                     </if>
                 </then><else>
@@ -1728,7 +1728,7 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="isIncoming" from="shipmentTypeEnum?.enumId == 'ShpTpIncoming' || shipmentTypeEnum?.parentEnumId == 'ShpTpIncoming'"/>
             <if condition="!isIncoming">
                 <!-- check for Assembly Task with unused component quantities -->
-                <if condition="shipment.assemblyWorkEffortId">
+                <!--<if condition="shipment.assemblyWorkEffortId">
                     <service-call name="co.hotwax.work.ManufacturingServices.get#ConsumedAssetRemaining"
                             in-map="[workEffortId:shipment.assemblyWorkEffortId]" out-map="assemblyAssetInfo"/>
                     <if condition="assemblyAssetInfo.componentIssuedAvailable">
@@ -1738,10 +1738,10 @@ along with this software (see the LICENSE.md file). If not, see
                                         componentQuantity:componentQty, unissueDate:packedDate]"/>
                         </iterate>
                     </if>
-                </if>
+                </if>-->
 
                 <!-- reduce ShipmentItem.quantity to quantity handled for each item -->
-                <service-call name="co.hotwax.shipment.ShipmentServices.reduce#QuantitiesToHandled" in-map="[shipmentId:shipmentId]"/>
+                <service-call name="mantle.shipment.ShipmentServices.reduce#QuantitiesToHandled" in-map="[shipmentId:shipmentId]"/>
             </if>
 
             <set field="packedDate" from="packedDate ?: ec.user.nowTimestamp"/>
@@ -1759,7 +1759,7 @@ along with this software (see the LICENSE.md file). If not, see
                         <field-map field-name="orderId" from="shipmentItemSource.orderId"/>
                         <field-map field-name="orderItemSeqId" from="shipmentItemSource.orderItemSeqId"/>
                     </entity-find-one>
-                    <service-call name="co.hotwax.order.OrderServices.checkComplete#OrderPart"
+                    <service-call name="mantle.order.OrderServices.checkComplete#OrderPart"
                             in-map="[orderId:orderItem.orderId, orderPartSeqId:orderItem.orderPartSeqId]"/>
                 </if>
             </iterate>
@@ -1798,7 +1798,7 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="shipmentTypeEnum" from="shipment.'ShipmentType#moqui.basic.Enumeration'"/>
             <set field="isIncoming" from="shipmentTypeEnum?.enumId == 'ShpTpIncoming' || shipmentTypeEnum?.parentEnumId == 'ShpTpIncoming'"/>
             <if condition="isIncoming">
-                <service-call name="co.hotwax.shipment.ShipmentServices.reduce#QuantitiesToHandled" in-map="[shipmentId:shipmentId]"/></if>
+                <service-call name="mantle.shipment.ShipmentServices.reduce#QuantitiesToHandled" in-map="[shipmentId:shipmentId]"/></if>
 
             <service-call name="update#mantle.shipment.Shipment" in-map="[shipmentId:shipmentId, statusId:'ShipDelivered']" out-map="context"/>
 
@@ -1833,7 +1833,7 @@ along with this software (see the LICENSE.md file). If not, see
                     </else></if>
                 </iterate>
                 <if condition="checkSprsList &amp;&amp; !foundNotDelivered">
-                    <service-call name="co.hotwax.shipment.ShipmentServices.deliver#Shipment"
+                    <service-call name="mantle.shipment.ShipmentServices.deliver#Shipment"
                             in-map="[shipmentId:shipment.shipmentId, actualArrivalDate:trackingStatusDate]"/>
                 </if>
             </if>
@@ -1868,7 +1868,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <entity-find entity-name="mantle.product.issuance.AssetIssuance" list="assetIssuanceList">
                     <econdition field-name="shipmentId"/><econdition field-name="quantity" operator="greater" from="0.0"/></entity-find>
                 <iterate list="assetIssuanceList" entry="assetIssuance">
-                    <service-call name="co.hotwax.shipment.ShipmentServices.unpack#ShipmentItemIssuance"
+                    <service-call name="mantle.shipment.ShipmentServices.unpack#ShipmentItemIssuance"
                             in-map="[assetIssuanceId:assetIssuance.assetIssuanceId]"/>
                 </iterate>
 
@@ -1876,7 +1876,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <entity-find entity-name="mantle.product.receipt.AssetReceipt" list="assetReceiptList">
                     <econdition field-name="shipmentId"/><econdition field-name="quantityAccepted" operator="greater" from="0.0"/></entity-find>
                 <iterate list="assetReceiptList" entry="assetReceipt">
-                    <service-call name="co.hotwax.product.AssetServices.update#AssetAndReceipt" in-map="[assetId:assetReceipt.assetId,
+                    <service-call name="mantle.product.AssetServices.update#AssetAndReceipt" in-map="[assetId:assetReceipt.assetId,
                         assetReceiptId:assetReceipt.assetReceiptId, shipmentId:shipmentId, quantityAccepted:0.0, quantityRejected:0.0]"/>
                 </iterate>
             </if>
@@ -1908,13 +1908,13 @@ along with this software (see the LICENSE.md file). If not, see
                     <return error="true" message="Outgoing shipment ${shipmentId} has items already issued/packed, cannot cancel."/></if>
             </if>
 
-            <service-call name="co.hotwax.shipment.ShipmentServices.reduce#QuantitiesToHandled" in-map="[shipmentId:shipmentId]"/>
+            <service-call name="mantle.shipment.ShipmentServices.reduce#QuantitiesToHandled" in-map="[shipmentId:shipmentId]"/>
 
             <service-call name="update#mantle.shipment.Shipment" in-map="[shipmentId:shipmentId, statusId:'ShipCancelled']" out-map="context"/>
 
             <!-- if any orders are Completed they may not still be, see if order needs to be moved back to Approved -->
             <iterate list="orderIdList" entry="orderId">
-                <service-call name="co.hotwax.order.OrderServices.checkStillComplete#Order" in-map="[orderId:orderId]"/>
+                <service-call name="mantle.order.OrderServices.checkStillComplete#Order" in-map="[orderId:orderId]"/>
             </iterate>
         </actions>
     </service>
@@ -1939,7 +1939,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <set field="quantityHandled" from="0.0"/>
                 </if>
                 <if condition="shipmentItem.quantity != quantityHandled">
-                    <service-call name="co.hotwax.shipment.ShipmentServices.update#ShipmentItem"
+                    <service-call name="mantle.shipment.ShipmentServices.update#ShipmentItem"
                             in-map="[shipmentId:shipmentId, productId:shipmentItem.productId, quantity:quantityHandled]"/>
 
                     <!-- reduce ShipmentPackageContent quantity as needed, mostly to undo auto packaging -->
@@ -2000,7 +2000,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                 <!-- get to party email address -->
                 <if condition="!toAddresses">
-                    <service-call name="co.hotwax.party.ContactServices.get#PartyContactInfo" out-map="emailInfo"
+                    <service-call name="mantle.party.ContactServices.get#PartyContactInfo" out-map="emailInfo"
                             in-map="[partyId:toPartyId, emailContactMechPurposeId:'EmailShippingDest', defaultToPrimaryPurpose:true]"/>
                     <set field="toAddresses" from="emailInfo.emailAddress"/>
                     <!-- get to party userId for toUserId -->
@@ -2060,7 +2060,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <service-call name="create#mantle.shipment.ShipmentContent" in-map="context" out-map="context"/>
             <if condition="contentFile != null &amp;&amp; contentFile.size &gt; 0">
-                <service-call name="co.hotwax.shipment.ShipmentServices.save#ShipmentContentFile" in-map="context"/></if>
+                <service-call name="mantle.shipment.ShipmentServices.save#ShipmentContentFile" in-map="context"/></if>
         </actions>
     </service>
     <service verb="update" noun="ShipmentContent">
@@ -2073,7 +2073,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <if condition="contentFile != null &amp;&amp; contentFile.size &gt; 0">
                 <entity-find-one entity-name="mantle.shipment.ShipmentContent" value-field="shipmentContent"/>
-                <service-call name="co.hotwax.shipment.ShipmentServices.save#ShipmentContentFile" out-map="context"
+                <service-call name="mantle.shipment.ShipmentServices.save#ShipmentContentFile" out-map="context"
                         in-map="context + [shipmentId:shipmentContent.shipmentId, saveContentLocation:false]"/>
             </if>
             <service-call name="update#mantle.shipment.ShipmentContent" in-map="context"/>

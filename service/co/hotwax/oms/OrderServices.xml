@@ -201,7 +201,7 @@
 
             <!-- Billing Details -->
             <if condition="billing_details.address">
-                <service-call name="co.hotwax.party.ContactServices.create#PostalAddress" out-map="billingAddressOut"
+                <service-call name="mantle.party.ContactServices.create#PostalAddress" out-map="billingAddressOut"
                               in-map="[toName:billing_details.address.toName ?: '', address1:billing_details.address.address1,
                               address2:billing_details.address.address2 ?: '', city:billing_details.address.city,
                               stateProvinceGeoId:billing_details.address.stateProvinceGeoId ?: '',
@@ -209,7 +209,7 @@
             </if>
 
             <if condition="billing_details.phone">
-                <service-call name="co.hotwax.party.ContactServices.create#TelecomNumber" out-map="billingPhoneOut"
+                <service-call name="mantle.party.ContactServices.create#TelecomNumber" out-map="billingPhoneOut"
                               in-map="[countryCode:billing_details.phone.countryCode,
                               areaCode:billing_details.phone.areaCode, contactNumber:billing_details.phone.contactNumber]"/>
             </if>
@@ -224,7 +224,7 @@
                     <if condition="order_part.shipping_details.address">
                         <set field="shippingAddress" from="order_part.shipping_details.address"/>
                         <!-- Shipping Address -->
-                        <service-call name="co.hotwax.party.ContactServices.create#PostalAddress" out-map="shippingAddressOut"
+                        <service-call name="mantle.party.ContactServices.create#PostalAddress" out-map="shippingAddressOut"
                                       in-map="[toName:shippingAddress.toName ?: '', address1:shippingAddress.address1,
                                       address2:shippingAddress.address2 ?: '', city:shippingAddress.city,
                                       stateProvinceGeoId:shippingAddress.stateProvinceGeoId ?: '', countryGeoId:shippingAddress.countryGeoId,
@@ -234,7 +234,7 @@
                     <if condition="order_part.shipping_details.phone">
                         <set field="shippingPhone" from="order_part.shipping_details.phone"/>
                         <!-- Shipping Phone -->
-                        <service-call name="co.hotwax.party.ContactServices.create#TelecomNumber" out-map="shippingPhoneOut"
+                        <service-call name="mantle.party.ContactServices.create#TelecomNumber" out-map="shippingPhoneOut"
                                       in-map="[countryCode:shippingPhone.countryCode, areaCode:shippingPhone.areaCode,
                                       contactNumber:shippingPhone.contactNumber]"/>
                         <set field="shippingPhoneContactMechId" from="shippingPhoneOut.contactMechId"/>
@@ -277,7 +277,7 @@
                         <return error="true" message="Product with sku ${order_item.sku} not found."/>
                     </if>
                     <!-- Create Order Item -->
-                    <service-call name="co.hotwax.order.OrderServices.create#OrderItem" out-map="orderItemOut"
+                    <service-call name="mantle.order.OrderServices.create#OrderItem" out-map="orderItemOut"
                             in-map="context + [orderId:orderHeaderOut.orderId,
                             orderPartSeqId:orderPartOut.orderPartSeqId, productId:productList[0].productId,
                             quantity:order_item.quantity, itemDescription:order_item.productName,
@@ -944,7 +944,7 @@
                         <if condition="order_part.shipping_details.address">
                             <set field="shippingAddress" from="order_part.shipping_details.address"/>
                             <!-- Shipping Address -->
-                            <service-call name="co.hotwax.party.ContactServices.create#PostalAddress"
+                            <service-call name="mantle.party.ContactServices.create#PostalAddress"
                                           out-map="shippingAddressOut" in-map="[toName:shippingAddress.toName ?: '',
                                 address1:shippingAddress.address1, address2:shippingAddress.address2 ?: '',
                                 city:shippingAddress.city, countryGeoId:shippingAddress.countryGeoId,
@@ -954,7 +954,7 @@
                         <if condition="order_part.shipping_details.phone">
                             <set field="shippingPhone" from="order_part.shipping_details.phone"/>
                             <!-- Shipping Phone -->
-                            <service-call name="co.hotwax.party.ContactServices.create#TelecomNumber"
+                            <service-call name="mantle.party.ContactServices.create#TelecomNumber"
                                           out-map="shippingPhoneOut" in-map="[countryCode:shippingPhone.countryCode,
                                 areaCode:shippingPhone.areaCode,
                                 contactNumber:shippingPhone.contactNumber]"/>
@@ -1000,7 +1000,7 @@
         </out-parameters>
         <actions>
             <!-- Create Order Item -->
-            <service-call name="co.hotwax.order.OrderServices.create#OrderItem" out-map="orderItemOut"
+            <service-call name="mantle.order.OrderServices.create#OrderItem" out-map="orderItemOut"
                           in-map="context + [orderPartSeqId:orderPartId, productId:orderItem.productId,
                     itemDescription:orderItem.productName, quantity:orderItem.quantity,
                     unitAmount:orderItem.unitAmount]"/>
@@ -1161,7 +1161,7 @@
                         <if condition="order_part.shipping_details.address">
                             <set field="shippingAddress" from="order_part.shipping_details.address"/>
                             <!-- Shipping Address -->
-                            <service-call name="co.hotwax.party.ContactServices.create#PostalAddress"
+                            <service-call name="mantle.party.ContactServices.create#PostalAddress"
                                     out-map="shippingAddressOut" in-map="[toName:shippingAddress.toName ?: '',
                                     address1:shippingAddress.address1, address2:shippingAddress.address2 ?: '',
                                     city:shippingAddress.city, countryGeoId:shippingAddress.countryGeoId,
@@ -1171,7 +1171,7 @@
                         <if condition="order_part.shipping_details.phone">
                             <set field="shippingPhone" from="order_part.shipping_details.phone"/>
                             <!-- Shipping Phone -->
-                            <service-call name="co.hotwax.party.ContactServices.create#TelecomNumber"
+                            <service-call name="mantle.party.ContactServices.create#TelecomNumber"
                                     out-map="shippingPhoneOut" in-map="[countryCode:shippingPhone.countryCode,
                                     areaCode:shippingPhone.areaCode,
                                     contactNumber:shippingPhone.contactNumber]"/>
@@ -1201,14 +1201,14 @@
 
             <!-- Update Order Item's tax record -->
             <if condition="!taxItems.isEmpty()">
-                <service-call name="co.hotwax.order.OrderServices.update#OrderItem" out-map="context"
+                <service-call name="mantle.order.OrderServices.update#OrderItem" out-map="context"
                         in-map="[orderId:orderId, orderItemSeqId:taxItems.first.orderItemSeqId,
                         unitAmount:taxItems.first.unitAmount, quantity:itemQuantity,
                         orderPartSeqId:newOrderPartId]"/>
             </if>
 
             <!-- Update Order Item record -->
-            <service-call name="co.hotwax.order.OrderServices.update#OrderItem" out-map="context"
+            <service-call name="mantle.order.OrderServices.update#OrderItem" out-map="context"
                     in-map="[orderId:orderId, orderItemSeqId:order_part.item_details.id,
                     unitAmount:orderItem.unitAmount, quantity:itemQuantity,
                     orderPartSeqId:newOrderPartId]"/>
@@ -1273,7 +1273,7 @@
         </out-parameters>
         <actions>
             <!-- Using OOTB service for handling the cancel of order item -->
-            <service-call name="co.hotwax.order.OrderServices.cancel#OrderItem" out-map="context"
+            <service-call name="mantle.order.OrderServices.cancel#OrderItem" out-map="context"
                           in-map="context + [orderItemSeqId:orderItemId]"/>
         </actions>
     </service>

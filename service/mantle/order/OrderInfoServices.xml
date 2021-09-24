@@ -502,7 +502,7 @@ along with this software (see the LICENSE.md file). If not, see
             </if>
             <!-- if no template setting for store look for PartySetting on Shipment.fromPartyId -->
             <if condition="!templateLocation &amp;&amp; firstPart.vendorPartyId">
-                <service-call name="co.hotwax.party.PartyServices.get#PartySettingValue" out-map="ptySettingOut"
+                <service-call name="mantle.party.PartyServices.get#PartySettingValue" out-map="ptySettingOut"
                         in-map="[partyId:firstPart.vendorPartyId, partySettingTypeId:('Org' + templateSettingSuffix)]"/>
                 <set field="templateLocation" from="ptySettingOut?.settingValue"/>
             </if>
@@ -612,7 +612,7 @@ along with this software (see the LICENSE.md file). If not, see
                 </else></if>
             </iterate>
 
-            <service-call name="co.hotwax.order.OrderServices.get#OrderItemTotal"
+            <service-call name="mantle.order.OrderServices.get#OrderItemTotal"
                     in-map="[orderItem:orderItem, getChildrenTotals:true]" out-map="orderItemTotalOut"/>
 
             <set field="orderItemQuantity" from="orderItemTotalOut.combinedQuantity"/>
@@ -1004,7 +1004,7 @@ along with this software (see the LICENSE.md file). If not, see
                         </if>
 
                         <!-- if current address not black/greylisted then look for others in system (generally more likely/useful) -->
-                        <service-call name="co.hotwax.party.DuplicateServices.find#PostalAddresses" out-map="blacklistAddrOut" out-map-add-to-existing="false"
+                        <service-call name="mantle.party.DuplicateServices.find#PostalAddresses" out-map="blacklistAddrOut" out-map-add-to-existing="false"
                                 in-map="[partyId:customerPartyId, address1:addr.address1, unitNumber:addr.unitNumber, postalCode:addr.postalCode,
                                     postalCodeExt:addr.postalCodeExt, countryGeoId:addr.countryGeoId,
                                     trustLevelEnumId:'CmtlGreylisted,CmtlBlacklisted']"/>
@@ -1027,7 +1027,7 @@ along with this software (see the LICENSE.md file). If not, see
                             <continue/>
                         </if>
                         <!-- if current address not black/greylisted then look for others in system (generally more likely/useful) -->
-                        <service-call name="co.hotwax.party.DuplicateServices.find#PostalAddresses" out-map="blacklistAddrOut" out-map-add-to-existing="false"
+                        <service-call name="mantle.party.DuplicateServices.find#PostalAddresses" out-map="blacklistAddrOut" out-map-add-to-existing="false"
                                 in-map="[partyId:customerPartyId, address1:addr.address1, unitNumber:addr.unitNumber, postalCode:addr.postalCode,
                                     postalCodeExt:addr.postalCodeExt, countryGeoId:addr.countryGeoId,
                                     trustLevelEnumId:'CmtlGreylisted,CmtlBlacklisted']"/>
@@ -1040,7 +1040,7 @@ along with this software (see the LICENSE.md file). If not, see
                     </iterate>
 
                     <!-- TODO: maybe also do phone numbers, etc
-                    <service-call name="co.hotwax.party.DuplicateServices.find#TelecomNumbers" out-map="blacklistTelOut" out-map-add-to-existing="false"
+                    <service-call name="mantle.party.DuplicateServices.find#TelecomNumbers" out-map="blacklistTelOut" out-map-add-to-existing="false"
                             in-map="[partyId:partyId, areaCode:ptn.areaCode, contactNumber:ptn.contactNumber,
                                 trustLevelEnumId:'CmtlGreylisted,CmtlBlacklisted']"/>
                     -->
@@ -1230,12 +1230,12 @@ along with this software (see the LICENSE.md file). If not, see
                         <if condition="!productId || !productItemTypes.contains(orderItem.itemTypeEnumId)"><continue/></if>
                         <set field="unitAmount" from="orderItem.unitAmount"/>
 
-                        <service-call name="co.hotwax.product.PriceServices.get#ProductPriceByType" out-map="minOut"
+                        <service-call name="mantle.product.PriceServices.get#ProductPriceByType" out-map="minOut"
                                 in-map="[productId:orderItem.productId, quantity:orderItem.quantity, validDate:placedDate,
                                 priceUomId:currencyUomId, productStoreId:productStoreId, vendorPartyId:vendorPartyId,
                                 customerPartyId:customerPartyId, priceTypeEnumId:'PptMinimum']"/>
                         <set field="minPrice" from="minOut.price"/>
-                        <service-call name="co.hotwax.product.PriceServices.get#ProductPriceByType" out-map="maxOut"
+                        <service-call name="mantle.product.PriceServices.get#ProductPriceByType" out-map="maxOut"
                                 in-map="[productId:orderItem.productId, quantity:orderItem.quantity, validDate:placedDate,
                                 priceUomId:currencyUomId, productStoreId:productStoreId, vendorPartyId:vendorPartyId,
                                 customerPartyId:customerPartyId, priceTypeEnumId:'PptMaximum']"/>
@@ -1303,7 +1303,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                 <!-- get customer email address -->
                 <if condition="!toAddresses &amp;&amp; customerPartyId">
-                    <service-call name="co.hotwax.party.ContactServices.get#PartyContactInfo" out-map="emailInfo"
+                    <service-call name="mantle.party.ContactServices.get#PartyContactInfo" out-map="emailInfo"
                             in-map="[partyId:customerPartyId, emailContactMechPurposeId:'EmailOrder', defaultToPrimaryPurpose:true]"/>
                     <set field="toAddresses" from="emailInfo.emailAddress"/>
                     <!-- get customer userId for toUserId -->

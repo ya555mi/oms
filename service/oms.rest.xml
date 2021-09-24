@@ -5,7 +5,7 @@
           name="oms" displayName="Headless OMS APIs" version="1.0.0" description="Services for OMS">
 
     <resource name="lookup" description="Lookup from various entities by ID">
-        <method type="get"><service name="co.hotwax.GeneralServices.lookup#ById"/></method>
+        <method type="get"><service name="mantle.GeneralServices.lookup#ById"/></method>
     </resource>
     
     <resource name="orders">

@@ -105,12 +105,12 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="priceUomId"/>
         </out-parameters>
         <actions>
-            <service-call name="co.hotwax.product.PriceServices.get#ProductPriceByType" out-map="currentOut"
+            <service-call name="mantle.product.PriceServices.get#ProductPriceByType" out-map="currentOut"
                     in-map="context + [priceTypeEnumId:'PptCurrent']"/>
             <set field="productPriceId" from="currentOut.productPriceId"/>
             <set field="price" from="currentOut.price"/>
 
-            <service-call name="co.hotwax.product.PriceServices.get#ProductPriceByType" out-map="listOut"
+            <service-call name="mantle.product.PriceServices.get#ProductPriceByType" out-map="listOut"
                     in-map="context + [priceTypeEnumId:'PptList']"/>
             <set field="listProductPriceId" from="listOut.productPriceId"/>
             <set field="listPrice" from="listOut.price"/>
@@ -125,13 +125,13 @@ along with this software (see the LICENSE.md file). If not, see
                 <if condition="varAssocList">
                     <set field="virtualProductId" from="varAssocList[0].productId"/>
                     <if condition="!price">
-                        <service-call name="co.hotwax.product.PriceServices.get#ProductPriceByType" out-map="currentOut" out-map-add-to-existing="false"
+                        <service-call name="mantle.product.PriceServices.get#ProductPriceByType" out-map="currentOut" out-map-add-to-existing="false"
                                 in-map="context + [productId:virtualProductId, priceTypeEnumId:'PptCurrent']"/>
                         <set field="productPriceId" from="currentOut.productPriceId"/>
                         <set field="price" from="currentOut.price"/>
                     </if>
                     <if condition="!listPrice">
-                        <service-call name="co.hotwax.product.PriceServices.get#ProductPriceByType" out-map="listOut" out-map-add-to-existing="false"
+                        <service-call name="mantle.product.PriceServices.get#ProductPriceByType" out-map="listOut" out-map-add-to-existing="false"
                                 in-map="context + [productId:virtualProductId, priceTypeEnumId:'PptList']"/>
                         <set field="listProductPriceId" from="listOut.productPriceId"/>
                         <set field="listPrice" from="listOut.price"/>
@@ -211,13 +211,13 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="!pricePurposeEnumId"><set field="pricePurposeEnumId" value="PppPurchase"/></if>
             <!-- don't defaultToListPrice for Recurring prices so we can see if there really is a Recurring price in order to default to Purchase purpose below -->
             <set field="defaultToListPrice" from="pricePurposeEnumId != 'PppRecurring'"/>
-            <service-call name="co.hotwax.product.PriceServices.get#ProductPrice" in-map="context" out-map="context"/>
+            <service-call name="mantle.product.PriceServices.get#ProductPrice" in-map="context" out-map="context"/>
 
             <!-- if no Recurring price try again with Purchase purpose -->
             <if condition="!price &amp;&amp; pricePurposeEnumId == 'PppRecurring'">
                 <set field="pricePurposeEnumId" value="PppPurchase"/>
                 <set field="defaultToListPrice" from="true"/>
-                <service-call name="co.hotwax.product.PriceServices.get#ProductPrice" in-map="context" out-map="context"/>
+                <service-call name="mantle.product.PriceServices.get#ProductPrice" in-map="context" out-map="context"/>
             </if>
         </actions>
     </service>

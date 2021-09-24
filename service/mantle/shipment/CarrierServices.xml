@@ -192,7 +192,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <!-- if Party has ownerPartId lookup setting there -->
                 <entity-find-one entity-name="mantle.party.Party" value-field="party"/>
                 <if condition="party?.ownerPartyId">
-                    <service-call name="co.hotwax.party.PartyServices.get#PartySettingValue" out-map="ptySettingOut"
+                    <service-call name="mantle.party.PartyServices.get#PartySettingValue" out-map="ptySettingOut"
                             in-map="[partyId:party.ownerPartyId, partySettingTypeId:'ValidateAddressGatewayConfigId']"/>
                     <set field="shippingGatewayConfigId" from="ptySettingOut?.settingValue"/>
                 </if>
@@ -272,7 +272,7 @@ along with this software (see the LICENSE.md file). If not, see
             <iterate list="pcmList" entry="pcm">
                 <if condition="validateCount &gt;= validateLimit"><break/></if>
 
-                <service-call name="co.hotwax.shipment.CarrierServices.validate#PostalAddress" out-map="validateOut" transaction="force-new"
+                <service-call name="mantle.shipment.CarrierServices.validate#PostalAddress" out-map="validateOut" transaction="force-new"
                         in-map="[contactMechId:pcm.contactMechId, partyId:pcm.partyId, shippingGatewayConfigId:shippingGatewayConfigId]"/>
 
                 <set field="validateCount" from="validateCount + 1"/>
@@ -302,7 +302,7 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find entity-name="mantle.order.OrderPart" list="orderPartList"><econdition field-name="orderId"/></entity-find>
             <set field="shippingTotal" from="0" type="BigDecimal"/>
             <iterate list="orderPartList" entry="orderPart">
-                <service-call name="co.hotwax.shipment.CarrierServices.calculate#OrderPartShipping"
+                <service-call name="mantle.shipment.CarrierServices.calculate#OrderPartShipping"
                         in-map="context + [orderPartSeqId:orderPart.orderPartSeqId]" out-map="copsOut"/>
                 <set field="shippingTotal" from="shippingTotal + (copsOut.shippingTotal ?: 0)"/>
             </iterate>
@@ -380,7 +380,7 @@ along with this software (see the LICENSE.md file). If not, see
             <service-call name="${getOrderRateServiceName}" in-map="context" out-map="context"/>
 
             <if condition="productStore?.markupOrderShipLabels == 'Y' || ec.user.getPreference('AllStoresMarkupLabelOrder') == 'true'">
-                <service-call name="co.hotwax.shipment.CarrierServices.get#ShipLabelMarkup" out-map="markupOut" out-map-add-to-existing="false"
+                <service-call name="mantle.shipment.CarrierServices.get#ShipLabelMarkup" out-map="markupOut" out-map-add-to-existing="false"
                         in-map="[productStoreId:productStore.productStoreId, carrierPartyId:carrierPartyId,
                                         shipmentMethodEnumId:shipmentMethodEnumId]"/>
 
@@ -502,7 +502,7 @@ along with this software (see the LICENSE.md file). If not, see
 
                     <set field="originFacilityId" from="orderPart.facilityId"/>
                     <if condition="!originFacilityId"><continue/></if>
-                    <service-call name="co.hotwax.facility.ContactServices.get#FacilityDefaultShipOrigin" out-map="facOriginOut"
+                    <service-call name="mantle.facility.ContactServices.get#FacilityDefaultShipOrigin" out-map="facOriginOut"
                             in-map="[facilityId:originFacilityId]"/>
                     <if condition="!facOriginOut.postalContactMechId"><continue/></if>
 
@@ -519,7 +519,7 @@ along with this software (see the LICENSE.md file). If not, see
                                     currencyUomId:orderHeader.currencyUomId]"/>
                     <iterate list="bulkOut.shippingRateInfoList" entry="shippingRateInfo">
                         <if condition="productStore?.markupOrderShipLabels == 'Y' || ec.user.getPreference('AllStoresMarkupLabelOrder') == 'true'">
-                            <service-call name="co.hotwax.shipment.CarrierServices.get#ShipLabelMarkup" out-map="markupOut" out-map-add-to-existing="false"
+                            <service-call name="mantle.shipment.CarrierServices.get#ShipLabelMarkup" out-map="markupOut" out-map-add-to-existing="false"
                                     in-map="[productStoreId:productStore.productStoreId, carrierPartyId:shippingRateInfo.carrierPartyId,
                                         shipmentMethodEnumId:shippingRateInfo.shipmentMethodEnumId]"/>
 
@@ -588,7 +588,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <description>Get return labels for the shipment INSTEAD of standard outbound labels; populate the return* fields on ShipmentPackageRouteSeg</description></parameter>
         </in-parameters>
         <actions>
-            <service-call name="co.hotwax.shipment.CarrierServices.get#ShipmentGatewayDetails" in-map="context" out-map="context"/>
+            <service-call name="mantle.shipment.CarrierServices.get#ShipmentGatewayDetails" in-map="context" out-map="context"/>
             <set field="requestLabelsServiceName" from="shippingGatewayConfig.requestLabelsServiceName"/>
             <if condition="!requestLabelsServiceName"><log level="error" message="No ShippingGatewayConfig with ID ${shippingGatewayConfigId} has no requestLabelsServiceName, not validating address"/><return/></if>
 
@@ -614,7 +614,7 @@ along with this software (see the LICENSE.md file). If not, see
                 </entity-find>
 
                 <iterate list="srsList" entry="routeSegment">
-                    <service-call name="co.hotwax.shipment.CarrierServices.get#ShipLabelMarkup" out-map="markupOut" out-map-add-to-existing="false"
+                    <service-call name="mantle.shipment.CarrierServices.get#ShipLabelMarkup" out-map="markupOut" out-map-add-to-existing="false"
                             in-map="[productStoreId:productStore.productStoreId, carrierPartyId:routeSegment.carrierPartyId, shipmentMethodEnumId:routeSegment.shipmentMethodEnumId]"/>
                     <set field="markupAmount" from="markupOut?.markupAmount ?: 0.0"/>
                     <set field="markupMultiplier" from="markupOut?.markupMultiplier ?: 0.0"/>
@@ -704,7 +704,7 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="shipmentRouteSegmentSeqId"><description>Defaults to the first route segment</description></parameter>
         </in-parameters>
         <actions>
-            <service-call name="co.hotwax.shipment.CarrierServices.get#ShipmentGatewayDetails" in-map="context" out-map="context"/>
+            <service-call name="mantle.shipment.CarrierServices.get#ShipmentGatewayDetails" in-map="context" out-map="context"/>
             <set field="refundLabelsServiceName" from="shippingGatewayConfig.refundLabelsServiceName"/>
             <if condition="!refundLabelsServiceName"><log level="error" message="No ShippingGatewayConfig with ID ${shippingGatewayConfigId} has no refundLabelsServiceName, not validating address"/><return/></if>
 
@@ -720,7 +720,7 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="shipmentRouteSegmentSeqId"><description>Defaults to the first route segment</description></parameter>
         </in-parameters>
         <actions>
-            <service-call name="co.hotwax.shipment.CarrierServices.get#ShipmentGatewayDetails" in-map="context" out-map="context"/>
+            <service-call name="mantle.shipment.CarrierServices.get#ShipmentGatewayDetails" in-map="context" out-map="context"/>
             <set field="trackLabelsServiceName" from="shippingGatewayConfig.trackLabelsServiceName"/>
             <if condition="!trackLabelsServiceName"><log level="error" message="No ShippingGatewayConfig with ID ${shippingGatewayConfigId} has no trackLabelsServiceName, not validating address"/><return/></if>
 
@@ -767,7 +767,7 @@ along with this software (see the LICENSE.md file). If not, see
             <if condition="!shippingGatewayConfigId">
                 <entity-find-one entity-name="mantle.shipment.Shipment" value-field="shipment"/>
                 <if condition="shipment?.fromPartyId">
-                    <service-call name="co.hotwax.party.PartyServices.get#PartySettingValue" out-map="ptySettingOut"
+                    <service-call name="mantle.party.PartyServices.get#PartySettingValue" out-map="ptySettingOut"
                             in-map="[partyId:shipment.fromPartyId, partySettingTypeId:'DefaultShipmentGatewayConfigId']"/>
                     <set field="shippingGatewayConfigId" from="ptySettingOut?.settingValue"/>
                 </if>
@@ -853,7 +853,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <script>quantityByProductId.put(packageContent.productId, packageContent.quantity)</script>
             </iterate>
 
-            <service-call name="co.hotwax.shipment.CarrierServices.get#GeneralPackageRequiresInsurance" out-map="context"
+            <service-call name="mantle.shipment.CarrierServices.get#GeneralPackageRequiresInsurance" out-map="context"
                     in-map="[quantityByProductId:quantityByProductId, insurancePackageThreshold:insurancePackageThreshold,
                         currencyUomId:shipment.costUomId, productStoreId:shipment.productStoreId, vendorPartyId:shipment.fromPartyId]"/>
         </actions>
@@ -884,7 +884,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <if condition="product.shippingInsuranceReqd == 'Y'"><set field="insuranceRequired" from="true"/></if>
 
                 <!-- NOTE: PptAverage = Average Cost -->
-                <service-call name="co.hotwax.product.PriceServices.get#ProductPriceByType" out-map="costOut"
+                <service-call name="mantle.product.PriceServices.get#ProductPriceByType" out-map="costOut"
                         in-map="[productId:productId, priceTypeEnumId:'PptAverage', priceUomId:currencyUomId,
                             productStoreId:productStoreId, vendorPartyId:vendorPartyId]"/>
                 <if condition="costOut.price"><then>
@@ -936,7 +936,7 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="shipmentMethodEnumId" from="shipmentMethodEnumId ?: orderPart.shipmentMethodEnumId"/>
 
             <set field="postalContactMechId" from="postalContactMechId ?: orderPart.postalContactMechId"/>
-            <service-call name="co.hotwax.party.ContactServices.get#PostalAddressGeoIdSet" out-map="context"
+            <service-call name="mantle.party.ContactServices.get#PostalAddressGeoIdSet" out-map="context"
                     in-map="[contactMechId:postalContactMechId]"/>
 
             <set field="itemCount" from="0.0" type="BigDecimal"/>

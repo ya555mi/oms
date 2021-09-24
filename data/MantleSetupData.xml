@@ -38,13 +38,13 @@ along with this software (see the LICENSE.md file). If not, see
 
     <!-- Registered Services: Store Order Pre-Approve Validation -->
     <moqui.service.ServiceRegister serviceRegisterId="OrderManualApprove" serviceTypeEnumId="OrderValidate"
-            description="Require Manual Approval" serviceName="co.hotwax.order.OrderInfoServices.validate#OrderRequireManual"/>
+            description="Require Manual Approval" serviceName="mantle.order.OrderInfoServices.validate#OrderRequireManual"/>
 
     <!-- ========== Service Jobs ========== -->
 
     <!-- Service Job: Auto-approve Orders Delayed - every 15 minutes by default -->
     <moqui.service.job.ServiceJob jobName="autoApprove_OrdersDelayed" description="Auto-approve Orders Delayed"
-            serviceName="co.hotwax.order.OrderServices.autoApprove#OrdersDelayed" cronExpression="0 0/15 * * * ?" paused="N"
+            serviceName="mantle.order.OrderServices.autoApprove#OrdersDelayed" cronExpression="0 0/15 * * * ?" paused="N"
             transactionTimeout="1800"/>
 
 </entity-facade-xml>

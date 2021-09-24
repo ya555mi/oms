@@ -286,7 +286,7 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find-one entity-name="mantle.order.OrderItem" value-field="orderItem"/>
             <if condition="orderItem == null"><return error="true" message="Could not find Order Item ${orderId}:${orderItemSeqId}"/></if>
 
-            <service-call name="co.hotwax.order.ReturnServices.calculate#OrderItemReturnable" in-map="context" out-map="context"/>
+            <service-call name="mantle.order.ReturnServices.calculate#OrderItemReturnable" in-map="context" out-map="context"/>
             <set field="returnPrice" from="returnPrice ?: orderItem.unitAmount ?: 0.0"/>
             <set field="returnTotal" from="responseAmount != null ? responseAmount :
                     ((returnQuantity != null ? returnQuantity : 1.0) * returnPrice).setScale(2, BigDecimal.ROUND_HALF_UP)"/>
@@ -325,7 +325,7 @@ along with this software (see the LICENSE.md file). If not, see
             <order-map-list list="childOrderItemList"><order-by field-name="orderItemSeqId"/></order-map-list>
 
             <iterate list="childOrderItemList" entry="childOrderItem">
-                <service-call name="co.hotwax.order.ReturnServices.calculate#OrderItemReturnable" out-map="childOut"
+                <service-call name="mantle.order.ReturnServices.calculate#OrderItemReturnable" out-map="childOut"
                         in-map="[orderId:childOrderItem.orderId, orderItemSeqId:childOrderItem.orderItemSeqId, orderItem:childOrderItem]"/>
                 <!-- only add child to return if not a product item -->
                 <if condition="childOut.isProductItemType"><continue/></if>
@@ -425,11 +425,11 @@ along with this software (see the LICENSE.md file). If not, see
 
     <service verb="request" noun="Return">
         <implements service="mantle.order.ReturnServices.change#ReturnStatusInterface"/>
-        <actions><service-call name="co.hotwax.order.ReturnServices.update#ReturnStatus" out-map="context" in-map="context + [statusId:'ReturnRequested']"/></actions>
+        <actions><service-call name="mantle.order.ReturnServices.update#ReturnStatus" out-map="context" in-map="context + [statusId:'ReturnRequested']"/></actions>
     </service>
     <service verb="approve" noun="Return">
         <implements service="mantle.order.ReturnServices.change#ReturnStatusInterface"/>
-        <actions><service-call name="co.hotwax.order.ReturnServices.update#ReturnStatus" out-map="context" in-map="context + [statusId:'ReturnApproved']"/></actions>
+        <actions><service-call name="mantle.order.ReturnServices.update#ReturnStatus" out-map="context" in-map="context + [statusId:'ReturnApproved']"/></actions>
     </service>
 
     <service verb="receive" noun="ReturnShipmentItems">
@@ -447,7 +447,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <select-field field-name="quantityAccepted"/>
             </entity-find>
             <iterate list="receiptSummaryList" entry="receiptSummary">
-                <service-call name="co.hotwax.order.ReturnServices.receive#ReturnItem"
+                <service-call name="mantle.order.ReturnServices.receive#ReturnItem"
                         in-map="[returnId:receiptSummary.returnId, returnItemSeqId:receiptSummary.returnItemSeqId,
                             receivedQuantity:receiptSummary.quantityAccepted]"/>
             </iterate>
@@ -463,7 +463,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <script>addToBigDecimalInMap([returnId:receipt.returnId, returnItemSeqId:receipt.returnItemSeqId], receipt.quantityAccepted, receiptSummaryMap)</script>
             </iterate>
             <iterate list="receiptSummaryMap" entry="quantityAccepted" key="idMap">
-                <service-call name="co.hotwax.order.ReturnServices.receive#ReturnItem" in-map="[returnId:idMap.returnId,
+                <service-call name="mantle.order.ReturnServices.receive#ReturnItem" in-map="[returnId:idMap.returnId,
                         returnItemSeqId:idMap.returnItemSeqId, receivedQuantity:quantityAccepted]"/>
             </iterate>
 
@@ -481,7 +481,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <econdition field-name="returnId"/></entity-find>
             <set field="shipmentIdSet" from="new TreeSet(shipmentItemSourceList*.shipmentId)"/>
             <iterate list="shipmentIdSet" entry="shipmentId">
-                <service-call name="co.hotwax.shipment.ShipmentServices.cancel#Shipment"
+                <service-call name="mantle.shipment.ShipmentServices.cancel#Shipment"
                         in-map="[shipmentId:shipmentId, undoIssueReceive:false]"/>
                 <message>Canceled return shipment ${shipmentId}</message>
             </iterate>
@@ -491,12 +491,12 @@ along with this software (see the LICENSE.md file). If not, see
                 <econdition field-name="returnId"/></entity-find>
             <iterate list="returnItemList" entry="returnItem">
                 <if condition="!(returnItem.statusId in ['ReturnApproved', 'ReturnShipped'])"><continue/></if>
-                <service-call name="co.hotwax.order.ReturnServices.receive#ReturnItem" out-map="context" in-map="[returnId:returnId,
+                <service-call name="mantle.order.ReturnServices.receive#ReturnItem" out-map="context" in-map="[returnId:returnId,
                     returnItemSeqId:returnItem.returnItemSeqId, receivedQuantity:(returnItem.returnQuantity - (returnItem.receivedQuantity ?: 0.0))]"/>
             </iterate>
 
             <!-- process item responses -->
-            <service-call name="co.hotwax.order.ReturnServices.process#ReturnItemResponses" in-map="[returnId:returnId]"/>
+            <service-call name="mantle.order.ReturnServices.process#ReturnItemResponses" in-map="[returnId:returnId]"/>
         </actions>
     </service>
     <service verb="receive" noun="ReturnItem">
@@ -543,20 +543,20 @@ along with this software (see the LICENSE.md file). If not, see
             </iterate>
 
             <!-- if all items received update header status to Received -->
-            <service-call name="co.hotwax.order.ReturnServices.checkUpdate#ReturnHeaderStatus" in-map="[returnId:returnId,
+            <service-call name="mantle.order.ReturnServices.checkUpdate#ReturnHeaderStatus" in-map="[returnId:returnId,
                     statusId:'ReturnReceived', itemStatusIds:['ReturnReceived', 'ReturnManResp', 'ReturnCompleted', 'ReturnCancelled']]"/>
 
             <!-- if returnResponseEnumId=RrspManual and not already processed, set statusId to ReturnManResp, and on header too -->
             <if condition="returnItem.returnResponseEnumId == 'RrspManual' &amp;&amp; !returnItem.responseDate">
                 <service-call name="update#mantle.order.return.ReturnItem" in-map="[returnId:returnId,
                         returnItemSeqId:returnItemSeqId, statusId:'ReturnManResp']"/>
-                <service-call name="co.hotwax.order.ReturnServices.checkUpdate#ReturnHeaderStatus" in-map="[returnId:returnId,
+                <service-call name="mantle.order.ReturnServices.checkUpdate#ReturnHeaderStatus" in-map="[returnId:returnId,
                         statusId:'ReturnManResp', itemStatusIds:['ReturnReceived', 'ReturnManResp', 'ReturnCancelled']]"/>
             </if>
 
             <!-- if response already processed (responseDate set) status to ReturnCompleted, and on header too -->
             <if condition="hasResponse">
-                <service-call name="co.hotwax.order.ReturnServices.complete#ReturnItem"
+                <service-call name="mantle.order.ReturnServices.complete#ReturnItem"
                         in-map="[returnId:returnId, returnItemSeqId:returnItemSeqId]"/>
             </if>
         </actions>
@@ -567,7 +567,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <service-call name="update#mantle.order.return.ReturnItem" in-map="[returnId:returnId,
                     returnItemSeqId:returnItemSeqId, statusId:'ReturnCompleted']"/>
-            <service-call name="co.hotwax.order.ReturnServices.checkUpdate#ReturnHeaderStatus" in-map="[returnId:returnId,
+            <service-call name="mantle.order.ReturnServices.checkUpdate#ReturnHeaderStatus" in-map="[returnId:returnId,
                     statusId:'ReturnCompleted', itemStatusIds:['ReturnCompleted', 'ReturnCancelled']]"/>
         </actions>
     </service>
@@ -636,16 +636,16 @@ along with this software (see the LICENSE.md file). If not, see
                     <!-- create ReturnItemBilling records to connect ReturnItem and InvoiceItem -->
 
                     <!-- create return credit memo Invoice if needed -->
-                    <if condition="!returnInvoiceId">
+                    <!--<if condition="!returnInvoiceId">
                         <service-call name="co.hotwax.account.InvoiceServices.create#Invoice" out-map="returnInvoiceOut" out-map-add-to-existing="false"
                                 in-map="[fromPartyId:returnHeader.customerPartyId, toPartyId:returnHeader.vendorPartyId,
                                     invoiceTypeEnumId:'InvoiceReturn', invoiceDate:responseDate, currencyUomId:returnHeader.currencyUomId]"/>
                         <set field="returnInvoiceId" from="returnInvoiceOut.invoiceId"/>
-                    </if>
+                    </if>-->
                     <!-- create return credit memo InvoiceItem -->
-                    <service-call name="co.hotwax.account.InvoiceServices.create#InvoiceItem" out-map="retInvItemOut" out-map-add-to-existing="false"
+                    <!--<service-call name="co.hotwax.account.InvoiceServices.create#InvoiceItem" out-map="retInvItemOut" out-map-add-to-existing="false"
                             in-map="[invoiceId:returnInvoiceId, itemTypeEnumId:returnItem.itemTypeEnumId, description:returnItem.description,
-                                quantity:itemQuantity, amount:itemAmount, productId:returnItem.productId]"/>
+                                quantity:itemQuantity, amount:itemAmount, productId:returnItem.productId]"/>-->
                     <!-- create ReturnItemBilling -->
                     <!-- TODO populate assetReceiptId -->
                     <service-call name="create#mantle.order.return.ReturnItemBilling" in-map="[returnId:returnId,
@@ -677,7 +677,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <set field="returnItem.responseDate" from="responseDate"/>
                 </iterate>
 
-                <if condition="creditTotal">
+                <!--<if condition="creditTotal">
                     <set field="finAccountId" from="returnHeader.finAccountId"/>
                     <if condition="!finAccountId">
                         <service-call name="co.hotwax.account.FinancialAccountServices.getOrCreate#FinancialAccount"
@@ -685,27 +685,27 @@ along with this software (see the LICENSE.md file). If not, see
                                 organizationPartyId:returnHeader.vendorPartyId]" out-map="context"/>
                     </if>
 
-                    <!-- create the FA Payment -->
-                    <service-call name="co.hotwax.account.PaymentServices.create#Payment" out-map="faPaymentOut" out-map-add-to-existing="false"
+                    &lt;!&ndash; create the FA Payment &ndash;&gt;
+                    &lt;!&ndash;<service-call name="co.hotwax.account.PaymentServices.create#Payment" out-map="faPaymentOut" out-map-add-to-existing="false"
                             in-map="[paymentTypeEnumId:'PtInvoicePayment', statusId:'PmntAuthorized',
                                 paymentInstrumentEnumId:'PiFinancialAccount', finAccountId:finAccountId, effectiveDate:responseDate,
                                 fromPartyId:returnHeader.vendorPartyId, toPartyId:returnHeader.customerPartyId,
                                 amount:creditTotal, amountUomId:returnHeader.currencyUomId, forInvoiceId:returnInvoiceId]"/>
-                    <!-- deliver the FA Payment via FA Trans; NOTE: could also do via SECA on set payment status to Delivered -->
+                    &lt;!&ndash; deliver the FA Payment via FA Trans; NOTE: could also do via SECA on set payment status to Delivered &ndash;&gt;
                     <service-call name="co.hotwax.account.FinancialAccountServices.checkCreate#PaymentTrans" out-map="faTxOut" out-map-add-to-existing="false"
-                            in-map="[paymentId:faPaymentOut.paymentId, reasonEnumId:'FatrCsCredit']"/>
+                            in-map="[paymentId:faPaymentOut.paymentId, reasonEnumId:'FatrCsCredit']"/>&ndash;&gt;
 
-                    <!-- set finAccountTransId and update all credit return items -->
+                    &lt;!&ndash; set finAccountTransId and update all credit return items &ndash;&gt;
                     <iterate list="faItemList" entry="returnItem">
                         <set field="returnItem.finAccountTransId" from="faTxOut.finAccountTransId"/>
                         <set field="returnItem.refundPaymentId" from="faPaymentOut.paymentId"/>
                         <entity-update value-field="returnItem"/>
 
                         <if condition="returnItem.statusId == 'ReturnReceived'">
-                            <service-call name="co.hotwax.order.ReturnServices.complete#ReturnItem"
+                            <service-call name="mantle.order.ReturnServices.complete#ReturnItem"
                                     in-map="[returnId:returnId, returnItemSeqId:returnItem.returnItemSeqId]"/></if>
                     </iterate>
-                </if>
+                </if>-->
             </if>
 
             <!-- Refund (Payment); consolidate for checks -->
@@ -759,18 +759,18 @@ along with this software (see the LICENSE.md file). If not, see
                     -->
 
                     <!-- NOTE: don't specify paymentInstrumentEnumId, create#Payment will determine from toPaymentMethodId or default to PiCompanyCheck (paymentInstrumentEnumId:'PiCompanyCheck',) -->
-                    <service-call name="co.hotwax.account.PaymentServices.create#Payment" out-map="refundPmntOut" out-map-add-to-existing="false"
+                    <!--<service-call name="co.hotwax.account.PaymentServices.create#Payment" out-map="refundPmntOut" out-map-add-to-existing="false"
                         in-map="[paymentTypeEnumId:'PtRefund', statusId:'PmntPromised',
                             fromPartyId:returnHeader.vendorPartyId, toPartyId:returnHeader.customerPartyId,
                             paymentMethodId:paymentMethodId, toPaymentMethodId:returnHeader.paymentMethodId,
-                            amount:paymentTotal, amountUomId:returnHeader.currencyUomId, forInvoiceId:returnInvoiceId]"/>
+                            amount:paymentTotal, amountUomId:returnHeader.currencyUomId, forInvoiceId:returnInvoiceId]"/>-->
 
                     <iterate list="paymentItemList" entry="returnItem">
                         <set field="returnItem.refundPaymentId" from="refundPmntOut.paymentId"/>
                         <entity-update value-field="returnItem"/>
 
                         <if condition="returnItem.statusId == 'ReturnReceived'">
-                            <service-call name="co.hotwax.order.ReturnServices.complete#ReturnItem"
+                            <service-call name="mantle.order.ReturnServices.complete#ReturnItem"
                                     in-map="[returnId:returnId, returnItemSeqId:returnItem.returnItemSeqId]"/></if>
                     </iterate>
 
@@ -798,11 +798,11 @@ along with this software (see the LICENSE.md file). If not, see
                 </iterate>
 
                 <if condition="approvedItemSet">
-                    <service-call name="co.hotwax.order.OrderServices.create#Order" out-map="approvedOrderOut"
+                    <service-call name="mantle.order.OrderServices.create#Order" out-map="approvedOrderOut"
                             in-map="[vendorPartyId:returnHeader.vendorPartyId, customerPartyId:returnHeader.customerPartyId]"/>
                 </if>
                 <if condition="placedItemSet">
-                    <service-call name="co.hotwax.order.OrderServices.create#Order" out-map="placedOrderOut"
+                    <service-call name="mantle.order.OrderServices.create#Order" out-map="placedOrderOut"
                             in-map="[vendorPartyId:returnHeader.vendorPartyId, customerPartyId:returnHeader.customerPartyId]"/>
                 </if>
 
@@ -810,7 +810,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <set field="replaceOrderId" from="approvedItemSet.contains(returnItem.returnItemSeqId) ? approvedOrderOut.orderId : placedOrderOut.orderId"/>
                     <set field="itemQuantity" from="returnItem.receivedQuantity ?: returnItem.returnQuantity"/>
 
-                    <service-call name="co.hotwax.order.OrderServices.add#OrderProductQuantity"
+                    <service-call name="mantle.order.OrderServices.add#OrderProductQuantity"
                             in-map="[orderId:replaceOrderId, productId:(returnItem.replacementProductId ?: returnItem.productId),
                                 quantity:itemQuantity, unitAmount:0.0]"/>
 
@@ -819,28 +819,28 @@ along with this software (see the LICENSE.md file). If not, see
                     <entity-update value-field="returnItem"/>
 
                     <if condition="returnItem.statusId == 'ReturnReceived'">
-                        <service-call name="co.hotwax.order.ReturnServices.complete#ReturnItem"
+                        <service-call name="mantle.order.ReturnServices.complete#ReturnItem"
                                 in-map="[returnId:returnId, returnItemSeqId:returnItem.returnItemSeqId]"/></if>
                 </iterate>
 
                 <if condition="approvedOrderOut">
-                    <service-call name="co.hotwax.order.OrderServices.set#OrderBillingShippingInfo"
+                    <service-call name="mantle.order.OrderServices.set#OrderBillingShippingInfo"
                             in-map="[orderId:approvedOrderOut.orderId, shippingPostalContactMechId:returnHeader.postalContactMechId,
                             shippingTelecomContactMechId:returnHeader.telecomContactMechId,
                             shippingFacilityId:returnHeader.facilityId, carrierPartyId:returnHeader.carrierPartyId,
                             shipmentMethodEnumId:returnHeader.shipmentMethodEnumId]"/>
                     <!-- place and approve order, come from here ready to ship -->
-                    <service-call name="co.hotwax.order.OrderServices.place#Order" in-map="[orderId:approvedOrderOut.orderId]"/>
-                    <service-call name="co.hotwax.order.OrderServices.approve#Order" in-map="[orderId:approvedOrderOut.orderId]"/>
+                    <service-call name="mantle.order.OrderServices.place#Order" in-map="[orderId:approvedOrderOut.orderId]"/>
+                    <service-call name="mantle.order.OrderServices.approve#Order" in-map="[orderId:approvedOrderOut.orderId]"/>
                 </if>
                 <if condition="placedOrderOut">
-                    <service-call name="co.hotwax.order.OrderServices.set#OrderBillingShippingInfo"
+                    <service-call name="mantle.order.OrderServices.set#OrderBillingShippingInfo"
                             in-map="[orderId:placedOrderOut.orderId, shippingPostalContactMechId:returnHeader.postalContactMechId,
                             shippingTelecomContactMechId:returnHeader.telecomContactMechId,
                             shippingFacilityId:returnHeader.facilityId, carrierPartyId:returnHeader.carrierPartyId,
                             shipmentMethodEnumId:returnHeader.shipmentMethodEnumId]"/>
                     <!-- place order only, will be approved later -->
-                    <service-call name="co.hotwax.order.OrderServices.place#Order" in-map="[orderId:placedOrderOut.orderId]"/>
+                    <service-call name="mantle.order.OrderServices.place#Order" in-map="[orderId:placedOrderOut.orderId]"/>
                 </if>
             </if>
 
@@ -862,7 +862,7 @@ along with this software (see the LICENSE.md file). If not, see
                         </if>
                     </iterate>
                     <if condition="approveOrder">
-                        <service-call name="co.hotwax.order.OrderServices.approve#Order" in-map="[orderId:originalReplacementOrderId]"/>
+                        <service-call name="mantle.order.OrderServices.approve#Order" in-map="[orderId:originalReplacementOrderId]"/>
                     </if>
                 </if>
             </iterate>
@@ -887,7 +887,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <econdition field-name="parentItemSeqId" operator="is-null"/>
             </entity-find>
             <iterate list="returnItemList" entry="returnItem">
-                <service-call name="co.hotwax.order.ReturnServices.cancel#ReturnItem" out-map="itemOut"
+                <service-call name="mantle.order.ReturnServices.cancel#ReturnItem" out-map="itemOut"
                         in-map="[returnId:returnId, returnItemSeqId:returnItem.returnItemSeqId]"/>
             </iterate>
 
@@ -919,7 +919,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <econdition field-name="parentItemSeqId" from="returnItemSeqId"/>
             </entity-find>
             <iterate list="childItemList" entry="childItem">
-                <service-call name="co.hotwax.order.ReturnServices.cancel#ReturnItem" out-map="itemOut"
+                <service-call name="mantle.order.ReturnServices.cancel#ReturnItem" out-map="itemOut"
                         in-map="[returnId:returnId, returnItemSeqId:childItem.returnItemSeqId]"/>
             </iterate>
 
@@ -953,7 +953,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <econdition field-name="parentItemSeqId" from="returnItemSeqId"/>
                 </entity-find>
                 <iterate list="childItemList" entry="childItem">
-                    <service-call name="co.hotwax.order.ReturnServices.update#ReturnItem"
+                    <service-call name="mantle.order.ReturnServices.update#ReturnItem"
                             in-map="[returnId:returnId, returnItemSeqId:childItem.returnItemSeqId, responseImmediate:responseImmediate]"/>
                 </iterate>
             </if>
@@ -982,7 +982,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <econdition field-name="parentItemSeqId" from="returnItemSeqId"/>
             </entity-find>
             <iterate list="childItemList" entry="childItem">
-                <service-call name="co.hotwax.order.ReturnServices.delete#ReturnItem"
+                <service-call name="mantle.order.ReturnServices.delete#ReturnItem"
                         in-map="[returnId:returnId, returnItemSeqId:childItem.returnItemSeqId]"/>
             </iterate>
 
@@ -1031,7 +1031,7 @@ along with this software (see the LICENSE.md file). If not, see
             <set field="carrierPartyId" from="returnHeader.carrierPartyId"/>
 
             <!-- create Shipment and ShipmentRouteSegment records, get shipmentId -->
-            <service-call name="co.hotwax.shipment.ShipmentServices.create#Shipment" out-map="context"
+            <service-call name="mantle.shipment.ShipmentServices.create#Shipment" out-map="context"
                     in-map="context + [shipmentTypeEnumId:shipmentTypeEnumId,
                         fromPartyId:returnHeader.customerPartyId, toPartyId:returnHeader.vendorPartyId]"/>
 
@@ -1044,7 +1044,7 @@ along with this software (see the LICENSE.md file). If not, see
                                 shipmentRouteSegmentSeqId:shipmentRouteSegmentSeqId]"/>
             </if>
 
-            <service-call name="co.hotwax.order.ReturnServices.add#ReturnToShipment"
+            <service-call name="mantle.order.ReturnServices.add#ReturnToShipment"
                     in-map="[shipmentId:shipmentId, returnId:returnId]"/>
         </actions>
     </service>
@@ -1135,8 +1135,8 @@ along with this software (see the LICENSE.md file). If not, see
             <parameter name="newShipmentId"/>
         </out-parameters>
         <actions>
-            <service-call name="co.hotwax.order.ReturnServices.return#Shipment" in-map="context" out-map="context"/>
-            <service-call name="co.hotwax.order.ReturnServices.resell#Shipment" in-map="context" out-map="context"/>
+            <service-call name="mantle.order.ReturnServices.return#Shipment" in-map="context" out-map="context"/>
+            <service-call name="mantle.order.ReturnServices.resell#Shipment" in-map="context" out-map="context"/>
             <message>Shipment ${shipmentId} returned in Return ${returnId}, resold in Order ${newOrderId} and inventory issued to Shipment ${newShipmentId}</message>
         </actions>
     </service>
@@ -1182,7 +1182,7 @@ along with this software (see the LICENSE.md file). If not, see
             </else></if>
 
             <!-- create ReturnHeader -->
-            <service-call name="co.hotwax.order.ReturnServices.create#Return" out-map="context"
+            <service-call name="mantle.order.ReturnServices.create#Return" out-map="context"
                     in-map="[vendorPartyId:vendorPartyId, customerPartyId:customerPartyId, facilityId:facilityId,
                         postalContactMechId:postalContactMechId, telecomContactMechId:telecomContactMechId]"/>
 
@@ -1190,7 +1190,7 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find entity-name="mantle.shipment.ShipmentItemSource" list="sisList">
                 <econdition field-name="shipmentId"/></entity-find>
             <iterate list="sisList" entry="sis">
-                <service-call name="co.hotwax.order.ReturnServices.add#OrderItemToReturn" in-map="[returnId:returnId,
+                <service-call name="mantle.order.ReturnServices.add#OrderItemToReturn" in-map="[returnId:returnId,
                         orderId:sis.orderId, orderItemSeqId:sis.orderItemSeqId, returnQuantity:sis.quantity,
                         returnReasonEnumId:returnReasonEnumId, returnResponseEnumId:returnResponseEnumId,
                         responseImmediate:responseImmediate]"/>
@@ -1231,7 +1231,7 @@ along with this software (see the LICENSE.md file). If not, see
             <!-- NOTE: don't set postalContactMechId or telecomContactMechId, those were for the other customer -->
 
             <!-- create Order -->
-            <service-call name="co.hotwax.order.OrderServices.create#Order" out-map="ordOut"
+            <service-call name="mantle.order.OrderServices.create#Order" out-map="ordOut"
                     in-map="[vendorPartyId:vendorPartyId, customerPartyId:customerPartyId, facilityId:facilityId]"/>
             <set field="newOrderId" from="ordOut.orderId"/>
 
@@ -1239,12 +1239,12 @@ along with this software (see the LICENSE.md file). If not, see
             <entity-find entity-name="mantle.shipment.ShipmentItem" list="shipmentItemList">
                 <econdition field-name="shipmentId"/></entity-find>
             <iterate list="shipmentItemList" entry="shipmentItem">
-                <service-call name="co.hotwax.order.OrderServices.add#OrderProductQuantity" in-map="[orderId:newOrderId,
+                <service-call name="mantle.order.OrderServices.add#OrderProductQuantity" in-map="[orderId:newOrderId,
                         productId:shipmentItem.productId, quantity:shipmentItem.quantity]"/>
             </iterate>
 
             <!-- create new shipment for order -->
-            <service-call name="co.hotwax.shipment.ShipmentServices.create#OrderPartShipment"
+            <service-call name="mantle.shipment.ShipmentServices.create#OrderPartShipment"
                     in-map="[orderId:ordOut.orderId, orderPartSeqId:ordOut.orderPartSeqId]" out-map="shipOut"/>
             <set field="newShipmentId" from="shipOut.shipmentId"/>
 
@@ -1252,7 +1252,7 @@ along with this software (see the LICENSE.md file). If not, see
             <service-call name="update#mantle.shipment.Shipment" in-map="[shipmentId:shipmentId, statusId:'ShipRejected']"/>
 
             <!-- reallocate inventory to new shipment -->
-            <service-call name="co.hotwax.product.AssetServices.move#IssuancesToNewShipment"
+            <service-call name="mantle.product.AssetServices.move#IssuancesToNewShipment"
                     in-map="[shipmentId:shipmentId, newOrderId:newOrderId, newShipmentId:newShipmentId]"/>
 
             <!-- set shipment picked (don't set to packed until after manual order update, set prices/etc as needed) -->

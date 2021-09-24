@@ -83,7 +83,7 @@
                 2. Creates new records for AssetDetail with the quantityChange. -->
             <!-- Note: For now, using the default pick location to record inventory for the facility;
                  added to use the pick location for fulfillment, to update later as required -->
-            <service-call name="co.hotwax.product.AssetServices.record#PhysicalInventoryQuantity"
+            <service-call name="mantle.product.AssetServices.record#PhysicalInventoryQuantity"
                     in-map="context + [locationSeqId:'DEFAULT_PICK_LOC']" out-map="context"/>
 
             <!-- Set external id out parameters -->
@@ -183,7 +183,7 @@
 
             <set field="result" from="[]"/>
             <iterate list="facilityList" entry="facility">
-                <service-call name="co.hotwax.product.AssetServices.get#AvailableInventory" out-map="inventoryOut"
+                <service-call name="mantle.product.AssetServices.get#AvailableInventory" out-map="inventoryOut"
                         in-map="[productId:productId, facilityId:facility.facilityId]" />
                 <set field="inventoryInfo" from="[productId:productId, sku:productList[0].pseudoId,
                     facilityId:facility.facilityId, locationId:facility.pseudoId,

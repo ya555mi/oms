@@ -261,7 +261,7 @@
                     1. check for existing features,
                     2. Creates ProductFeature if not existing, and
                     3. Applies the features to the Product -->
-                <service-call name="co.hotwax.product.ProductServices.create#ProductFeature" out-map="context"
+                <service-call name="mantle.product.ProductServices.create#ProductFeature" out-map="context"
                               in-map="[productId:productId, description:productFeature.description,
                         productFeatureTypeEnumId:productFeature.type, ownerPartyId:'_NA_']"/>
             </iterate>

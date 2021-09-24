@@ -123,7 +123,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <service-call name="create#mantle.party.communication.CommunicationEventContent" in-map="context" out-map="context"/>
             <if condition="contentFile != null &amp;&amp; contentFile.size &gt; 0">
-                <service-call name="co.hotwax.party.CommunicationServices.save#CommunicationEventContentFile" in-map="context"/></if>
+                <service-call name="mantle.party.CommunicationServices.save#CommunicationEventContentFile" in-map="context"/></if>
         </actions>
     </service>
 
@@ -137,7 +137,7 @@ along with this software (see the LICENSE.md file). If not, see
         <actions>
             <if condition="contentFile != null &amp;&amp; contentFile.size &gt; 0">
                 <entity-find-one entity-name="mantle.party.communication.CommunicationEventContent" value-field="communicationEventContent"/>
-                <service-call name="co.hotwax.party.CommunicationServices.save#CommunicationEventContentFile" out-map="context"
+                <service-call name="mantle.party.CommunicationServices.save#CommunicationEventContentFile" out-map="context"
                               in-map="context + [communicationEventId:communicationEventContent.communicationEventId, saveContentLocation:false]"/>
             </if>
             <service-call name="update#mantle.party.communication.CommunicationEventContent" in-map="context"/>
