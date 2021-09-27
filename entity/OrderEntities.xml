@@ -251,7 +251,6 @@ along with this software (see the LICENSE.md file). If not, see
                     <detail relationship="issuances"/>
                     <detail relationship="receipts"/>
                     <detail relationship="shipmentSources"/>
-                    <detail relationship="billings"/>
                 </detail>
                 <detail relationship="parties">
                     <!-- NOTE: Party is also a master entity, could use mechanism to inherit detail but better to
