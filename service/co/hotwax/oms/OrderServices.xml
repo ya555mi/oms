@@ -915,6 +915,7 @@
         </out-parameters>
         <actions>
             <entity-find-one entity-name="mantle.order.OrderHeader" value-field="order"/>
+            <log message="=====order==${order}="/>
             <if condition="order.statusId in ['OrderCancelled','OrderCompleted']">
                 <return error="true" message="Found order [${orderId}] in status ${order.statusId}, cannot be updated"/>
             </if>
