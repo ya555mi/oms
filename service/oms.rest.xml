@@ -41,7 +41,7 @@
     </resource>
 
     <resource name="facilities">
-        <method type="post"><service name="co.hotwax.oms.FacilityServices.create#Facility"/></method>
+        <method type="post"><service name="co.hotwax.oms.FacilityServices.store#Facility"/></method>
         <method type="get"><service name="co.hotwax.oms.FacilityServices.find#Facilities"/></method>
 
         <id name="locationId">

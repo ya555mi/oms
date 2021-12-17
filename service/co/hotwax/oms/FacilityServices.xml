@@ -2,10 +2,9 @@
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
 
     <!-- Create Facility -->
-    <service verb="create" noun="Facility">
+    <service verb="store" noun="Facility">
         <description>
-            Allows a fulfillment location to be created with basic location data.
-            Also creates the primary address for the location if provided in the request.
+            Store (create/update) the fulfillment location with basic location and address data.
         </description>
         <in-parameters>
             <parameter name="locationId" required="true">
@@ -39,6 +38,12 @@
             <parameter name="postalCode">
                 <description>The postal code for the address.</description>
             </parameter>
+            <parameter name="latitude" type="BigDecimal">
+                <description>The geographic coordinate representing the latitude for the address.</description>
+            </parameter>
+            <parameter name="longitude" type="BigDecimal">
+                <description>The geographic coordinate representing the longitude for the address.</description>
+            </parameter>
         </in-parameters>
         <out-parameters>
             <parameter name="locationId">
@@ -49,15 +54,43 @@
             </parameter>
         </out-parameters>
         <actions>
-            <!-- Using OOTB create#Facility -->
-            <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="context"
-                    in-map="context + [pseudoId:locationId, facilityName:locationName,
-                    facilityTypeEnumId:locationType]"/>
+            <!-- If no ownerPartyId value incoming, set from the default product store -->
+            <if condition="!ownerPartyId">
+                <!-- get ProductStore ID from ProductStoreSetting of hostname-->
+                <service-call name="co.hotwax.oms.StoreServices.get#ProductStoreIdFromHostName"
+                        in-map="[requestHostName:ec.web?.getHostName(false) ?: 'localhost']" out-map="productStoreIdContext"/>
+                <set field="defaultProductStoreId" from="productStoreIdContext?.productStoreId"/>
 
-            <!-- Creating default pick location for the facility -->
-            <service-call name="mantle.facility.FacilityServices.create#FacilityLocation" out-map="context"
-                    in-map="[facilityId:facilityId, locationSeqId:'DEFAULT_PICK_LOC',
-                    locationTypeEnumId:'FltPick']"/>
+                <entity-find-one entity-name="mantle.product.store.ProductStore" value-field="defaultProductStore">
+                    <field-map field-name="productStoreId" from="defaultProductStoreId"/>
+                </entity-find-one>
+                <set field="ownerPartyId" from="defaultProductStore?.organizationPartyId"/>
+            </if>
+
+            <!-- Create/Update Facility -->
+            <!-- Check if facility existing for the locationId -->
+            <entity-find entity-name="mantle.facility.Facility" list="facilityList">
+                <econdition field-name="pseudoId" from="locationId"/>
+            </entity-find>
+
+            <if condition="facilityList"><then>
+                <set field="facilityId" from="facilityList.first?.facilityId"/>
+                <!-- Using OOTB update#Facility -->
+                <service-call name="mantle.facility.FacilityServices.update#Facility" out-map="context"
+                        in-map='context + [facilityId:facilityId, facilityName:locationName,
+                        facilityTypeEnumId:locationType]'/>
+            </then><else>
+                <!-- Using OOTB create#Facility -->
+                <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="context"
+                        in-map='context + [pseudoId:locationId, facilityName:locationName,
+                        facilityTypeEnumId:locationType]'/>
+
+                <!-- Creating default pick location when new facility created -->
+                <service-call name="mantle.facility.FacilityServices.create#FacilityLocation" out-map="context"
+                        in-map="[facilityId:facilityId, locationSeqId:'DEFAULT_PICK_LOC',
+                        locationTypeEnumId:'FltPick']"/>
+            </else>
+            </if>
         </actions>
     </service>
 
