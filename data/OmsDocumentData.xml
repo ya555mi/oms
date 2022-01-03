@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed-initial">
+
+    <!-- ========== Facility Document Data ========== -->
+    <dataDocuments dataDocumentId="FacilityDataDocument" indexName="facility" documentName="Facility"
+            primaryEntityName="mantle.facility.Facility" documentTitle="${facilityId}">
+        <fields fieldSeqId="01" fieldPath="facilityId"/>
+        <fields fieldSeqId="02" fieldPath="pseudoId"/>
+        <fields fieldSeqId="03" fieldPath="facilityName"/>
+        <fields fieldSeqId="04" fieldPath="facilityTypeEnumId"/>
+
+        <fields fieldSeqId="05" fieldPath="contactMechs:postalAddress:contactMechId"/>
+        <fields fieldSeqId="06" fieldPath="contactMechs:postalAddress:address1"/>
+        <fields fieldSeqId="07" fieldPath="contactMechs:postalAddress:city"/>
+        <fields fieldSeqId="08" fieldPath="contactMechs:postalAddress:postalCode"/>
+        <fields fieldSeqId="09" fieldPath="contactMechs:postalAddress:stateProvinceGeoId"/>
+        <fields fieldSeqId="10" fieldPath="contactMechs:postalAddress:stateProvinceGeo:geoName" fieldNameAlias="state"/>
+        <fields fieldSeqId="11" fieldPath="contactMechs:contactMech:postalAddress:countyGeoId"/>
+        <fields fieldSeqId="12" fieldPath="contactMechs:contactMech:postalAddress:countyGeo:geoName" fieldNameAlias="country"/>
+        <fields fieldSeqId="13" fieldPath="contactMechs:contactMech:telecomNumber:contactNumber"/>
+        <fields fieldSeqId="14" fieldPath="contactMechs:contactMechPurposeId"/>
+        <fields fieldSeqId="15" fieldPath="contactMechs:fromDate"/>
+        <fields fieldSeqId="16" fieldPath="contactMechs:thruDate"/>
+
+        <fields fieldSeqId="17" fieldPath="contactMechs:postalAddress:geoPoint:latitude" fieldNameAlias="latitude"/>
+        <fields fieldSeqId="18" fieldPath="contactMechs:postalAddress:geoPoint:longitude" fieldNameAlias="longitude"/>
+    </dataDocuments>
+
+    <!-- Search Data Feed for Facility -->
+    <moqui.entity.feed.DataFeed dataFeedId="FacilitySearch" dataFeedTypeEnumId="DTFDTP_RT_PUSH" indexOnStartEmpty="Y"
+            feedName="Oms Search Facility Data" feedReceiveServiceName="co.hotwax.oms.SearchServices.index#FacilityDataDocuments">
+        <documents dataDocumentId="FacilityDataDocument"/>
+    </moqui.entity.feed.DataFeed>
+</entity-facade-xml>

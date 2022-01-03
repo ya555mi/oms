@@ -1,0 +1,43 @@
+{
+  "properties": {
+    "storeCode": {
+      "type": "keyword"
+    },
+    "storeName": {
+      "type": "text"
+    },
+    "storeType": {
+      "type": "text"
+    },
+    "address1": {
+      "type": "text"
+    },
+    "city": {
+      "type": "text"
+    },
+    "countryCode": {
+      "type": "text"
+    },
+    "externalId": {
+      "type": "text"
+    },
+    "location": {
+      "type": "geo_point"
+    },
+    "phone": {
+      "type": "text"
+    },
+    "postalCode": {
+      "type": "text"
+    },
+    "state": {
+      "type": "text"
+    },
+    "stateCode": {
+      "type": "text"
+    },
+    "storePhone": {
+      "type": "text"
+    }
+  }
+}
