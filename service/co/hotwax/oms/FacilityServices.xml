@@ -44,6 +44,9 @@
             <parameter name="longitude" type="BigDecimal">
                 <description>The geographic coordinate representing the longitude for the address.</description>
             </parameter>
+            <parameter name="contactNumber">
+                <description>The contact number for the fulfillment location.</description>
+            </parameter>
         </in-parameters>
         <out-parameters>
             <parameter name="locationId">
