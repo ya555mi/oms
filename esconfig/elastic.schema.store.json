@@ -24,9 +24,6 @@
     "location": {
       "type": "geo_point"
     },
-    "phone": {
-      "type": "text"
-    },
     "postalCode": {
       "type": "text"
     },
