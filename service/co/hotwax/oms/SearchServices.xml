@@ -67,17 +67,17 @@
                 </if>
 
                 <set field="source" from="[storeCode:document.facilityId,
-                        storeName:document.facilityName,
-                        externalId:document.pseudoId,
-                        storeType:document.facilityTypeEnumId,
+                        storeName:document.storeName,
+                        externalId:document.externalId,
+                        storeType:document.storeType,
                         address1:postalAddress ? postalAddress.address1 : null,
                         city:postalAddress ? postalAddress.city : null,
-                        stateCode:postalAddress ? postalAddress.stateProvinceGeoId : null,
+                        stateCode:postalAddress ? postalAddress.stateCode : null,
                         state:postalAddress ? postalAddress.state : null,
-                        countryCode:postalAddress ? postalAddress.countyGeoId : null,
+                        countryCode:postalAddress ? postalAddress.countryCode : null,
                         country:postalAddress ? postalAddress.country : null,
                         postalCode:postalAddress ? postalAddress.postalCode : null,
-                        storePhone:telecomNumber ? telecomNumber.contactNumber : null]"/>
+                        storePhone:telecomNumber ? telecomNumber.storePhone : null]"/>
 
                 <if condition="postalAddress &amp;&amp; postalAddress.latitude &amp;&amp; postalAddress.longitude">
                     <set field="source.location" from="[lat:postalAddress.latitude, lon:postalAddress.longitude]"/>
