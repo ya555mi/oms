@@ -39,7 +39,7 @@
     </service>
 
     <!-- Index Facility -->
-    <service verb="index" noun="FacilityDataDocuments">
+    <service verb="index" noun="FacilityDataDocuments" authenticate="anonymous-all">
         <description>
             The service will index Facility data documents and handle the save of facility's
             latitude and longitude data if existing, to index in the geo_point type location field.
