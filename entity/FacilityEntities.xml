@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/entity-definition-2.1.xsd">
+
+    <!-- Extended Product Facility to store the inventory counts -->
+    <!-- Note: computedLastInventoryCount will be the count excluding the minimumStock in ProductFacility -->
+    <extend-entity entity-name="ProductFacility" package="mantle.facility">
+        <field name="lastInventoryCount" type="number-decimal"/>
+        <field name="computedLastInventoryCount" type="number-decimal"/>
+    </extend-entity>
+</entities>
