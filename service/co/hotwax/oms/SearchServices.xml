@@ -23,9 +23,6 @@
             <parameter name="aggregations"/>
         </out-parameters>
         <actions>
-            <log message="===== inside search#OmsData service ======"/>
-            <log message="=== indexName: ${indexName} ======="/>
-
             <script><![CDATA[
                 import groovy.json.JsonSlurper
                 try {
