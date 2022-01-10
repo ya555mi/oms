@@ -13,10 +13,10 @@
         <fields fieldSeqId="06" fieldPath="contactMechs:postalAddress:address1"/>
         <fields fieldSeqId="07" fieldPath="contactMechs:postalAddress:city"/>
         <fields fieldSeqId="08" fieldPath="contactMechs:postalAddress:postalCode"/>
-        <fields fieldSeqId="09" fieldPath="contactMechs:postalAddress:stateProvinceGeoId" fieldNameAlias="stateCode"/>
+        <fields fieldSeqId="09" fieldPath="contactMechs:postalAddress:stateProvinceGeo:geoCodeAlpha2" fieldNameAlias="stateCode"/>
         <fields fieldSeqId="10" fieldPath="contactMechs:postalAddress:stateProvinceGeo:geoName" fieldNameAlias="state"/>
-        <fields fieldSeqId="11" fieldPath="contactMechs:contactMech:postalAddress:countyGeoId" fieldNameAlias="countryCode"/>
-        <fields fieldSeqId="12" fieldPath="contactMechs:contactMech:postalAddress:countyGeo:geoName" fieldNameAlias="country"/>
+        <fields fieldSeqId="11" fieldPath="contactMechs:contactMech:postalAddress:countryGeo:geoCodeAlpha3" fieldNameAlias="countryCode"/>
+        <fields fieldSeqId="12" fieldPath="contactMechs:contactMech:postalAddress:countryGeo:geoName" fieldNameAlias="country"/>
         <fields fieldSeqId="13" fieldPath="contactMechs:contactMech:telecomNumber:contactNumber" fieldNameAlias="storePhone"/>
         <fields fieldSeqId="14" fieldPath="contactMechs:contactMechPurposeId"/>
         <fields fieldSeqId="15" fieldPath="contactMechs:fromDate"/>
