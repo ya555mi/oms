@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <entity-facade-xml type="seed-initial">
 
-    <!-- ========== Facility Document Data ========== -->
-    <dataDocuments dataDocumentId="FacilityDataDocument" indexName="facility" documentName="Facility"
+    <!-- ========== Store Document Data ========== -->
+    <dataDocuments dataDocumentId="OmsStore" indexName="store" documentName="Store"
             primaryEntityName="mantle.facility.Facility" documentTitle="${facilityId}">
         <fields fieldSeqId="01" fieldPath="facilityId"/>
         <fields fieldSeqId="02" fieldPath="pseudoId" fieldNameAlias="externalId"/>
@@ -26,9 +26,9 @@
         <fields fieldSeqId="18" fieldPath="contactMechs:postalAddress:geoPoint:longitude"/>
     </dataDocuments>
 
-    <!-- Search Data Feed for Facility -->
-    <moqui.entity.feed.DataFeed dataFeedId="FacilitySearch" dataFeedTypeEnumId="DTFDTP_RT_PUSH" indexOnStartEmpty="Y"
-            feedName="Oms Search Facility Data" feedReceiveServiceName="co.hotwax.oms.SearchServices.index#FacilityDataDocuments">
-        <documents dataDocumentId="FacilityDataDocument"/>
+    <!-- Search Data Feed for Stores -->
+        <moqui.entity.feed.DataFeed dataFeedId="StoreSearch" dataFeedTypeEnumId="DTFDTP_RT_PUSH" indexOnStartEmpty="Y"
+            feedName="Oms Search Store Data" feedReceiveServiceName="co.hotwax.oms.SearchServices.index#StoreDataDocuments">
+        <documents dataDocumentId="OmsStore"/>
     </moqui.entity.feed.DataFeed>
 </entity-facade-xml>

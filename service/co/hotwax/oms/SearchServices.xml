@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
 
-    <!-- Service to create mappings, added for manually creating index for stores
-            due to the use of geo_point type location field -->
+    <!-- Service to create mappings, added for manually creating index, also needed to create
+        mappings for stores due to the use of geo_point type location field -->
     <service verb="create" noun="Mappings" authenticate="anonymous-all">
         <in-parameters>
             <parameter name="clusterName" default-value="default"/>
@@ -30,7 +30,7 @@
                             def docMapping = (Map) new JsonSlurper().parse(file);
                             elasticClient.createIndex(index, docMapping, null)
                         } catch (Exception e) {
-                            ec.logger.log(ec.logger.ERROR_INT, "Error creating mappings", e)
+                            ec.message.addError("Error creating mappings : ${e.getMessage()}")
                         }
                     }
                 }
@@ -39,9 +39,9 @@
     </service>
 
     <!-- Index Facility -->
-    <service verb="index" noun="FacilityDataDocuments" authenticate="anonymous-all">
+    <service verb="index" noun="StoreDataDocuments" authenticate="anonymous-all">
         <description>
-            The service will index Facility data documents and handle the save of facility's
+            The service will index store data documents and handle the save of store's
             latitude and longitude data if existing, to index in the geo_point type location field.
         </description>
         <implements service="org.moqui.EntityServices.receive#DataFeed"/>
@@ -49,14 +49,14 @@
             <parameter name="clusterName" default-value="default"/>
         </in-parameters>
         <actions>
-            <set field="indexName" value="store"/>
             <set field="elasticClient" from="ec.factory.elastic.getClient(clusterName)"/>
             <if condition="elasticClient == null">
                 <return type="danger" message="No Elastic Client found, not creating mapping"/>
             </if>
 
             <iterate list="documentList" entry="document">
-                <log level="info" message="Running ${indexName} index service for: ${document.facilityId} "/>
+                <log message="=== document: ${document} ======"/>
+                <log level="info" message="Running ${document._index} index service for: ${document.facilityId} "/>
 
                 <set field="facilityContactMechs" from="document.contactMechs"/>
                 <if condition="facilityContactMechs">
@@ -85,9 +85,9 @@
 
                 <script><![CDATA[
                     try {
-                        elasticClient.index(indexName, document.facilityId, source)
+                        elasticClient.index(document._index, document.facilityId, source)
                     } catch (Exception e) {
-                        ec.logger.log(ec.logger.ERROR_INT, "Error creating index", e)
+                        ec.message.addError("Error creating index : ${e.getMessage()}")
                     }
                 ]]></script>
             </iterate>
