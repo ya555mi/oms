@@ -2,12 +2,12 @@
 <entity-facade-xml type="seed-initial">
 
     <!-- ========== Store Document Data ========== -->
-    <dataDocuments dataDocumentId="OmsStore" indexName="store" documentName="Store"
+    <dataDocuments dataDocumentId="StoreDataDocument" indexName="store" documentName="Store"
             primaryEntityName="mantle.facility.Facility" documentTitle="${facilityId}">
         <fields fieldSeqId="01" fieldPath="facilityId"/>
         <fields fieldSeqId="02" fieldPath="pseudoId" fieldNameAlias="externalId"/>
         <fields fieldSeqId="03" fieldPath="facilityName" fieldNameAlias="storeName"/>
-        <fields fieldSeqId="04" fieldPath="facilityTypeEnumId" fieldNameAlias="storeType"/>
+        <fields fieldSeqId="04" fieldPath="type:enumCode" fieldNameAlias="storeType"/>
 
         <fields fieldSeqId="05" fieldPath="contactMechs:postalAddress:contactMechId"/>
         <fields fieldSeqId="06" fieldPath="contactMechs:postalAddress:address1"/>
@@ -29,6 +29,6 @@
     <!-- Search Data Feed for Stores -->
         <moqui.entity.feed.DataFeed dataFeedId="StoreSearch" dataFeedTypeEnumId="DTFDTP_RT_PUSH" indexOnStartEmpty="Y"
             feedName="Oms Search Store Data" feedReceiveServiceName="co.hotwax.oms.SearchServices.index#StoreDataDocuments">
-        <documents dataDocumentId="OmsStore"/>
+        <documents dataDocumentId="StoreDataDocument"/>
     </moqui.entity.feed.DataFeed>
 </entity-facade-xml>
