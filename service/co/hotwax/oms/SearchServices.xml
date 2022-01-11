@@ -55,7 +55,6 @@
             </if>
 
             <iterate list="documentList" entry="document">
-                <log message="=== document: ${document} ======"/>
                 <log level="info" message="Running ${document._index} index service for: ${document.facilityId} "/>
 
                 <set field="facilityContactMechs" from="document.contactMechs"/>
