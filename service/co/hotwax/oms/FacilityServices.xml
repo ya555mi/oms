@@ -5,10 +5,17 @@
     <service verb="store" noun="Facility">
         <description>
             Store (create/update) the fulfillment location with basic location and address data.
+            The service will update the facility based on the provided facilityId, else will create
+            the new fulfillment location.
         </description>
         <in-parameters>
-            <parameter name="locationId" required="true">
-                <description>The unique ID of the fulfillment location in the external system.</description>
+            <parameter name="facilityId">
+                <description>The unique ID of the fulfillment location in OMS. If not provided in the
+                    request, the system will auto generate the unqiue facilityId.</description>
+            </parameter>
+            <parameter name="locationId">
+                <description>The unique ID of the fulfillment location in the external system. If not
+                    provided in the request, this will be set as facilityId in the system.</description>
             </parameter>
             <parameter name="locationName" required="true">
                 <description>The name of the fulfillment location.</description>
@@ -30,10 +37,10 @@
                 <description>The city where the address is located in.</description>
             </parameter>
             <parameter name="stateProvinceGeoId">
-                <description>The state code where the address is located in.</description>
+                <description>The ID of the state code where the address is located in.</description>
             </parameter>
             <parameter name="countryGeoId">
-                <description>The country code for the address.</description>
+                <description>The ID of the country code for the address.</description>
             </parameter>
             <parameter name="postalCode">
                 <description>The postal code for the address.</description>
@@ -49,11 +56,11 @@
             </parameter>
         </in-parameters>
         <out-parameters>
+            <parameter name="facilityId">
+                <description>The unique ID of the fulfillment location in OMS.</description>
+            </parameter>
             <parameter name="locationId">
                 <description>The unique ID of the fulfillment location in the external system.</description>
-            </parameter>
-            <parameter name="facilityId">
-                <description>The unique ID generated for the fulfillment location in the internal system.</description>
             </parameter>
         </out-parameters>
         <actions>
@@ -71,17 +78,17 @@
             </if>
 
             <!-- Create/Update Facility -->
-            <!-- Check if facility existing for the locationId -->
+            <!-- Check if facility existing -->
             <entity-find entity-name="mantle.facility.Facility" list="facilityList">
-                <econdition field-name="pseudoId" from="locationId"/>
+                <econdition field-name="facilityId"/>
             </entity-find>
 
-            <if condition="facilityList"><then>
+            <if condition="!facilityList.isEmpty()"><then>
                 <set field="facilityId" from="facilityList.first?.facilityId"/>
                 <!-- Using OOTB update#Facility -->
                 <service-call name="mantle.facility.FacilityServices.update#Facility" out-map="context"
-                        in-map='context + [facilityId:facilityId, facilityName:locationName,
-                        facilityTypeEnumId:locationType]'/>
+                        in-map='context + [pseudoId:locationId, facilityId:facilityId,
+                        facilityName:locationName, facilityTypeEnumId:locationType]'/>
             </then><else>
                 <!-- Using OOTB create#Facility -->
                 <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="context"
@@ -92,6 +99,8 @@
                 <service-call name="mantle.facility.FacilityServices.create#FacilityLocation" out-map="context"
                         in-map="[facilityId:facilityId, locationSeqId:'DEFAULT_PICK_LOC',
                         locationTypeEnumId:'FltPick']"/>
+                <set field="facilityId" from="context.facilityId"/>
+                <set field="locationId" from="context.facilityId"/>
             </else>
             </if>
         </actions>
