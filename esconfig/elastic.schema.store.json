@@ -1,0 +1,28 @@
+{
+  "properties": {
+    "storeCode": {
+      "type": "keyword"
+    },
+    "externalId": {
+      "type": "keyword"
+    },
+    "storeType": {
+      "type": "keyword"
+    },
+    "storePhone": {
+      "type": "keyword"
+    },
+    "location": {
+      "type": "geo_point"
+    },
+    "stateCode": {
+      "type": "keyword"
+    },
+    "countryCode": {
+      "type": "keyword"
+    },
+    "postalCode": {
+      "type": "keyword"
+    }
+  }
+}

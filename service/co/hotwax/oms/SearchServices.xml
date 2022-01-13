@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <!-- Service to create mappings, added for manually creating index, also needed to create
+        mappings for stores due to the use of geo_point type location field -->
+    <service verb="create" noun="Mappings" authenticate="anonymous-all">
+        <in-parameters>
+            <parameter name="clusterName" default-value="default"/>
+        </in-parameters>
+        <actions>
+            <set field="elasticClient" from="ec.factory.elastic.getClient(clusterName)"/>
+            <if condition="elasticClient == null">
+                <return type="danger" message="No Elastic Client found, not creating mapping"/>
+            </if>
+            <script><![CDATA[
+                import groovy.json.JsonSlurper;
+                // TODO Add logic to find in all the components and dynamically get configurations in esconfig
+                File esconfigs = new File((String) ec.factory.getRuntimePath() + "/component/oms/esconfig");
+
+                if (esconfigs.isDirectory()) {
+                    File[] files = esconfigs.listFiles();
+                    for (File file : files) {
+                        try {
+                            // File path is elastic.schema.<index name>.json.
+                            String filePath = file.getName();
+                            // Extracted <index name>.json
+                            String fileName = filePath.substring(filePath.substring(0, filePath.lastIndexOf(".")).lastIndexOf(".")+1);
+                            // Extracted <index name>
+                            String index = ((List) fileName.split("\\.")).get(0).toLowerCase();
+                            def docMapping = (Map) new JsonSlurper().parse(file);
+                            elasticClient.createIndex(index, docMapping, null)
+                        } catch (Exception e) {
+                            ec.message.addError("Error creating mappings : ${e.getMessage()}")
+                        }
+                    }
+                }
+            ]]></script>
+        </actions>
+    </service>
+
+    <!-- Index Facility -->
+    <service verb="index" noun="StoreDataDocuments" authenticate="anonymous-all">
+        <description>
+            The service will index store data documents and handle the save of store's
+            latitude and longitude data if existing, to index in the geo_point type location field.
+        </description>
+        <implements service="org.moqui.EntityServices.receive#DataFeed"/>
+        <in-parameters>
+            <parameter name="clusterName" default-value="default"/>
+        </in-parameters>
+        <actions>
+            <set field="elasticClient" from="ec.factory.elastic.getClient(clusterName)"/>
+            <if condition="elasticClient == null">
+                <return type="danger" message="No Elastic Client found, not creating mapping"/>
+            </if>
+
+            <iterate list="documentList" entry="document">
+                <log level="info" message="Running ${document._index} index service for: ${document.facilityId} "/>
+
+                <set field="facilityContactMechs" from="document.contactMechs"/>
+                <if condition="facilityContactMechs">
+                    <set field="nowTime" from="new Timestamp(System.currentTimeMillis())"/>
+                    <set field="postalAddress" from="facilityContactMechs.find({ 'PostalPrimary'.equals(it.contactMechPurposeId) &amp;&amp; (it.fromDate == null || it.fromDate.compareTo(nowTime) &lt;= 0) &amp;&amp; (it.thruDate == null || it.thruDate.compareTo(nowTime) &gt; 0) })"/>
+
+                    <set field="telecomNumber" from="facilityContactMechs.find({ 'PhonePrimary'.equals(it.contactMechPurposeId) &amp;&amp; (it.fromDate == null || it.fromDate.compareTo(nowTime) &lt;= 0) &amp;&amp; (it.thruDate == null || it.thruDate.compareTo(nowTime) &gt; 0) })"/>
+                </if>
+
+                <set field="source" from="[storeCode:document.facilityId,
+                        storeName:document.storeName,
+                        externalId:document.externalId,
+                        storeType:document.storeType,
+                        address1:postalAddress ? postalAddress.address1 : null,
+                        city:postalAddress ? postalAddress.city : null,
+                        stateCode:postalAddress ? postalAddress.stateCode : null,
+                        state:postalAddress ? postalAddress.state : null,
+                        countryCode:postalAddress ? postalAddress.countryCode : null,
+                        country:postalAddress ? postalAddress.country : null,
+                        postalCode:postalAddress ? postalAddress.postalCode : null,
+                        storePhone:telecomNumber ? telecomNumber.storePhone : null]"/>
+
+                <if condition="postalAddress &amp;&amp; postalAddress.latitude &amp;&amp; postalAddress.longitude">
+                    <set field="source.location" from="[lat:postalAddress.latitude, lon:postalAddress.longitude]"/>
+                </if>
+
+                <script><![CDATA[
+                    try {
+                        elasticClient.index(document._index, document.facilityId, source)
+                    } catch (Exception e) {
+                        ec.message.addError("Error creating index : ${e.getMessage()}")
+                    }
+                ]]></script>
+            </iterate>
+        </actions>
+    </service>
+</services>
