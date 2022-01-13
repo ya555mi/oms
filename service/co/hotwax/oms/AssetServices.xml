@@ -194,7 +194,7 @@
         </actions>
     </service>
 
-    <service verb="update" noun="InventoryCountFromDetail" authenticate="anonymous-all">
+    <service verb="update" noun="ProductInventory" authenticate="anonymous-all">
         <description>
             The service will update the inventory counts for a product at a facility based on the
             availableToPromiseDiff from Asset Detail, taking in consideration the minimum stock value
