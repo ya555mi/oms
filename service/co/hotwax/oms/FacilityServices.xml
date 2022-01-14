@@ -23,7 +23,6 @@
             <parameter name="locationType" default-value="FcTpRetailStore">
                 <description>The type of the fulfillment location.</description>
             </parameter>
-            <!-- TODO discuss the use of ownerPartyId field -->
             <parameter name="ownerPartyId">
                 <description>The ID of the vendor organization for the fulfillment location.</description>
             </parameter>
@@ -64,19 +63,6 @@
             </parameter>
         </out-parameters>
         <actions>
-            <!-- If no ownerPartyId value incoming, set from the default product store -->
-            <if condition="!ownerPartyId">
-                <!-- get ProductStore ID from ProductStoreSetting of hostname-->
-                <service-call name="co.hotwax.oms.StoreServices.get#ProductStoreIdFromHostName"
-                        in-map="[requestHostName:ec.web?.getHostName(false) ?: 'localhost']" out-map="productStoreIdContext"/>
-                <set field="defaultProductStoreId" from="productStoreIdContext?.productStoreId"/>
-
-                <entity-find-one entity-name="mantle.product.store.ProductStore" value-field="defaultProductStore">
-                    <field-map field-name="productStoreId" from="defaultProductStoreId"/>
-                </entity-find-one>
-                <set field="ownerPartyId" from="defaultProductStore?.organizationPartyId"/>
-            </if>
-
             <!-- Create/Update Facility -->
             <!-- Check if facility existing -->
             <entity-find entity-name="mantle.facility.Facility" list="facilityList">
@@ -86,21 +72,20 @@
             <if condition="!facilityList.isEmpty()"><then>
                 <set field="facilityId" from="facilityList.first?.facilityId"/>
                 <!-- Using OOTB update#Facility -->
-                <service-call name="mantle.facility.FacilityServices.update#Facility" out-map="context"
+                <service-call name="mantle.facility.FacilityServices.update#Facility" out-map="facilityOut"
                         in-map='context + [pseudoId:locationId, facilityId:facilityId,
                         facilityName:locationName, facilityTypeEnumId:locationType]'/>
             </then><else>
                 <!-- Using OOTB create#Facility -->
-                <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="context"
+                <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="facilityOut"
                         in-map='context + [pseudoId:locationId, facilityName:locationName,
                         facilityTypeEnumId:locationType]'/>
 
                 <!-- Creating default pick location when new facility created -->
                 <service-call name="mantle.facility.FacilityServices.create#FacilityLocation" out-map="context"
-                        in-map="[facilityId:facilityId, locationSeqId:'DEFAULT_PICK_LOC',
+                        in-map="[facilityId:facilityOut?.facilityId, locationSeqId:'DEFAULT_PICK_LOC',
                         locationTypeEnumId:'FltPick']"/>
-                <set field="facilityId" from="context.facilityId"/>
-                <set field="locationId" from="context.facilityId"/>
+                <set field="facilityId" from="facilityOut.facilityId"/>
             </else>
             </if>
         </actions>
