@@ -27,8 +27,24 @@
     </dataDocuments>
 
     <!-- Search Data Feed for Stores -->
-        <moqui.entity.feed.DataFeed dataFeedId="StoreSearch" dataFeedTypeEnumId="DTFDTP_RT_PUSH" indexOnStartEmpty="Y"
+    <moqui.entity.feed.DataFeed dataFeedId="StoreSearch" dataFeedTypeEnumId="DTFDTP_RT_PUSH" indexOnStartEmpty="Y"
             feedName="Oms Search Store Data" feedReceiveServiceName="co.hotwax.oms.SearchServices.index#StoreDataDocuments">
         <documents dataDocumentId="StoreDataDocument"/>
+    </moqui.entity.feed.DataFeed>
+
+    <!-- Product Facility Document Data -->
+    <dataDocuments dataDocumentId="ProductFacility" indexName="product_inventory" documentName="Product Facility"
+            primaryEntityName="mantle.facility.ProductFacility" documentTitle="${productId}:${facilityId}">
+        <fields fieldSeqId="01" fieldPath="productId"/>
+        <fields fieldSeqId="02" fieldPath="facilityId"/>
+        <fields fieldSeqId="03" fieldPath="minimumStock"/>
+        <fields fieldSeqId="04" fieldPath="lastInventoryCount"/>
+        <fields fieldSeqId="05" fieldPath="computedLastInventoryCount"/>
+    </dataDocuments>
+
+    <!-- Product Facility DataFeed -->
+    <moqui.entity.feed.DataFeed dataFeedId="ProductFacilitySearch" dataFeedTypeEnumId="DTFDTP_RT_PUSH"
+            feedName="Product Facility Search Data" feedReceiveServiceName="org.moqui.search.SearchServices.index#DataDocuments">
+        <documents dataDocumentId="ProductFacility"/>
     </moqui.entity.feed.DataFeed>
 </entity-facade-xml>
