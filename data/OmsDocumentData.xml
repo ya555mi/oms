@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-facade-xml type="seed-initial">
+
+    <!-- ========== Store Document Data ========== -->
+    <dataDocuments dataDocumentId="StoreDataDocument" indexName="store" documentName="Store"
+            primaryEntityName="mantle.facility.Facility" documentTitle="${facilityId}">
+        <fields fieldSeqId="01" fieldPath="facilityId"/>
+        <fields fieldSeqId="02" fieldPath="pseudoId" fieldNameAlias="externalId"/>
+        <fields fieldSeqId="03" fieldPath="facilityName" fieldNameAlias="storeName"/>
+        <fields fieldSeqId="04" fieldPath="type:enumCode" fieldNameAlias="storeType"/>
+
+        <fields fieldSeqId="05" fieldPath="contactMechs:postalAddress:contactMechId"/>
+        <fields fieldSeqId="06" fieldPath="contactMechs:postalAddress:address1"/>
+        <fields fieldSeqId="07" fieldPath="contactMechs:postalAddress:city"/>
+        <fields fieldSeqId="08" fieldPath="contactMechs:postalAddress:postalCode"/>
+        <fields fieldSeqId="09" fieldPath="contactMechs:postalAddress:stateProvinceGeo:geoCodeAlpha2" fieldNameAlias="stateCode"/>
+        <fields fieldSeqId="10" fieldPath="contactMechs:postalAddress:stateProvinceGeo:geoName" fieldNameAlias="state"/>
+        <fields fieldSeqId="11" fieldPath="contactMechs:contactMech:postalAddress:countryGeo:geoCodeAlpha3" fieldNameAlias="countryCode"/>
+        <fields fieldSeqId="12" fieldPath="contactMechs:contactMech:postalAddress:countryGeo:geoName" fieldNameAlias="country"/>
+        <fields fieldSeqId="13" fieldPath="contactMechs:contactMech:telecomNumber:contactNumber" fieldNameAlias="storePhone"/>
+        <fields fieldSeqId="14" fieldPath="contactMechs:contactMechPurposeId"/>
+        <fields fieldSeqId="15" fieldPath="contactMechs:fromDate"/>
+        <fields fieldSeqId="16" fieldPath="contactMechs:thruDate"/>
+
+        <fields fieldSeqId="17" fieldPath="contactMechs:postalAddress:geoPoint:latitude"/>
+        <fields fieldSeqId="18" fieldPath="contactMechs:postalAddress:geoPoint:longitude"/>
+    </dataDocuments>
+
+    <!-- Search Data Feed for Stores -->
+    <moqui.entity.feed.DataFeed dataFeedId="StoreSearch" dataFeedTypeEnumId="DTFDTP_RT_PUSH" indexOnStartEmpty="Y"
+            feedName="Oms Search Store Data" feedReceiveServiceName="co.hotwax.oms.SearchServices.index#StoreDataDocuments">
+        <documents dataDocumentId="StoreDataDocument"/>
+    </moqui.entity.feed.DataFeed>
+
+    <!-- Product Facility Document Data -->
+    <dataDocuments dataDocumentId="ProductFacility" indexName="product_inventory" documentName="Product Facility"
+            primaryEntityName="mantle.facility.ProductFacility" documentTitle="${productId}:${facilityId}">
+        <fields fieldSeqId="01" fieldPath="productId"/>
+        <fields fieldSeqId="02" fieldPath="facilityId"/>
+        <fields fieldSeqId="03" fieldPath="minimumStock"/>
+        <fields fieldSeqId="04" fieldPath="lastInventoryCount"/>
+        <fields fieldSeqId="05" fieldPath="computedLastInventoryCount"/>
+    </dataDocuments>
+
+    <!-- Product Facility DataFeed -->
+    <moqui.entity.feed.DataFeed dataFeedId="ProductFacilitySearch" dataFeedTypeEnumId="DTFDTP_RT_PUSH"
+            feedName="Product Facility Search Data" feedReceiveServiceName="org.moqui.search.SearchServices.index#DataDocuments">
+        <documents dataDocumentId="ProductFacility"/>
+    </moqui.entity.feed.DataFeed>
+</entity-facade-xml>

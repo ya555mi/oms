@@ -194,4 +194,46 @@
         </actions>
     </service>
 
+    <service verb="update" noun="ProductInventory" authenticate="anonymous-all">
+        <description>
+            The service will update the inventory counts for a product at a facility based on the
+            availableToPromiseDiff from Asset Detail, taking in consideration the minimum stock value
+            if existing.
+        </description>
+        <in-parameters>
+            <parameter name="assetId" required="true"/>
+            <parameter name="productId"/>
+            <parameter name="availableToPromiseDiff" type="BigDecimal"/>
+        </in-parameters>
+        <actions>
+            <!-- Find Asset, this is needed to get the facilityId for which product's inv is updated -->
+            <entity-find entity-name="mantle.product.asset.Asset" list="assetList">
+                <econdition field-name="assetId"/>
+                <econdition field-name="assetTypeEnumId" value="AstTpInventory"/>
+            </entity-find>
+
+            <if condition="assetList">
+                <!-- Find Product Facility -->
+                <entity-find-one entity-name="mantle.facility.ProductFacility" value-field="productFacility" for-update="true">
+                    <field-map field-name="productId"/>
+                    <field-map field-name="facilityId" from="assetList.first?.facilityId"/>
+                </entity-find-one>
+
+                <if condition="!productFacility">
+                    <return type="warning" message="Product Facility not found for product ${productId} and facility ${assetList.first?.facilityId}, not updating inventory counts."/>
+                </if>
+
+                <set field="minimumStock" from="productFacility ? productFacility.minimumStock : 0" type="Integer"/>
+
+                <!-- lastInventoryCount is the latest inventory count for the product at a facility -->
+                <set field="productFacility.lastInventoryCount" from="(productFacility.lastInventoryCount ?: 0.0) + availableToPromiseDiff"/>
+
+                <!-- computedLastInventoryCount is the inventory excluding the minimum stock if set in the Product Facility -->
+                <set field="productFacility.computedLastInventoryCount" from="minimumStock ? productFacility.lastInventoryCount - minimumStock : productFacility.lastInventoryCount"/>
+
+                <!-- Update the inventory counts in Product Facility-->
+                <entity-update value-field="productFacility"/>
+            </if>
+        </actions>
+    </service>
 </services>
