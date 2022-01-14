@@ -33,7 +33,7 @@
     </resource>
 
     <resource name="products">
-        <method type="put"><service name="co.hotwax.oms.ProductServices.store#ProductRestImpl"/></method>
+        <method type="put"><service name="co.hotwax.oms.ProductServices.store#Product"/></method>
         <method type="get"><service name="co.hotwax.oms.ProductServices.find#Products"/></method>
         <id name="productId">
             <method type="get"><service name="co.hotwax.oms.ProductServices.find#Products"/></method>

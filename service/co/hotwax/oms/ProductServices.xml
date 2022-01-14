@@ -101,7 +101,13 @@
             </iterate>
         </actions>
     </service>
-    <service verb="store" noun="ProductInterface" type="interface">
+
+    <!-- Create/Update Product -->
+    <service verb="store" noun="Product">
+        <description>
+            Store (create or update) a product.
+            Also accepts the list price and product features as applicable.
+        </description>
         <in-parameters>
             <parameter name="productId">
                 <description>The unique ID of the product in OMS.</description>
@@ -155,38 +161,6 @@
                 <description>The unique SKU of the product.</description>
             </parameter>
         </out-parameters>
-    </service>
-
-    <!-- Wrapper service for store product API end-point-->
-    <service verb="store" noun="ProductRestImpl">
-        <description>
-            Creates a new product. Accepts the list price and product features as applicable.
-            If product's SKU is existing in the system, the API will update the product information.
-        </description>
-        <implements service="co.hotwax.oms.ProductServices.store#ProductInterface"/>
-        <actions>
-            <!-- get ProductStore ID from ProductStoreSetting of hostname-->
-            <service-call name="co.hotwax.oms.StoreServices.get#ProductStoreIdFromHostName"
-                    in-map="[requestHostName:ec.web?.getHostName(false) ?: 'localhost']" out-map="productStoreIdContext"/>
-            <set field="defaultProductStoreId" from="productStoreIdContext?.productStoreId"/>
-
-            <!-- Store Product -->
-            <service-call name="co.hotwax.oms.ProductServices.store#Product" out-map="context"
-                    in-map="context + [productStoreId: defaultProductStoreId]"/>
-
-        </actions>
-    </service>
-
-    <!-- Create/Update Product -->
-    <service verb="store" noun="Product">
-        <description>
-            Store (create or update) a product.
-            Also accepts the list price and product features as applicable.
-        </description>
-        <implements service="co.hotwax.oms.ProductServices.store#ProductInterface"/>
-        <in-parameters>
-            <parameter name="productStoreId" required="true"/>
-        </in-parameters>
         <actions>
             <!-- Validate features list -->
             <iterate list="features" entry="feature">
