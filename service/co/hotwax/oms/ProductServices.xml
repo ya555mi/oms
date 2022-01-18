@@ -116,7 +116,7 @@
                 <description>The unique SKU of the product.</description>
             </parameter>
             <parameter name="isVirtual" type="Boolean" default="false">
-                <description>Set to true for variant product. Defaults to false.</description>
+                <description>Set to true for virtual product. Defaults to false for variant product.</description>
             </parameter>
             <parameter name="parentProductSku">
                 <description>The unique SKU for the product's parent product.</description>
