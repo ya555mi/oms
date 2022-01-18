@@ -101,10 +101,25 @@
             </iterate>
         </actions>
     </service>
-    <service verb="store" noun="ProductInterface" type="interface">
+
+    <!-- Create/Update Product -->
+    <service verb="store" noun="Product">
+        <description>
+            Store (create or update) a product.
+            Also accepts the list price and product features as applicable.
+        </description>
         <in-parameters>
-            <parameter name="sku" required="true">
+            <parameter name="productId">
+                <description>The unique ID of the product in OMS.</description>
+            </parameter>
+            <parameter name="sku">
                 <description>The unique SKU of the product.</description>
+            </parameter>
+            <parameter name="isVirtual" type="Boolean" default="false">
+                <description>Set to true for virtual product. Defaults to false for variant product.</description>
+            </parameter>
+            <parameter name="parentProductSku">
+                <description>The unique SKU for the product's parent product.</description>
             </parameter>
             <parameter name="productName" required="true">
                 <description>The name of the product.</description>
@@ -132,6 +147,10 @@
                     </parameter>
                 </parameter>
             </parameter>
+            <parameter name="identifications" type="Map">
+                <description>The identifiers for the product as key-value pairs.
+                    eg. {"identificationTypeId1":"value1","identificationTypeId2":"value2"}</description>
+            </parameter>
         </in-parameters>
         <out-parameters>
             <!-- Returning Product Id and SKU -->
@@ -142,58 +161,18 @@
                 <description>The unique SKU of the product.</description>
             </parameter>
         </out-parameters>
-    </service>
-
-    <!-- Wrapper service for store product API end-point-->
-    <service verb="store" noun="ProductRestImpl">
-        <description>
-            Creates a new product. Accepts the list price and product features as applicable.
-            If product's SKU is existing in the system, the API will update the product information.
-        </description>
-        <implements service="co.hotwax.oms.ProductServices.store#ProductInterface"/>
-        <actions>
-            <!-- get ProductStore ID from ProductStoreSetting of hostname-->
-            <service-call name="co.hotwax.oms.StoreServices.get#ProductStoreIdFromHostName"
-                    in-map="[requestHostName:ec.web.getHostName(false)]" out-map="productStoreIdContext"/>
-            <set field="defaultProductStoreId" from="productStoreIdContext?.productStoreId"/>
-
-            <!-- Store Product -->
-            <service-call name="co.hotwax.oms.ProductServices.store#Product" out-map="context"
-                    in-map="context + [productStoreId: defaultProductStoreId]"/>
-
-        </actions>
-    </service>
-
-    <!-- Create/Update Product -->
-    <service verb="store" noun="Product">
-        <description>
-            Store (create or update) a product.
-            Also accepts the list price and product features as applicable.
-        </description>
-        <implements service="co.hotwax.oms.ProductServices.store#ProductInterface"/>
-        <in-parameters>
-            <parameter name="productStoreId" required="true"/>
-        </in-parameters>
         <actions>
             <!-- Validate features list -->
             <iterate list="features" entry="feature">
                 <if condition="!feature.description || !feature.type">
                     <message error="true">Field cannot be empty for {description, type} in the features.</message>
                 </if>
-                <entity-find-count entity-name="moqui.basic.Enumeration" count-field="featureTypeCount" cache="true">
-                    <econdition field-name="enumId" from="feature.type"/>
-                    <econdition field-name="enumTypeId" value="ProductFeatureType"/>
-                </entity-find-count>
-                <if condition="featureTypeCount == 0">
-                    <!-- NOTE: Added the allowed values for color and size types in the message, to update this as per need in the future. -->
-                    <message error="true">Invalid value for feature type: ${feature.type}. Allowed values: ['PftSize', 'PftColor']</message>
-                </if>
             </iterate>
             <check-errors/>
 
-            <!-- Find Product by SKU -->
+            <!-- Find if product is existing -->
             <entity-find entity-name="mantle.product.Product" list="productList" for-update="true">
-                <econdition field-name="pseudoId" from="sku"/>
+                <econdition field-name="productId"/>
             </entity-find>
             <set field="product" from="productList ? productList[0] : null"/>
 
@@ -204,13 +183,75 @@
                     <set field="product.productName" from="productName"/>
                     <set field="product.description" from="description"/>
                     <service-call name="update#mantle.product.Product" in-map="product"/>
+
+                    <!-- Handling added for product assoc records if variant product -->
+                    <if condition="!isVirtual">
+                        <!-- Get Parent Product Id -->
+                        <entity-find entity-name="mantle.product.Product" list="parentProduct">
+                            <econdition field-name="pseudoId" from="parentProductSku"/>
+                        </entity-find>
+                        <if condition="!parentProduct">
+                            <return error="true" message="Parent product not found for the product sku ${sku}."/>
+                        </if>
+                        <set field="parentProductId" from="parentProduct.first?.productId"/>
+
+                        <!-- Check if Product Assoc record existing-->
+                        <entity-find entity-name="mantle.product.ProductAssoc" list="pasList">
+                            <econdition field-name="productId" from="parentProductId"/>
+                            <econdition field-name="toProductId" from="product.productId"/>
+                            <econdition field-name="productAssocTypeEnumId" value="PatVariant"/>
+                            <date-filter/>
+                        </entity-find>
+
+                        <if condition="!pasList">
+                            <!-- Create the product assoc for variant product -->
+                            <service-call name="create#mantle.product.ProductAssoc"
+                                    in-map="[productId:parentProductId, toProductId:productId,
+                                    productAssocTypeEnumId:'PatVariant', fromDate:ec.user.nowTimestamp]"/>
+                        </if>
+                    </if>
                 </then>
                 <else>
-                    <service-call name="create#mantle.product.Product" out-map="productOut"
-                            in-map="[pseudoId:sku, productTypeEnumId:'PtAsset', productName:productName,
-                            description:description, assetTypeEnumId:'AstTpInventory',
-                            assetClassEnumId:'AsClsInventoryFin']"/>
-                    <set field="productId" from="productOut.productId"/>
+                    <!-- Handling of virtual/variant products creation-->
+                    <if condition="isVirtual">
+                        <then>
+                            <!-- Creating virtual product -->
+                            <service-call name="create#mantle.product.Product" out-map="productOut"
+                                    in-map="[pseudoId:sku, productName:productName, description:description,
+                                    productTypeEnumId:'PtVirtual']"/>
+                            <set field="productId" from="productOut.productId"/>
+                        </then>
+                        <else>
+                            <!-- Creating variant product -->
+                            <service-call name="create#mantle.product.Product" out-map="productOut"
+                                    in-map="[pseudoId:sku, productName:productName, description:description,
+                                    assetTypeEnumId:'AstTpInventory', assetClassEnumId:'AsClsInventoryFin',
+                                    productTypeEnumId:'PtAsset']"/>
+                            <set field="productId" from="productOut.productId"/>
+
+                            <!--Handling of parentProductSku parameter-->
+                            <if condition="!parentProductSku">
+                                <return error="true" message="ParentProductSku is missing for the variant product sku, ${sku}."/>
+                            </if>
+
+                            <entity-find entity-name="mantle.product.Product" list="parentProduct">
+                                <econdition field-name="pseudoId" from="parentProductSku"/>
+                            </entity-find>
+
+                            <if condition="!parentProduct">
+                                <!-- If no record found for the parent product, then create a new one -->
+                                <!-- Note: This is done to create virtual product record with minimal details; other product
+                                 details will be updated for it once the create request comes for the virtual product  -->
+                                <service-call name="create#mantle.product.Product" out-map="parentProductOut"
+                                        in-map="[pseudoId:parentProductSku, productTypeEnumId:'PtVirtual']"/>
+                            </if>
+
+                            <!--Handling the creation of product assoc for variant product-->
+                            <service-call name="create#mantle.product.ProductAssoc"
+                                    in-map="[productId:parentProduct ? parentProduct.first.productId : parentProductOut.productId,
+                                    toProductId:productId, productAssocTypeEnumId:'PatVariant', fromDate:ec.user.nowTimestamp]"/>
+                        </else>
+                    </if>
                 </else>
             </if>
 
@@ -255,16 +296,66 @@
                 </if>
             </if>
 
-            <!-- Handling Product Features -->
-            <iterate list="features" entry="productFeature">
-                <!-- Using OOTB service for creating Product Features, which includes:
-                    1. check for existing features,
-                    2. Creates ProductFeature if not existing, and
-                    3. Applies the features to the Product -->
-                <service-call name="mantle.product.ProductServices.create#ProductFeature" out-map="context"
-                              in-map="[productId:productId, description:productFeature.description,
-                        productFeatureTypeEnumId:productFeature.type, ownerPartyId:'_NA_']"/>
-            </iterate>
+            <!-- Handling Product Features for the variant product -->
+            <!-- Note: This will handle the association of features for both virtual and variant product -->
+            <if condition="!isVirtual &amp;&amp; features">
+                <iterate list="features" entry="productFeature">
+                    <!-- Check if the product feature type is existing, if not create new type for it -->
+                    <entity-find entity-name="moqui.basic.Enumeration" list="featureTypeList" cache="true">
+                        <econdition field-name="description" from="productFeature.type"/>
+                        <econdition field-name="enumTypeId" value="ProductFeatureType"/>
+                    </entity-find>
+                    <set field="featureType" from="featureTypeList?.first"/>
+
+                    <if condition="!featureType">
+                        <service-call name="create#moqui.basic.Enumeration" out-map="featureType"
+                                in-map="[description:productFeature.type, enumTypeId:'ProductFeatureType']"/>
+                    </if>
+
+                    <!-- Get productId for the virtual product -->
+                    <entity-find-one entity-name="mantle.product.Product" value-field="virtualProduct">
+                        <field-map field-name="pseudoId" from="parentProductSku"/>
+                    </entity-find-one>
+
+                    <!-- Using OOTB service for creating Product Features, which includes:
+                        1. check for existing features,
+                        2. Creates ProductFeature if not existing, and
+                        3. Applies the features to the Product -->
+
+                    <!-- Features for Virtual Product -->
+                    <service-call name="mantle.product.ProductServices.create#ProductFeature" out-map="context"
+                            in-map="[productId:virtualProduct.productId, description:productFeature.description,
+                            applTypeEnumId:'PfatSelectable', productFeatureTypeEnumId:featureType.enumId,
+                            ownerPartyId:'_NA_']"/>
+
+                    <!-- Features for Variant Product -->
+                    <service-call name="mantle.product.ProductServices.create#ProductFeature" out-map="context"
+                            in-map="[productId:productId, description:productFeature.description,
+                            productFeatureTypeEnumId:featureType.enumId, ownerPartyId:'_NA_']"/>
+                </iterate>
+            </if>
+
+            <!-- Handling product identifications -->
+            <if condition="identifications">
+                <iterate list="identifications" key="idType" entry="value">
+                    <!-- Check if enumeration record exist for product identification -->
+                    <entity-find entity-name="moqui.basic.Enumeration" list="identificationTypeList" cache="true">
+                        <econdition field-name="enumId" from="idType"/>
+                        <econdition field-name="enumTypeId" value="ProductIdentificationType"/>
+                    </entity-find>
+                    <set field="identificationType" from="identificationTypeList?.first"/>
+
+                    <!-- If enumId not exist for the product identification, then create new one -->
+                    <if condition="!identificationType">
+                        <service-call name="create#moqui.basic.Enumeration"
+                                in-map="[enumId:idType, enumTypeId:'ProductIdentificationType']"/>
+                    </if>
+
+                    <!-- Create/Update product identification -->
+                    <service-call name="store#mantle.product.ProductIdentification"
+                            in-map="[productId:productId, productIdTypeEnumId:idType, idValue:value]"/>
+                </iterate>
+            </if>
 
             <!-- Clear the messages if success -->
             <!-- This is done to avoid warning messages of create#ProductFeature in the response -->
