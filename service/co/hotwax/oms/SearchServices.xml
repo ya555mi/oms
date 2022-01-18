@@ -92,4 +92,57 @@
             </iterate>
         </actions>
     </service>
+
+    <service verb="search" noun="Document">
+        <description>
+            The service will perform search on the provided elastic index name.
+        </description>
+        <in-parameters>
+            <parameter name="indexName" required="true"/>
+            <parameter name="_source_include"/>
+            <parameter name="_source_exclude"/>
+            <parameter name="from"/>
+            <parameter name="request"/>
+            <parameter name="size"/>
+            <parameter name="sort"/>
+            <parameter name="clusterName" default-value="default"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="took"/>
+            <parameter name="timed_out"/>
+            <parameter name="_shards"/>
+            <parameter name="hits"/>
+            <parameter name="aggregations"/>
+        </out-parameters>
+        <actions>
+            <script><![CDATA[
+                import groovy.json.JsonSlurper
+                try {
+                def Map params = [:]
+                if (request) params.putAll((Map) new  JsonSlurper().parseText(URLDecoder.decode(request)))
+                if (_source_include || _source_exclude) {
+                    Map sourceMap = [:];
+                    if (_source_include) sourceMap.put("includes", _source_include.split(",") as List);
+                    if (_source_exclude) sourceMap.put("excludes", _source_exclude.split(",") as List)
+                    params.put("_source", sourceMap);
+                }
+                if (from) params.put("from", from)
+                if (size) params.put("size", size)
+                if (sort) {
+                    def sortFields = sort.split(":");
+                    def sortBy = sortFields[0];
+                    def sortMap = [:];
+                    def sortOrder = (sortFields.length > 1)?sortFields[1]: "asc";
+                    sortMap.put(sortBy, sortOrder);
+                    params.put("sort", sortMap);
+                }
+                def elasticClient = ec.factory.elastic.getClient(clusterName)
+                def Map resultMap = elasticClient.search(indexName, params)
+                context.putAll(resultMap)
+                } catch (Exception e) {
+                    ec.logger.error("Error in ElasticSearch : ${e.getMessage()}")
+                }
+            ]]></script>
+        </actions>
+    </service>
 </services>

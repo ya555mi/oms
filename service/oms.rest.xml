@@ -7,6 +7,13 @@
     <resource name="lookup" description="Lookup from various entities by ID">
         <method type="get"><service name="mantle.GeneralServices.lookup#ById"/></method>
     </resource>
+
+    <resource name="search" require-authentication="anonymous-view">
+        <!-- TODO check for passing dynamic values in resource name to perform search on single
+                end point like /_search/store or /_search/product_inventory -->
+        <!-- For now added indexName parameter in service to identify the index to search on -->
+        <method type="get"><service name="co.hotwax.oms.SearchServices.search#Document"/></method>
+    </resource>
     
     <resource name="orders">
         <method type="get"><service name="co.hotwax.oms.OrderServices.find#Orders"/></method>
