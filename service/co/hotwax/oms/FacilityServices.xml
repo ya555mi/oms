@@ -2,14 +2,20 @@
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
 
     <!-- Create Facility -->
-    <service verb="create" noun="Facility">
+    <service verb="store" noun="Facility">
         <description>
-            Allows a fulfillment location to be created with basic location data.
-            Also creates the primary address for the location if provided in the request.
+            Store (create/update) the fulfillment location with basic location and address data.
+            The service will update the facility based on the provided facilityId, else will create
+            the new fulfillment location.
         </description>
         <in-parameters>
-            <parameter name="locationId" required="true">
-                <description>The unique ID of the fulfillment location in the external system.</description>
+            <parameter name="facilityId">
+                <description>The unique ID of the fulfillment location in OMS. If not provided in the
+                    request, the system will auto generate the unqiue facilityId.</description>
+            </parameter>
+            <parameter name="locationId">
+                <description>The unique ID of the fulfillment location in the external system. If not
+                    provided in the request, this will be set as facilityId in the system.</description>
             </parameter>
             <parameter name="locationName" required="true">
                 <description>The name of the fulfillment location.</description>
@@ -17,7 +23,6 @@
             <parameter name="locationType" default-value="FcTpRetailStore">
                 <description>The type of the fulfillment location.</description>
             </parameter>
-            <!-- TODO discuss the use of ownerPartyId field -->
             <parameter name="ownerPartyId">
                 <description>The ID of the vendor organization for the fulfillment location.</description>
             </parameter>
@@ -31,33 +36,58 @@
                 <description>The city where the address is located in.</description>
             </parameter>
             <parameter name="stateProvinceGeoId">
-                <description>The state code where the address is located in.</description>
+                <description>The ID of the state code where the address is located in.</description>
             </parameter>
             <parameter name="countryGeoId">
-                <description>The country code for the address.</description>
+                <description>The ID of the country code for the address.</description>
             </parameter>
             <parameter name="postalCode">
                 <description>The postal code for the address.</description>
             </parameter>
+            <parameter name="latitude" type="BigDecimal">
+                <description>The geographic coordinate representing the latitude for the address.</description>
+            </parameter>
+            <parameter name="longitude" type="BigDecimal">
+                <description>The geographic coordinate representing the longitude for the address.</description>
+            </parameter>
+            <parameter name="contactNumber">
+                <description>The contact number for the fulfillment location.</description>
+            </parameter>
         </in-parameters>
         <out-parameters>
+            <parameter name="facilityId">
+                <description>The unique ID of the fulfillment location in OMS.</description>
+            </parameter>
             <parameter name="locationId">
                 <description>The unique ID of the fulfillment location in the external system.</description>
             </parameter>
-            <parameter name="facilityId">
-                <description>The unique ID generated for the fulfillment location in the internal system.</description>
-            </parameter>
         </out-parameters>
         <actions>
-            <!-- Using OOTB create#Facility -->
-            <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="context"
-                    in-map="context + [pseudoId:locationId, facilityName:locationName,
-                    facilityTypeEnumId:locationType]"/>
+            <!-- Create/Update Facility -->
+            <!-- Check if facility existing -->
+            <entity-find entity-name="mantle.facility.Facility" list="facilityList">
+                <econdition field-name="facilityId"/>
+            </entity-find>
 
-            <!-- Creating default pick location for the facility -->
-            <service-call name="mantle.facility.FacilityServices.create#FacilityLocation" out-map="context"
-                    in-map="[facilityId:facilityId, locationSeqId:'DEFAULT_PICK_LOC',
-                    locationTypeEnumId:'FltPick']"/>
+            <if condition="!facilityList.isEmpty()"><then>
+                <set field="facilityId" from="facilityList.first?.facilityId"/>
+                <!-- Using OOTB update#Facility -->
+                <service-call name="mantle.facility.FacilityServices.update#Facility" out-map="facilityOut"
+                        in-map='context + [pseudoId:locationId, facilityId:facilityId,
+                        facilityName:locationName, facilityTypeEnumId:locationType]'/>
+            </then><else>
+                <!-- Using OOTB create#Facility -->
+                <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="facilityOut"
+                        in-map='context + [pseudoId:locationId, facilityName:locationName,
+                        facilityTypeEnumId:locationType]'/>
+
+                <!-- Creating default pick location when new facility created -->
+                <service-call name="mantle.facility.FacilityServices.create#FacilityLocation" out-map="context"
+                        in-map="[facilityId:facilityOut?.facilityId, locationSeqId:'DEFAULT_PICK_LOC',
+                        locationTypeEnumId:'FltPick']"/>
+                <set field="facilityId" from="facilityOut.facilityId"/>
+            </else>
+            </if>
         </actions>
     </service>
 
