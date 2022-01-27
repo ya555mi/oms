@@ -7,6 +7,7 @@
             Sets the total inventory count for a product at a fulfillment location.
             This requires either productId or SKU, either locationId or facilityId and available quantity of the product.
         </description>
+        <implements service="mantle.product.AssetServices.record#PhysicalInventoryQuantity" required="false"/>
         <in-parameters>
             <parameter name="productId">
                 <description>The ID of the product in the system.</description>
@@ -23,22 +24,6 @@
             <parameter name="quantity" type="Integer" required="true">
                 <description>The total quantity of the product available at the fulfillment location.</description>
             </parameter>
-            <parameter name="varianceReasonEnumId">
-                <description>The ID for the reason to record inventory for the product.</description>
-            </parameter>
-            <parameter name="physicalInventoryId"/>
-            <parameter name="physicalInventoryCountId"/>
-            <parameter name="partyId" default="ec.user.userAccount?.partyId"/>
-            <parameter name="physicalInventoryDate" type="Timestamp" default="ec.user.nowTimestamp"/>
-            <parameter name="comments"/>
-            <auto-parameters entity-name="mantle.product.asset.Asset" include="nonpk">
-                <exclude field-name="classEnumId"/>
-                <exclude field-name="quantityOnHandTotal"/>
-                <exclude field-name="availableToPromiseTotal"/>
-                <exclude field-name="hasQuantity"/>
-                <exclude field-name="receivedDate"/>
-                <exclude field-name="acquiredDate"/>
-            </auto-parameters>
         </in-parameters>
         <out-parameters>
             <parameter name="productId">

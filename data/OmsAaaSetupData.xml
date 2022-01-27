@@ -16,4 +16,6 @@
     <moqui.basic.Enumeration description="Retail Store" enumCode="STORE" enumId="FcTpRetailStore" enumTypeId="FacilityType"/>
     <moqui.basic.Enumeration description="Warehouse" enumCode="WAREHOUSE" enumId="FcTpWarehouse" enumTypeId="FacilityType"/>
 
+    <!-- Store Setting for Minimum Stock Quantity for products -->
+    <moqui.basic.Enumeration description="Minimum Stock Level" enumId="PsstMinimumStockLevel" enumTypeId="ProductStoreSettingType"/>
 </entity-facade-xml>
