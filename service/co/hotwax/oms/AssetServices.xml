@@ -7,6 +7,7 @@
             Sets the total inventory count for a product at a fulfillment location.
             This requires either productId or SKU, either locationId or facilityId and available quantity of the product.
         </description>
+        <implements service="mantle.product.AssetServices.record#PhysicalInventoryQuantity" required="false"/>
         <in-parameters>
             <parameter name="productId">
                 <description>The ID of the product in the system.</description>
