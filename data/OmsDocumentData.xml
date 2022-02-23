@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <entity-facade-xml type="seed-initial">
 
+    <!-- Added below service call in data file, which will run the create#Mappings service
+        to create the store index, this is needed for the special geo_point type location field.
+        Note: This is added here to run before data document load, else the StoreDataDocument can create
+        the index with default mappings if any facility data loaded as part of the project, and this
+        will return error if create#Mappings service is run manually after the data load. -->
+    <co.hotwax.oms.SearchServices.createMappings clusterName="default"/>
+
     <!-- ========== Store Document Data ========== -->
-    <dataDocuments dataDocumentId="StoreDataDocument" indexName="store" documentName="Store"
+    <dataDocuments dataDocumentId="StoreDataDocument" indexName="store_document" documentName="Store"
             primaryEntityName="mantle.facility.Facility" documentTitle="${facilityId}">
         <fields fieldSeqId="01" fieldPath="facilityId"/>
         <fields fieldSeqId="02" fieldPath="pseudoId" fieldNameAlias="externalId"/>

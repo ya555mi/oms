@@ -49,13 +49,14 @@
             <parameter name="clusterName" default-value="default"/>
         </in-parameters>
         <actions>
+            <set field="indexName" value="store"/>
             <set field="elasticClient" from="ec.factory.elastic.getClient(clusterName)"/>
             <if condition="elasticClient == null">
                 <return type="danger" message="No Elastic Client found, not creating mapping"/>
             </if>
 
             <iterate list="documentList" entry="document">
-                <log level="info" message="Running ${document._index} index service for: ${document.facilityId} "/>
+                <log level="info" message="Running ${indexName} index service for: ${document.facilityId} "/>
 
                 <set field="facilityContactMechs" from="document.contactMechs"/>
                 <if condition="facilityContactMechs">
@@ -84,7 +85,7 @@
 
                 <script><![CDATA[
                     try {
-                        elasticClient.index(document._index, document.facilityId, source)
+                        elasticClient.index(indexName, document.facilityId, source)
                     } catch (Exception e) {
                         ec.message.addError("Error creating index : ${e.getMessage()}")
                     }
