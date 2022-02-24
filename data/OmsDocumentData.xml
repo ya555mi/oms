@@ -9,7 +9,7 @@
     <co.hotwax.oms.SearchServices.createMappings clusterName="default"/>
 
     <!-- ========== Store Document Data ========== -->
-    <dataDocuments dataDocumentId="StoreDataDocument" indexName="store_document" documentName="Store"
+    <dataDocuments dataDocumentId="StoreDataDocument" indexName="store" documentName="Store"
             primaryEntityName="mantle.facility.Facility" documentTitle="${facilityId}">
         <fields fieldSeqId="01" fieldPath="facilityId"/>
         <fields fieldSeqId="02" fieldPath="pseudoId" fieldNameAlias="externalId"/>
