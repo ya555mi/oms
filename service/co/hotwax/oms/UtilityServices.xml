@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
 
-    <!-- Service to get the country code, area code and contact number
-         from given phone number -->
     <service verb="get" noun="ContactNumberMap">
+        <description>
+            Service to get the country code, area code and contact number
+            from a given phone number
+        </description>
         <in-parameters>
             <parameter name="phoneNumber" required="true"/>
             <parameter name="countryGeoId"/>
@@ -19,7 +21,6 @@
             <if condition="countryGeoId"><then>
                 <entity-find-one entity-name="moqui.basic.Geo" value-field="countryGeo">
                     <field-map field-name="geoId" from="countryGeoId"/>
-                    <field-map field-name="geoTypeEnumId" value="GEOT_COUNTRY"/>
                 </entity-find-one>
                 <set field="countryGeoCode" from="countryGeo.geoCodeAlpha2"/>
                 </then>

@@ -72,25 +72,24 @@
             <if condition="contactNumber">
                 <service-call name="co.hotwax.oms.UtilityServices.get#ContactNumberMap"
                         in-map="[phoneNumber:contactNumber, countryGeoId:countryGeoId]"
-                        out-map="resultMap"/>
+                        out-map="contactNumberOut"/>
+                <set field="contactNumberMap" from="contactNumberOut?.contactNumberMap"/>
             </if>
-
             <if condition="!facilityList.isEmpty()"><then>
                 <set field="facilityId" from="facilityList.first?.facilityId"/>
                 <!-- Using OOTB update#Facility -->
                 <service-call name="mantle.facility.FacilityServices.update#Facility" out-map="facilityOut"
                         in-map='context + [pseudoId:locationId, facilityId:facilityId,
                         facilityName:locationName, facilityTypeEnumId:locationType,
-                        countryCode:resultMap.contactNumberMap?.countryCode,
-                        areaCode:resultMap.contactNumberMap?.areaCode, contactNumber:resultMap.
-                        contactNumberMap?.contactNumber]'/>
+                        countryCode:contactNumberMap?.countryCode, areaCode:contactNumberMap?.areaCode,
+                        contactNumber:contactNumberMap?.contactNumber]'/>
             </then><else>
                 <!-- Using OOTB create#Facility -->
                 <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="facilityOut"
                         in-map='context + [pseudoId:locationId, facilityName:locationName,
-                        facilityTypeEnumId:locationType, countryCode:resultMap.contactNumberMap?.countryCode,
-                        areaCode:resultMap.contactNumberMap?.areaCode, contactNumber:resultMap.
-                        contactNumberMap?.contactNumber]'/>
+                        facilityTypeEnumId:locationType, countryCode:contactNumberMap?.countryCode,
+                        areaCode:contactNumberMap?.areaCode,
+                        contactNumber:contactNumberMap?.contactNumber]'/>
 
                 <!-- Creating default pick location when new facility created -->
                 <service-call name="mantle.facility.FacilityServices.create#FacilityLocation" out-map="context"
