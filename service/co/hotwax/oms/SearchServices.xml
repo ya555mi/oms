@@ -58,6 +58,8 @@
                 <log level="info" message="Running ${document._index} index service for: ${document.facilityId} "/>
 
                 <set field="facilityContactMechs" from="document.contactMechs"/>
+                <set field="postalAddress" from="[:]"/>
+                <set field="telecomNumber" from="[:]"/>
                 <if condition="facilityContactMechs">
                     <set field="nowTime" from="new Timestamp(System.currentTimeMillis())"/>
                     <set field="postalAddress" from="facilityContactMechs.find({ 'PostalPrimary'.equals(it.contactMechPurposeId) &amp;&amp; (it.fromDate == null || it.fromDate.compareTo(nowTime) &lt;= 0) &amp;&amp; (it.thruDate == null || it.thruDate.compareTo(nowTime) &gt; 0) })"/>
@@ -65,6 +67,13 @@
                     <set field="telecomNumber" from="facilityContactMechs.find({ 'PhonePrimary'.equals(it.contactMechPurposeId) &amp;&amp; (it.fromDate == null || it.fromDate.compareTo(nowTime) &lt;= 0) &amp;&amp; (it.thruDate == null || it.thruDate.compareTo(nowTime) &gt; 0) })"/>
                 </if>
 
+                <if condition="telecomNumber?.contactNumber"><then>
+                    <set field="storePhone" from="'+'+(telecomNumber.phoneCountryCode ? telecomNumber.phoneCountryCode+' ': '') + (telecomNumber.areaCode ? telecomNumber.areaCode+'-': '') + (telecomNumber.contactNumber ?: '')"/>
+                </then><else>
+                    <set field="storePhone" value="null"/>
+                </else>
+                </if>
+                
                 <set field="source" from="[storeCode:document.facilityId,
                         storeName:document.storeName,
                         externalId:document.externalId,
@@ -76,7 +85,7 @@
                         countryCode:postalAddress ? postalAddress.countryCode : null,
                         country:postalAddress ? postalAddress.country : null,
                         postalCode:postalAddress ? postalAddress.postalCode : null,
-                        storePhone:telecomNumber ? telecomNumber.storePhone : null]"/>
+                        storePhone: storePhone]"/>
 
                 <if condition="postalAddress &amp;&amp; postalAddress.latitude &amp;&amp; postalAddress.longitude">
                     <set field="source.location" from="[lat:postalAddress.latitude, lon:postalAddress.longitude]"/>
