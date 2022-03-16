@@ -4,7 +4,7 @@
     <service verb="get" noun="ContactNumberMap">
         <description>
             Service to get the country code, area code and contact number
-            from a given phone number
+            from a given phone number.
         </description>
         <in-parameters>
             <parameter name="phoneNumber" required="true"/>
@@ -18,6 +18,7 @@
             </parameter>
         </out-parameters>
         <actions>
+            <!-- If countryGeoId is provided, get the geoCodeAlpha2 from Geo using the countryGeoId -->
             <if condition="countryGeoId"><then>
                 <entity-find-one entity-name="moqui.basic.Geo" value-field="countryGeo">
                     <field-map field-name="geoId" from="countryGeoId"/>
