@@ -71,12 +71,9 @@
                     <set field="telecomNumber" from="facilityContactMechs.find({ 'PhonePrimary'.equals(it.contactMechPurposeId) &amp;&amp; (it.fromDate == null || it.fromDate.compareTo(nowTime) &lt;= 0) &amp;&amp; (it.thruDate == null || it.thruDate.compareTo(nowTime) &gt; 0) })"/>
                 </if>
 
-                <!-- Check if the telecomNumber has contactNumber -->
                 <if condition="telecomNumber?.contactNumber"><then>
-                    <!-- If contact number is present, the phoneCountryCode and areaCode
-                        are also present then storePhone for example will be set as: +1 408-445-8774
-                        where 1 is the phoneCountryCode, 408 is the areaCode and 445-8774
-                        is the contactNumber -->
+                    <!-- Sample phone number as per below format will be, +1 408-445-8774
+                        Here, 1 is phoneCountryCode, 408 is areaCode and 445-8774 is contactNumber -->
                     <set field="storePhone" from="'+'+(telecomNumber.phoneCountryCode ? telecomNumber.phoneCountryCode+' ': '') + (telecomNumber.areaCode ? telecomNumber.areaCode+'-': '') + (telecomNumber.contactNumber ?: '')"/>
                 </then><else>
                     <!-- If the contactNumber is not present, the storePhone is set to null.
