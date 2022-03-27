@@ -25,12 +25,14 @@
         <fields fieldSeqId="11" fieldPath="contactMechs:contactMech:postalAddress:countryGeo:geoCodeAlpha3" fieldNameAlias="countryCode"/>
         <fields fieldSeqId="12" fieldPath="contactMechs:contactMech:postalAddress:countryGeo:geoName" fieldNameAlias="country"/>
         <fields fieldSeqId="13" fieldPath="contactMechs:contactMech:telecomNumber:contactNumber" fieldNameAlias="storePhone"/>
-        <fields fieldSeqId="14" fieldPath="contactMechs:contactMechPurposeId"/>
-        <fields fieldSeqId="15" fieldPath="contactMechs:fromDate"/>
-        <fields fieldSeqId="16" fieldPath="contactMechs:thruDate"/>
+        <fields fieldSeqId="14" fieldPath="contactMechs:contactMech:telecomNumber:areaCode"/>
+        <fields fieldSeqId="15" fieldPath="contactMechs:contactMech:telecomNumber:countryCode" fieldNameAlias="phoneCountryCode"/>
+        <fields fieldSeqId="16" fieldPath="contactMechs:contactMechPurposeId"/>
+        <fields fieldSeqId="17" fieldPath="contactMechs:fromDate"/>
+        <fields fieldSeqId="18" fieldPath="contactMechs:thruDate"/>
 
-        <fields fieldSeqId="17" fieldPath="contactMechs:postalAddress:geoPoint:latitude"/>
-        <fields fieldSeqId="18" fieldPath="contactMechs:postalAddress:geoPoint:longitude"/>
+        <fields fieldSeqId="19" fieldPath="contactMechs:postalAddress:geoPoint:latitude"/>
+        <fields fieldSeqId="20" fieldPath="contactMechs:postalAddress:geoPoint:longitude"/>
     </dataDocuments>
 
     <!-- Search Data Feed for Stores -->

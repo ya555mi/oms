@@ -58,6 +58,12 @@
                 <log level="info" message="Running ${document._index} index service for: ${document.facilityId} "/>
 
                 <set field="facilityContactMechs" from="document.contactMechs"/>
+
+                <!-- initializing the maps as they retain the values from the
+                     the previous document in the loop -->
+                <set field="postalAddress" from="[:]"/>
+                <set field="telecomNumber" from="[:]"/>
+
                 <if condition="facilityContactMechs">
                     <set field="nowTime" from="new Timestamp(System.currentTimeMillis())"/>
                     <set field="postalAddress" from="facilityContactMechs.find({ 'PostalPrimary'.equals(it.contactMechPurposeId) &amp;&amp; (it.fromDate == null || it.fromDate.compareTo(nowTime) &lt;= 0) &amp;&amp; (it.thruDate == null || it.thruDate.compareTo(nowTime) &gt; 0) })"/>
@@ -76,6 +82,8 @@
                         countryCode:postalAddress ? postalAddress.countryCode : null,
                         country:postalAddress ? postalAddress.country : null,
                         postalCode:postalAddress ? postalAddress.postalCode : null,
+                        phoneCountryCode:telecomNumber ? telecomNumber.phoneCountryCode : null,
+                        areaCode:telecomNumber ? telecomNumber.areaCode : null,
                         storePhone:telecomNumber ? telecomNumber.storePhone : null]"/>
 
                 <if condition="postalAddress &amp;&amp; postalAddress.latitude &amp;&amp; postalAddress.longitude">
