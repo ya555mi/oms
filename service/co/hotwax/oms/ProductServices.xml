@@ -255,6 +255,13 @@
                 </else>
             </if>
 
+            <!-- Handling the association of Product Store with Product -->
+            <if condition="productStoreId">
+                <!-- Create/Update ProductStoreProduct -->
+                <service-call name="store#mantle.product.store.ProductStoreProduct"
+                        in-map="[productStoreId:productStoreId, productId:productId]"/>
+            </if>
+
             <!-- Handling Product Price -->
             <if condition="listPrice">
                 <!-- Get priceUomId in the system for the incoming priceUom abbreviated value -->
