@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/service-definition-2.1.xsd">
+
+    <service verb="get" noun="ContactNumberMap">
+        <description>
+            Service to get the country code, area code and contact number
+            from a given phone number.
+        </description>
+        <in-parameters>
+            <parameter name="phoneNumber" required="true"/>
+            <parameter name="countryGeoId"/>
+        </in-parameters>
+        <out-parameters>
+            <parameter name="contactNumberMap" type="Map">
+                <parameter name="areaCode"/>
+                <parameter name="countryCode"/>
+                <parameter name="contactNumber"/>
+            </parameter>
+        </out-parameters>
+        <actions>
+            <!-- If countryGeoId is provided, get the geoCodeAlpha2 from Geo using the countryGeoId -->
+            <if condition="countryGeoId"><then>
+                <entity-find-one entity-name="moqui.basic.Geo" value-field="countryGeo">
+                    <field-map field-name="geoId" from="countryGeoId"/>
+                </entity-find-one>
+                <set field="countryGeoCode" from="countryGeo.geoCodeAlpha2"/>
+                </then>
+                <else>
+                <!-- TODO: For now using the default value for countryGeoCode as US.
+                     Discuss the right way to set the country geo code if countryGeoId
+                     is not coming in the request -->
+                    <set field="countryGeoCode" value="US"/>
+                </else>
+            </if>
+            <script>
+                import com.google.i18n.phonenumbers.NumberParseException
+                import com.google.i18n.phonenumbers.PhoneNumberUtil
+                import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
+
+                try {
+            </script>
+
+            <set field="phoneUtil" from="PhoneNumberUtil.getInstance()"/>
+            <set field="phNumber" from="phoneUtil.parse(phoneNumber, countryGeoCode)"/>
+            <if condition="(phoneUtil.isValidNumber(phNumber) || phoneUtil.isPossibleNumber(phNumber))"><then>
+                <set field="nationalSignificantNumber" from="phoneUtil.getNationalSignificantNumber(phNumber)"/>
+                <set field="areaCodeLength" from="phoneUtil.getLengthOfGeographicalAreaCode(phNumber)"/>
+                <set field="countryCode" from="phNumber.getCountryCode()"/>
+                <if condition="areaCodeLength &gt; 0"><then>
+                    <set field="areaCode" from="nationalSignificantNumber.substring(0, areaCodeLength)"/>
+                    <set field="contactNumber" from="nationalSignificantNumber.substring(areaCodeLength)"/>
+                </then><else>
+                    <set field="areaCode" value=""/>
+                    <set field="contactNumber" from="nationalSignificantNumber"/>
+                </else>
+                </if>
+                <set field="contactNumberMap" from="[areaCode:areaCode, countryCode:countryCode,
+                    contactNumber:contactNumber]"/>
+            </then>
+            <else>
+                    <return error="true" message="Invalid Phone Number: ${phoneNumber}"/>
+            </else>
+            </if>
+            <script>} catch(NumberParseException e) {
+                ec.message.addError("NumberParseException for ${phoneNumber}. "+ e.getMessage()) }
+            </script>
+        </actions>
+    </service>
+
+</services>

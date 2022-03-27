@@ -68,18 +68,28 @@
             <entity-find entity-name="mantle.facility.Facility" list="facilityList">
                 <econdition field-name="facilityId"/>
             </entity-find>
-
+            <!-- If the contact number comes, call the get#ContactNumber service -->
+            <if condition="contactNumber">
+                <service-call name="co.hotwax.oms.UtilityServices.get#ContactNumberMap"
+                        in-map="[phoneNumber:contactNumber, countryGeoId:countryGeoId]"
+                        out-map="contactNumberOut"/>
+                <set field="contactNumberMap" from="contactNumberOut?.contactNumberMap"/>
+            </if>
             <if condition="!facilityList.isEmpty()"><then>
                 <set field="facilityId" from="facilityList.first?.facilityId"/>
                 <!-- Using OOTB update#Facility -->
                 <service-call name="mantle.facility.FacilityServices.update#Facility" out-map="facilityOut"
                         in-map='context + [pseudoId:locationId, facilityId:facilityId,
-                        facilityName:locationName, facilityTypeEnumId:locationType]'/>
+                        facilityName:locationName, facilityTypeEnumId:locationType,
+                        countryCode:contactNumberMap?.countryCode, areaCode:contactNumberMap?.areaCode,
+                        contactNumber:contactNumberMap?.contactNumber]'/>
             </then><else>
                 <!-- Using OOTB create#Facility -->
                 <service-call name="mantle.facility.FacilityServices.create#Facility" out-map="facilityOut"
                         in-map='context + [pseudoId:locationId, facilityName:locationName,
-                        facilityTypeEnumId:locationType]'/>
+                        facilityTypeEnumId:locationType, countryCode:contactNumberMap?.countryCode,
+                        areaCode:contactNumberMap?.areaCode,
+                        contactNumber:contactNumberMap?.contactNumber]'/>
 
                 <!-- Creating default pick location when new facility created -->
                 <service-call name="mantle.facility.FacilityServices.create#FacilityLocation" out-map="context"
